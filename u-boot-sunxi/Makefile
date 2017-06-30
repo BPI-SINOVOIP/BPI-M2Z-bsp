@@ -1128,6 +1128,10 @@ ifneq ($(CONFIG_ARCH_SUNXI),)
 u-boot-sunxi-with-spl.bin: spl/sunxi-spl.bin u-boot.img u-boot.dtb \
 		checkbinman FORCE
 	$(call if_changed,binman)
+#BPI
+	cp -a u-boot-sunxi-with-spl.bin u-boot-bpi-m2-zero-8k.img
+	@rm -f u-boot-bpi-m2-zero-8k.img.gz
+	gzip u-boot-bpi-m2-zero-8k.img
 endif
 
 ifneq ($(CONFIG_TEGRA),)
