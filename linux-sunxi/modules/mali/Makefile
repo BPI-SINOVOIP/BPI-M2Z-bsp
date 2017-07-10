@@ -20,6 +20,7 @@ install: build
 	fi
 
 build:
+	@echo LICHEE_MOD_DIR: $(LICHEE_MOD_DIR)
 	@echo LICHEE_KDIR: $(LICHEE_KDIR)
 	@echo LICHEE_PLATFORM: $(LICHEE_PLATFORM)
 	@echo UMP_ENABLE: $(UMP_ENABLE)
