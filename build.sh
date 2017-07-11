@@ -39,7 +39,7 @@ R="${SD}/BPI-ROOT"
 	#
 	mkdir -p $B/bananapi/${board}/linux
 	cp $BOOT_PACK_P/* $B/bananapi/${board}/linux/
-	cp -a $T/linux-sunxi/arch/arm/boot/uImage $B/bananapi/${board}/linux/uImage
+	cp -a $T/linux-sunxi/arch/arm/boot/zImage $B/bananapi/${board}/linux/zImage
 
 	#
 	## copy files to BPI-ROOT

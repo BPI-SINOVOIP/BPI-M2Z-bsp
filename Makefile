@@ -51,8 +51,6 @@ u-boot: $(U_CONFIG_H)
 	$(Q)$(MAKE) -C u-boot-sunxi all CROSS_COMPILE=$(U_CROSS_COMPILE) -j$J
 
 u-boot-clean:
-	rm -f sunxi-pack/chips/sun8iw7p1/bin/u-boot-sun8iw7p1.bin
-	rm -f u-boot-sunxi/tools/sunxi_env_gen
 	$(Q)$(MAKE) -C u-boot-sunxi CROSS_COMPILE=$(U_CROSS_COMPILE) -j$J distclean
 
 ## linux
