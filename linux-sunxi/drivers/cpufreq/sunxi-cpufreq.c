@@ -431,7 +431,7 @@ static int calibrate_max_cpufreq(void *maxfreq)
     switch(chipid[0]&0xff) {
     case 0x42:      /* H2+ */
     case 0x83:
-        *((unsigned int *)maxfreq) = 1008000000;
+        *((unsigned int *)maxfreq) = 960000000;
         ret = 1;
         break;
     case 0x00:      /* H3 */
