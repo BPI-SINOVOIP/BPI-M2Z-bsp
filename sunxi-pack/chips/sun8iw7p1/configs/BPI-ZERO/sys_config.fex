@@ -438,7 +438,7 @@ di_used = 0
 
 [mmc0_para]
 sdc_used = 1
-sdc_detmode = 1
+sdc_detmode = 3
 sdc_buswidth = 4
 sdc_clk = port:PF02<2><1><2><default>
 sdc_cmd = port:PF03<2><1><2><default>
@@ -508,7 +508,7 @@ smc_sda = port:PA08<2><default><default><default>
 
 [usbc0]
 usb_used = 1
-usb_port_type = 1
+usb_port_type = 2
 usb_detect_type = 0
 usb_id_gpio = port:PL06<0><1><default><default>
 usb_det_vbus_gpio = port:PL06<0><1><default><default>
@@ -523,7 +523,7 @@ usb_regulator_vol = 0
 usb_not_suspend = 0
 
 [usbc1]
-usb_used = 1
+usb_used = 0
 usb_drv_vbus_gpio =
 usb_restrict_gpio =
 usb_host_init_state = 1
@@ -533,7 +533,7 @@ usb_regulator_vol = 0
 usb_not_suspend = 0
 
 [usbc2]
-usb_used = 1
+usb_used = 0
 usb_drv_vbus_gpio =
 usb_restrict_gpio =
 usb_host_init_state = 1
@@ -710,12 +710,20 @@ pmu_gpio0 = port:PL06<1><1><2><1>
 pmu_level0 = 11300
 pmu_level1 = 1100
 max_freq = 1200000000
-min_freq = 648000000
-LV_count = 2
+min_freq = 240000000
+LV_count = 6
 LV1_freq = 1200000000
 LV1_volt = 1300
-LV2_freq = 648000000
+LV2_freq = 1008000000
 LV2_volt = 1300
+LV3_freq = 912000000
+LV3_volt = 1100
+LV4_freq = 648000000
+LV4_volt = 1100
+LV5_freq = 480000000
+LV5_volt = 1100
+LV6_freq = 240000000
+LV6_volt = 1100
 
 [gpu_dvfs_table]
 G_LV_count = 3
