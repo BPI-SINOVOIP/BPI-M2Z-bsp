@@ -290,6 +290,25 @@ static int sunxi_dw_hdmi_read_edid(struct udevice *dev, u8 *buf, int buf_size)
 	return dw_hdmi_read_edid(&priv->hdmi, buf, buf_size);
 }
 
+void sunxi_dw_hdmi_disable(void)
+{
+	struct sunxi_ccm_reg * const ccm =
+		(struct sunxi_ccm_reg *)SUNXI_CCM_BASE;
+	struct sunxi_hdmi_phy * const phy =
+		(struct sunxi_hdmi_phy *)(SUNXI_HDMI_BASE + HDMI_PHY_OFFS);
+
+	printf("%s\n", __func__);
+
+	clrbits_le32(&phy->ctrl, 0x1 << 31);
+	clrbits_le32(&ccm->hdmi_clk_cfg, 0x1 << 31);
+	clrbits_le32(&ccm->ahb_gate1, 0x1 << 11);
+#ifdef CONFIG_SUNXI_GEN_SUN6I
+	clrbits_le32(&ccm->ahb_reset1_cfg, 0x1 << 11);
+#endif
+	//clock_set_pll3(0);
+	
+}
+
 static int sunxi_dw_hdmi_enable(struct udevice *dev, int panel_bpp,
 				const struct display_timing *edid)
 {

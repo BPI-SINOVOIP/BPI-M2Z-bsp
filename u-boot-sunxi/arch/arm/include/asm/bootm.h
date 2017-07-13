@@ -12,6 +12,7 @@
 #define ARM_BOOTM_H
 
 extern void udc_disconnect(void);
+extern void sunxi_dw_hdmi_disable(void);
 
 #if defined(CONFIG_SETUP_MEMORY_TAGS) || \
 		defined(CONFIG_CMDLINE_TAG) || \

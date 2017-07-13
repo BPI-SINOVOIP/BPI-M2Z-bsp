@@ -300,7 +300,8 @@ static void __exit hdmi_module_exit(void)
 
 
 
-late_initcall(hdmi_module_init);
+//late_initcall(hdmi_module_init);
+module_init(hdmi_module_init);
 module_exit(hdmi_module_exit);
 
 MODULE_AUTHOR("tyle");
