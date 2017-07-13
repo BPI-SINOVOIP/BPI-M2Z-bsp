@@ -218,8 +218,41 @@ full_duplex = 1
 manual_cs = 0
 
 [gpio_para]
-gpio_used = 0
-gpio_num = 0
+gpio_used = 1
+gpio_num = 29
+gpio_pin_1 = port:PA12<1><default><default><0>
+gpio_pin_2 = port:PA11<1><default><default><0>
+gpio_pin_3 = port:PA06<1><default><default><0>
+gpio_pin_4 = port:PA01<1><default><default><0>
+gpio_pin_5 = port:PA00<1><default><default><0>
+gpio_pin_6 = port:PA03<1><default><default><0>
+gpio_pin_7 = port:PC00<1><default><default><0>
+gpio_pin_8 = port:PC01<1><default><default><0>
+gpio_pin_9 = port:PC02<1><default><default><0>
+gpio_pin_10 = port:PA19<1><default><default><0>
+gpio_pin_11 = port:PA07<1><default><default><0>
+gpio_pin_12 = port:PA08<1><default><default><0>
+gpio_pin_13 = port:PA09<1><default><default><0>
+gpio_pin_14 = port:PA10<1><default><default><0>
+gpio_pin_15 = port:PA17<1><default><default><0>
+gpio_pin_16 = port:PA13<1><default><default><0>
+gpio_pin_17 = port:PA14<1><default><default><0>
+gpio_pin_18 = port:PA16<1><default><default><0>
+gpio_pin_19 = port:PA15<1><default><default><0>
+gpio_pin_20 = port:PC04<1><default><default><0>
+gpio_pin_21 = port:PA02<1><default><default><0>
+gpio_pin_22 = port:PC03<1><default><default><0>
+gpio_pin_23 = port:PC07<1><default><default><0>
+gpio_pin_24 = port:PA18<1><default><default><0>
+gpio_pin_25 = port:PL02<1><default><default><0>
+gpio_pin_26 = port:PL04<1><default><default><0>
+gpio_pin_27 = port:PA21<1><default><default><0>
+gpio_pin_28 = port:PA20<1><default><default><0>
+gpio_pin_29 = port:PL10<0><default><default><1>
+
+[led_assign]
+normal_led      = "gpio_pin_29"
+;standby_led     = "gpio_pin_10"
 
 [leds_para]
 leds_used = 0
@@ -306,9 +339,9 @@ hdmi_mode_check = 1
 disp_init_enable = 1
 disp_mode = 0
 screen0_output_type = 3
-screen0_output_mode = 5
+screen0_output_mode = 10
 screen1_output_type = 3
-screen1_output_mode = 5
+screen1_output_mode = 10
 fb0_format = 0
 fb0_width = 0
 fb0_height = 0
