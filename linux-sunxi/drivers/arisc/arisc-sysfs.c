@@ -16,7 +16,7 @@ static unsigned int arisc_debug_baudrate = 57600;
 #else
 static unsigned int arisc_debug_baudrate = 115200;
 #endif
-unsigned int arisc_debug_level = 2;
+unsigned int arisc_debug_level = 3;
 
 unsigned int arisc_debug_dram_crc_en = 0;
 static unsigned int arisc_debug_dram_crc_srcaddr = 0x40000000;
