@@ -78,8 +78,8 @@ T:	git git://git.denx.de/u-boot-atmel.git
 F:	arch/arm/mach-at91/
 
 ARM BROADCOM BCM283X
-M:	Stephen Warren <swarren@wwwdotorg.org>
-S:	Maintained
+#M:	Stephen Warren <swarren@wwwdotorg.org>
+S:	Orphaned (Since 2017-07)
 F:	arch/arm/mach-bcm283x/
 F:	drivers/gpio/bcm2835_gpio.c
 F:	drivers/mmc/bcm2835_sdhci.c
@@ -89,6 +89,7 @@ F:	include/dm/platform_data/serial_bcm283x_mu.h
 
 ARM FREESCALE IMX
 M:	Stefano Babic <sbabic@denx.de>
+M:	Fabio Estevam <fabio.estevam@nxp.com>
 S:	Maintained
 T:	git git://git.denx.de/u-boot-imx.git
 F:	arch/arm/cpu/arm1136/mx*/
@@ -132,6 +133,7 @@ F:	arch/arm/mach-rmobile/
 
 ARM ROCKCHIP
 M:	Simon Glass <sjg@chromium.org>
+M:	Philipp Tomsich <philipp.tomsich@theobroma-systems.com>
 S:	Maintained
 T:	git git://git.denx.de/u-boot-rockchip.git
 F:	arch/arm/mach-rockchip/
@@ -219,12 +221,6 @@ S:	Maintained
 F:	arch/arm/cpu/armv8/zynqmp/
 F:	arch/arm/include/asm/arch-zynqmp/
 
-AVR32
-M:	Andreas Bießmann <andreas@biessmann.org>
-S:	Maintained
-T:	git git://git.denx.de/u-boot-avr32.git
-F:	arch/avr32/
-
 BUILDMAN
 M:	Simon Glass <sjg@chromium.org>
 S:	Maintained
@@ -262,6 +258,7 @@ F:	test/dm/
 EFI PAYLOAD
 M:	Alexander Graf <agraf@suse.de>
 S:	Maintained
+T:	git git://github.com/agraf/u-boot.git
 F:	include/efi_loader.h
 F:	lib/efi_loader/
 F:	cmd/bootefi.c
@@ -322,7 +319,7 @@ S:	Maintained
 F:	arch/powerpc/
 
 POWERPC MPC8XX
-M:	Wolfgang Denk <wd@denx.de>
+M:	Christophe Leroy <christophe.leroy@c-s.fr>
 S:	Maintained
 T:	git git://git.denx.de/u-boot-mpc8xx.git
 F:	arch/powerpc/cpu/mpc8xx/

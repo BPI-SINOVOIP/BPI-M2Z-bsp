@@ -5,7 +5,6 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-obj-$(CONFIG_PPC4xx_EMAC) += 4xx_enet.o
 obj-$(CONFIG_ALTERA_TSE) += altera_tse.o
 obj-$(CONFIG_AG7XXX) += ag7xxx.o
 obj-$(CONFIG_ARMADA100_FEC) += armada100_fec.o
@@ -39,6 +38,7 @@ obj-$(CONFIG_LAN91C96) += lan91c96.o
 obj-$(CONFIG_LPC32XX_ETH) += lpc32xx_eth.o
 obj-$(CONFIG_MACB) += macb.o
 obj-$(CONFIG_MCFFEC) += mcffec.o mcfmii.o
+obj-$(CONFIG_MPC8XX_FEC) += mpc8xx_fec.o
 obj-$(CONFIG_MVGBE) += mvgbe.o
 obj-$(CONFIG_MVNETA) += mvneta.o
 obj-$(CONFIG_MVPP2) += mvpp2.o

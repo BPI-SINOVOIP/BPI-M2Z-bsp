@@ -136,7 +136,6 @@ Directory Hierarchy:
 /arch			Architecture specific files
   /arc			Files generic to ARC architecture
   /arm			Files generic to ARM architecture
-  /avr32		Files generic to AVR32 architecture
   /m68k			Files generic to m68k architecture
   /microblaze		Files generic to microblaze architecture
   /mips			Files generic to MIPS architecture
@@ -319,9 +318,6 @@ The following options need to be configured:
 - CPU Type:	Define exactly one, e.g. CONFIG_MPC85XX.
 
 - Board Type:	Define exactly one, e.g. CONFIG_MPC8540ADS.
-
-- CPU Daughterboard Type: (if CONFIG_ATSTK1000 is defined)
-		Define exactly one, e.g. CONFIG_ATSTK1002
 
 - Marvell Family Member
 		CONFIG_SYS_MVFS		- define it if you want to enable
@@ -833,8 +829,6 @@ The following options need to be configured:
 		CONFIG_SCSI		* SCSI Support
 		CONFIG_CMD_SDRAM	* print SDRAM configuration information
 					  (requires CONFIG_CMD_I2C)
-		CONFIG_CMD_SETGETDCR	  Support for DCR Register access
-					  (4xx only)
 		CONFIG_CMD_SF		* Read/write/erase SPI NOR flash
 		CONFIG_CMD_SOFTSWITCH	* Soft switch setting command for BF60x
 		CONFIG_CMD_SOURCE	  "source" command Support
@@ -862,7 +856,7 @@ The following options need to be configured:
 		(configuration option CONFIG_CMD_CACHE) unless you know
 		what you (and your U-Boot users) are doing. Data
 		cache cannot be enabled on systems like the
-		8260 (where accesses to the IMMR region must be
+		8xx (where accesses to the IMMR region must be
 		uncached), and it cannot be disabled on all other
 		systems where we (mis-) use the data cache to hold an
 		initial stack and some data.
@@ -925,9 +919,11 @@ The following options need to be configured:
 		CONFIG_WATCHDOG
 		If this variable is defined, it enables watchdog
 		support for the SoC. There must be support in the SoC
-		specific code for a watchdog. When supported for a
-		specific SoC is available, then no further board specific
-		code should be needed to use it.
+		specific code for a watchdog. For the 8xx
+		CPUs, the SIU Watchdog feature is enabled in the SYPCR
+		register.  When supported for a specific SoC is
+		available, then no further board specific code should
+		be needed to use it.
 
 		CONFIG_HW_WATCHDOG
 		When using a watchdog circuitry external to the used
@@ -2534,12 +2530,6 @@ The following options need to be configured:
 		Define this option to include a destructive SPI flash
 		test ('sf test').
 
-		CONFIG_SF_DUAL_FLASH		Dual flash memories
-
-		Define this option to use dual flash support where two flash
-		memories can be connected with a given cs line.
-		Currently Xilinx Zynq qspi supports these type of connections.
-
 - SystemACE Support:
 		CONFIG_SYSTEMACE
 
@@ -3944,7 +3934,7 @@ Low Level (hardware related) configuration options:
 
 - CONFIG_SYS_IMMR:	Physical address of the Internal Memory.
 		DO NOT CHANGE unless you know exactly what you're
-		doing! (11-4) [82xx systems only]
+		doing! (11-4) [MPC8xx systems only]
 
 - CONFIG_SYS_INIT_RAM_ADDR:
 
@@ -3957,7 +3947,7 @@ Low Level (hardware related) configuration options:
 		sequences.
 
 		U-Boot uses the following memory types:
-		- PPC4xx:  data cache
+		- MPC8xx: IMMR (internal memory of the CPU)
 
 - CONFIG_SYS_GBL_DATA_OFFSET:
 
@@ -3995,10 +3985,6 @@ Low Level (hardware related) configuration options:
   CONFIG_SYS_OR_TIMING_SDRAM, CONFIG_SYS_OR2_PRELIM, CONFIG_SYS_BR2_PRELIM,
   CONFIG_SYS_OR3_PRELIM, CONFIG_SYS_BR3_PRELIM:
 		Memory Controller Definitions: BR2/3 and OR2/3 (SDRAM)
-
-- CONFIG_PCI_DISABLE_PCIE:
-		Disable PCI-Express on systems where it is supported but not
-		required.
 
 - CONFIG_PCI_ENUM_ONLY
 		Only scan through and get the devices on the buses.
@@ -4823,9 +4809,9 @@ details; basically, the header defines the following image properties:
   LynxOS, pSOS, QNX, RTEMS, INTEGRITY;
   Currently supported: Linux, NetBSD, VxWorks, QNX, RTEMS, LynxOS,
   INTEGRITY).
-* Target CPU Architecture (Provisions for Alpha, ARM, AVR32, Intel x86,
+* Target CPU Architecture (Provisions for Alpha, ARM, Intel x86,
   IA64, MIPS, NDS32, Nios II, PowerPC, IBM S390, SuperH, Sparc, Sparc 64 Bit;
-  Currently supported: ARM, AVR32, Intel x86, MIPS, NDS32, Nios II, PowerPC).
+  Currently supported: ARM, Intel x86, MIPS, NDS32, Nios II, PowerPC).
 * Compression Type (uncompressed, gzip, bzip2)
 * Load Address
 * Entry Point

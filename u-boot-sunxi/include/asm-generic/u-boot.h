@@ -32,16 +32,12 @@ typedef struct bd_info {
 	unsigned long	bi_flashoffset; /* reserved area for startup monitor */
 	unsigned long	bi_sramstart;	/* start of SRAM memory */
 	unsigned long	bi_sramsize;	/* size	 of SRAM memory */
-#ifdef CONFIG_AVR32
-	unsigned char   bi_phy_id[4];   /* PHY address for ATAG_ETHERNET */
-	unsigned long   bi_board_number;/* ATAG_BOARDINFO */
-#endif
 #ifdef CONFIG_ARM
 	unsigned long	bi_arm_freq; /* arm frequency */
 	unsigned long	bi_dsp_freq; /* dsp core frequency */
 	unsigned long	bi_ddr_freq; /* ddr frequency */
 #endif
-#if defined(CONFIG_E500) || defined(CONFIG_MPC86xx)
+#if defined(CONFIG_8xx) || defined(CONFIG_E500) || defined(CONFIG_MPC86xx)
 	unsigned long	bi_immr_base;	/* base of IMMR register */
 #endif
 #if defined(CONFIG_M68K)
@@ -71,19 +67,6 @@ typedef struct bd_info {
 	unsigned long bi_vcofreq;	/* vco Freq in MHz */
 	unsigned long bi_flbfreq;	/* Flexbus Freq in MHz */
 #endif
-#if defined(CONFIG_405)   || \
-		defined(CONFIG_405GP) || \
-		defined(CONFIG_405EP) || \
-		defined(CONFIG_405EZ) || \
-		defined(CONFIG_405EX) || \
-		defined(CONFIG_440)
-	unsigned char	bi_s_version[4];	/* Version of this structure */
-	unsigned char	bi_r_version[32];	/* Version of the ROM (AMCC) */
-	unsigned int	bi_procfreq;	/* CPU (Internal) Freq, in Hz */
-	unsigned int	bi_plb_busfreq;	/* PLB Bus speed, in Hz */
-	unsigned int	bi_pci_busfreq;	/* PCI Bus speed, in Hz */
-	unsigned char	bi_pci_enetaddr[6];	/* PCI Ethernet MAC address */
-#endif
 
 #ifdef CONFIG_HAS_ETH1
 	unsigned char   bi_enet1addr[6];	/* OLD: see README.enetaddr */
@@ -101,27 +84,6 @@ typedef struct bd_info {
 	unsigned char   bi_enet5addr[6];	/* OLD: see README.enetaddr */
 #endif
 
-#if defined(CONFIG_405GP) || defined(CONFIG_405EP) || \
-		defined(CONFIG_405EZ) || defined(CONFIG_440GX) || \
-		defined(CONFIG_440EP) || defined(CONFIG_440GR) || \
-		defined(CONFIG_440EPX) || defined(CONFIG_440GRX) || \
-		defined(CONFIG_460EX) || defined(CONFIG_460GT)
-	unsigned int	bi_opbfreq;		/* OPB clock in Hz */
-	int		bi_iic_fast[2];		/* Use fast i2c mode */
-#endif
-#if defined(CONFIG_4xx)
-#if defined(CONFIG_440GX) || \
-		defined(CONFIG_460EX) || defined(CONFIG_460GT)
-	int		bi_phynum[4];           /* Determines phy mapping */
-	int		bi_phymode[4];          /* Determines phy mode */
-#elif defined(CONFIG_405EP) || defined(CONFIG_405EX) || defined(CONFIG_440)
-	int		bi_phynum[2];           /* Determines phy mapping */
-	int		bi_phymode[2];          /* Determines phy mode */
-#else
-	int		bi_phynum[1];           /* Determines phy mapping */
-	int		bi_phymode[1];          /* Determines phy mode */
-#endif
-#endif /* defined(CONFIG_4xx) */
 	ulong	        bi_arch_number;	/* unique id for this board */
 	ulong	        bi_boot_params;	/* where this board expects params */
 #ifdef CONFIG_NR_DRAM_BANKS

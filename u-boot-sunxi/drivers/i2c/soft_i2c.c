@@ -17,8 +17,9 @@
  */
 
 #include <common.h>
-#if defined(CONFIG_AVR32)
-#include <asm/arch/portmux.h>
+#ifdef	CONFIG_MPC8260			/* only valid for MPC8260 */
+#include <ioports.h>
+#include <asm/io.h>
 #endif
 #if defined(CONFIG_AT91FAMILY)
 #include <asm/io.h>
@@ -28,7 +29,7 @@
 #include <asm/arch/gpio.h>
 #endif
 #endif
-#if defined(CONFIG_MPC852T) || defined(CONFIG_MPC866)
+#if defined(CONFIG_8xx)
 #include <asm/io.h>
 #endif
 #include <i2c.h>

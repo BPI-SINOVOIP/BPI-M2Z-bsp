@@ -97,8 +97,10 @@ dtb-$(CONFIG_ARCH_MVEBU) +=			\
 	armada-38x-controlcenterdc.dtb
 
 dtb-$(CONFIG_ARCH_UNIPHIER_LD11) += \
+	uniphier-ld11-global.dtb \
 	uniphier-ld11-ref.dtb
 dtb-$(CONFIG_ARCH_UNIPHIER_LD20) += \
+	uniphier-ld20-global.dtb \
 	uniphier-ld20-ref.dtb
 dtb-$(CONFIG_ARCH_UNIPHIER_LD4) += \
 	uniphier-ld4-ref.dtb
@@ -127,6 +129,7 @@ dtb-$(CONFIG_ARCH_ZYNQ) += zynq-zc702.dtb \
 	zynq-microzed.dtb \
 	zynq-picozed.dtb \
 	zynq-topic-miami.dtb \
+	zynq-topic-miamilite.dtb \
 	zynq-topic-miamiplus.dtb \
 	zynq-zc770-xm010.dtb \
 	zynq-zc770-xm011.dtb \
@@ -393,7 +396,7 @@ dtb-$(CONFIG_TARGET_AT91SAM9N12EK) += at91sam9n12ek.dtb
 
 dtb-$(CONFIG_TARGET_OMAP3_LOGIC) += \
 	logicpd-torpedo-37xx-devkit.dtb \
-	logicpd-som-lv-37xx-devkit.dts
+	logicpd-som-lv-37xx-devkit.dtb
 
 dtb-$(CONFIG_TARGET_SAMA5D2_XPLAINED) += \
 	at91-sama5d2_xplained.dtb

@@ -6,6 +6,7 @@
  */
 
 #include <common.h>
+#include <asm/io.h>
 
 /* ------------------------------------------------------------------------- */
 
@@ -64,10 +65,21 @@ int timer_init(void)
 {
 	unsigned long temp;
 
+#if defined(CONFIG_8xx)
+	immap_t __iomem *immap = (immap_t __iomem *)CONFIG_SYS_IMMR;
+
+	/* unlock */
+	out_be32(&immap->im_sitk.sitk_tbk, KAPWR_KEY);
+#endif
+
 	/* reset */
 	asm volatile("li %0,0 ; mttbu %0 ; mttbl %0;"
 	     : "=&r"(temp) );
 
+#if defined(CONFIG_8xx)
+	/* enable */
+	setbits_be16(&immap->im_sit.sit_tbscr, TBSCR_TBE);
+#endif
 	return (0);
 }
 /* ------------------------------------------------------------------------- */

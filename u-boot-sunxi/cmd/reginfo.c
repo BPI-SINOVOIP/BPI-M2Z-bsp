@@ -7,9 +7,9 @@
 
 #include <common.h>
 #include <command.h>
-#if defined (CONFIG_4xx)
-extern void ppc4xx_reginfo(void);
-#elif defined (CONFIG_MPC86xx)
+#if defined(CONFIG_8xx)
+void mpc8xx_reginfo(void);
+#elif defined(CONFIG_MPC86xx)
 extern void mpc86xx_reginfo(void);
 #elif defined(CONFIG_MPC85xx)
 extern void mpc85xx_reginfo(void);
@@ -18,8 +18,9 @@ extern void mpc85xx_reginfo(void);
 static int do_reginfo(cmd_tbl_t *cmdtp, int flag, int argc,
 		       char * const argv[])
 {
-#if defined (CONFIG_4xx)
-	ppc4xx_reginfo();
+#if defined(CONFIG_8xx)
+	mpc8xx_reginfo();
+
 #elif defined(CONFIG_MPC86xx)
 	mpc86xx_reginfo();
 
