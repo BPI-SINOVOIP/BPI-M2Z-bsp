@@ -49,7 +49,7 @@
 #include <dt-bindings/pinctrl/sun4i-a10.h>
 
 / {
-	model = "Lamobo R1";
+	model = "Lamobo R1 / Banana Pi BPI-R1";
 	compatible = "lamobo,lamobo-r1", "allwinner,sun7i-a20";
 
 	aliases {

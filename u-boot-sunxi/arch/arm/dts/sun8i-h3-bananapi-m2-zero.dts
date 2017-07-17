@@ -1,17 +1,17 @@
 /*
- * Copyright 2015 Hans de Goede <hdegoede@redhat.com>
+ * Copyright (C) 2016 Chen-Yu Tsai <wens@csie.org>
  *
  * This file is dual-licensed: you can use it either under the terms
  * of the GPL or the X11 license, at your option. Note that this dual
  * licensing only applies to this file, and not this project as a
  * whole.
  *
- *  a) This library is free software; you can redistribute it and/or
+ *  a) This file is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
  *     published by the Free Software Foundation; either version 2 of the
  *     License, or (at your option) any later version.
  *
- *     This library is distributed in the hope that it will be useful,
+ *     This file is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
@@ -41,16 +41,20 @@
  */
 
 /dts-v1/;
-#include "sun6i-a31s.dtsi"
+#include "sun8i-h3.dtsi"
 #include "sunxi-common-regulators.dtsi"
+
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/pinctrl/sun4i-a10.h>
 
 / {
-	model = "Banana Pi BPI-M2";
-	compatible = "sinovoip,bpi-m2", "allwinner,sun6i-a31s";
+	model = "Banana Pi BPI-M2-Zero";
+	compatible = "sinovoip,bpi-m2-plus", "allwinner,sun8i-h3";
 
 	aliases {
 		serial0 = &uart0;
+		serial1 = &uart1;
 	};
 
 	chosen {
@@ -60,49 +64,41 @@
 	leds {
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
-		pinctrl-0 = <&led_pins_bpi_m2>;
+		pinctrl-0 = <&pwr_led_bpi_m2p>;
 
-		blue {
-			label = "bpi-m2:blue:usr";
-			gpios = <&pio 6 11 GPIO_ACTIVE_HIGH>; /* PG11 */
-		};
-
-		green {
-			label = "bpi-m2:green:usr";
-			gpios = <&pio 6 10 GPIO_ACTIVE_HIGH>; /* PG10 */
-		};
-
-		red {
-			label = "bpi-m2:red:usr";
-			gpios = <&pio 6 5 GPIO_ACTIVE_HIGH>; /* PG5 */
+		pwr_led {
+			label = "bananapi-m2-plus:red:pwr";
+			gpios = <&r_pio 0 10 GPIO_ACTIVE_HIGH>; /* PL10 */
+			default-state = "on";
 		};
 	};
 
-	mmc2_pwrseq: mmc2_pwrseq {
+	gpio_keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&sw_r_bpi_m2p>;
+
+		sw4 {
+			label = "power";
+			linux,code = <BTN_0>;
+			gpios = <&r_pio 0 3 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	wifi_pwrseq: wifi_pwrseq {
 		compatible = "mmc-pwrseq-simple";
 		pinctrl-names = "default";
-		pinctrl-0 = <&mmc2_pwrseq_pin_bpi_m2>;
-		reset-gpios = <&r_pio 0 8 GPIO_ACTIVE_LOW>; /* PL8 WIFI_EN */
+		pinctrl-0 = <&wifi_en_bpi_m2p>;
+		reset-gpios = <&r_pio 0 7 GPIO_ACTIVE_LOW>; /* PL7 */
 	};
 };
 
-&ehci0 {
+&ehci1 {
 	status = "okay";
 };
 
-&gmac {
-	pinctrl-names = "default";
-	pinctrl-0 = <&gmac_pins_rgmii_a>, <&gmac_phy_reset_pin_bpi_m2>;
-	phy = <&phy1>;
-	phy-mode = "rgmii";
-	snps,reset-gpio = <&pio 0 21 GPIO_ACTIVE_HIGH>; /* PA21 */
-	snps,reset-active-low;
-	snps,reset-delays-us = <0 10000 30000>;
+&ehci2 {
 	status = "okay";
-
-	phy1: ethernet-phy@1 {
-		reg = <1>;
-	};
 };
 
 &ir {
@@ -113,23 +109,20 @@
 
 &mmc0 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&mmc0_pins_a>, <&mmc0_cd_pin_bpi_m2>;
-	vmmc-supply = <&reg_vcc3v0>;
+	pinctrl-0 = <&mmc0_pins_a>, <&mmc0_cd_pin>;
+	vmmc-supply = <&reg_vcc3v3>;
 	bus-width = <4>;
-	cd-gpios = <&pio 0 4 GPIO_ACTIVE_HIGH>; /* PA4 */
+	cd-gpios = <&pio 5 6 GPIO_ACTIVE_HIGH>; /* PF6 */
 	cd-inverted;
 	status = "okay";
 };
 
-&mmc0_pins_a {
-	allwinner,pull = <SUN4I_PINCTRL_PULL_UP>;
-};
-
-&mmc2 {
+&mmc1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&mmc2_pins_a>;
-	vmmc-supply = <&reg_vcc3v0>;
-	mmc-pwrseq = <&mmc2_pwrseq>;
+	pinctrl-0 = <&mmc1_pins_a>;
+	vmmc-supply = <&reg_vcc3v3>;
+	vqmmc-supply = <&reg_vcc3v3>;
+	mmc-pwrseq = <&wifi_pwrseq>;
 	bus-width = <4>;
 	non-removable;
 	status = "okay";
@@ -137,46 +130,47 @@
 	brcmf: bcrmf@1 {
 		reg = <1>;
 		compatible = "brcm,bcm4329-fmac";
-		interrupt-parent = <&r_pio>;
-		interrupts = <0 5 IRQ_TYPE_LEVEL_LOW>; /* PL5 */
+		interrupt-parent = <&pio>;
+		interrupts = <6 10 IRQ_TYPE_LEVEL_LOW>; /* PG10 / EINT10 */
 		interrupt-names = "host-wake";
 	};
 };
 
-&mmc2_pins_a {
-	allwinner,pull = <SUN4I_PINCTRL_PULL_UP>;
-};
-
-&ohci0 {
+&mmc2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&mmc2_8bit_pins>;
+	vmmc-supply = <&reg_vcc3v3>;
+	vqmmc-supply = <&reg_vcc3v3>;
+	bus-width = <8>;
+	non-removable;
 	status = "okay";
 };
 
-&pio {
-	gmac_phy_reset_pin_bpi_m2: gmac_phy_reset_pin@0 {
-		allwinner,pins = "PA21";
-		allwinner,function = "gpio_out";
-		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
-		allwinner,pull = <SUN4I_PINCTRL_NO_PULL>;
-	};
+&ohci1 {
+	status = "okay";
+};
 
-	led_pins_bpi_m2: led_pins@0 {
-		allwinner,pins = "PG5", "PG10", "PG11";
-		allwinner,function = "gpio_out";
-		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
-		allwinner,pull = <SUN4I_PINCTRL_NO_PULL>;
-	};
-
-	mmc0_cd_pin_bpi_m2: mmc0_cd_pin@0 {
-		allwinner,pins = "PA4";
-		allwinner,function = "gpio_in";
-		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
-		allwinner,pull = <SUN4I_PINCTRL_PULL_UP>;
-	};
+&ohci2 {
+	status = "okay";
 };
 
 &r_pio {
-	mmc2_pwrseq_pin_bpi_m2: mmc2_pwrseq_pin@0 {
-		allwinner,pins = "PL8";
+	pwr_led_bpi_m2p: led_pins@0 {
+		allwinner,pins = "PL10";
+		allwinner,function = "gpio_out";
+		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
+		allwinner,pull = <SUN4I_PINCTRL_NO_PULL>;
+	};
+
+	sw_r_bpi_m2p: key_pins@0 {
+		allwinner,pins = "PL3";
+		allwinner,function = "gpio_in";
+		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
+		allwinner,pull = <SUN4I_PINCTRL_NO_PULL>;
+	};
+
+	wifi_en_bpi_m2p: wifi_en_pin {
+		allwinner,pins = "PL7";
 		allwinner,function = "gpio_out";
 		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
 		allwinner,pull = <SUN4I_PINCTRL_NO_PULL>;
@@ -189,6 +183,13 @@
 	status = "okay";
 };
 
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart1_pins_a>;
+	status = "okay";
+};
+
 &usbphy {
+	/* USB VBUS is on as long as VCC-IO is on */
 	status = "okay";
 };

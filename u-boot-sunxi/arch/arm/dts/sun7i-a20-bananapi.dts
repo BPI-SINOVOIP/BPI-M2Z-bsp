@@ -51,8 +51,8 @@
 #include <dt-bindings/pinctrl/sun4i-a10.h>
 
 / {
-	model = "LeMaker Banana Pi";
-	compatible = "lemaker,bananapi", "allwinner,sun7i-a20";
+	model = "Banana Pi BPI-M1";
+	compatible = "sinovoip,bananapi", "allwinner,sun7i-a20";
 
 	aliases {
 		serial0 = &uart0;
