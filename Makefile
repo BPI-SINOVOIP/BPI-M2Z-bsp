@@ -25,7 +25,7 @@ U_CONFIG_H=$(U_O_PATH)/include/config.h
 K_DOT_CONFIG=$(K_O_PATH)/.config
 
 LICHEE_KDIR=$(CURDIR)/linux-sunxi
-LICHEE_MOD_DIR=$(LICHEE_KDIR)/output/lib/modules/3.4.113-BPI-ZERO-Kernel
+LICHEE_MOD_DIR=$(LICHEE_KDIR)/output/lib/modules/3.4.113-BPI-M2Z-Kernel
 ROOTFS=$(CURDIR)/rootfs/linux/default_linux_rootfs.tar.gz
 
 Q=

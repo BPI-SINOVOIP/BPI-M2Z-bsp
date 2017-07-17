@@ -33,7 +33,7 @@ R="${SD}/BPI-ROOT"
 	## copy files to 100MB
 	#
 	#cp -a $T/output/100MB/* $U
-	cp -a $T/u-boot-sunxi/*.img.gz $U
+	cp -a $T/u-boot-sunxi/out/*.img.gz $U
 	#
 	## copy files to BPI-BOOT
 	#
@@ -85,16 +85,23 @@ if [ -f env.sh ] ; then
 fi
 
 T="$TOPDIR"
-if [[ $BOARD =~ "BPI-M2P" ]]
-then
-        board="bpi-m2p"
-        kernel="3.4.113-BPI-M2P-Kernel"
-        BOOT_PACK_P=$T/sunxi-pack/chips/${MACH}/configs/default/linux
-else
-        board=$(echo $BOARD | tr '[A-Z]' '[a-z]')
-        kernel="3.4.113-${BOARD}-Kernel"
-        BOOT_PACK_P=$T/sunxi-pack/chips/${MACH}/configs/${BOARD}/linux
-fi
+case $BOARD in
+  BPI-M2P*)
+    board="bpi-m2p"
+    kernel="3.4.113-BPI-M2P-Kernel"
+    BOOT_PACK_P=$T/sunxi-pack/chips/${MACH}/configs/default/linux
+    ;;
+  BPI-M2Z*)
+    board="bpi-m2z"
+    kernel="3.4.113-BPI-M2Z-Kernel"
+    BOOT_PACK_P=$T/sunxi-pack/chips/${MACH}/configs/${BOARD}/linux
+    ;;
+  *)
+    board=$(echo $BOARD | tr '[A-Z]' '[a-z]')
+    kernel="3.4.113-${BOARD}-Kernel"
+    BOOT_PACK_P=$T/sunxi-pack/chips/${MACH}/configs/${BOARD}/linux
+    ;;
+esac
 
 echo "This tool support following building mode(s):"
 echo "--------------------------------------------------------------------------------"
@@ -126,7 +133,8 @@ case $mode in
 	1) make && 
 	   make pack && 
 	   cp_download_files;;
-	2) make u-boot;;
+#	2) make u-boot;;
+	2) (export PATH=$TOPDIR/allwinner-tools/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/bin:$PATH ; cd u-boot-sunxi ; ./bpi-m2z.sh legacy);;
 	3) make kernel;;
 	4) make kernel-config;;
 	5) make pack;;

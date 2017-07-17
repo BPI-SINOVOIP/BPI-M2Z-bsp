@@ -73,12 +73,17 @@ fi
 
 BOARD=$1
 
-if [[ $BOARD =~ "BPI-M2P" ]] 
-then
-	board="bpi"
-else
-	board=$(echo $BOARD | tr '[A-Z]' '[a-z]')
-fi
+case $BOARD in
+  BPI-M2P*)
+    board="bpi"
+    ;;
+  BPI-M2Z*)
+    board="bpi-m2z"
+    ;;
+  *)
+    board=$(echo $BOARD | tr '[A-Z]' '[a-z]')
+    ;;
+esac
 
 generate_board_envsh "$1" > env.sh
 
