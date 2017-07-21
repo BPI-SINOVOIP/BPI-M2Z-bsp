@@ -133,8 +133,7 @@ case $mode in
 	1) make && 
 	   make pack && 
 	   cp_download_files;;
-#	2) make u-boot;;
-	2) (export PATH=$TOPDIR/allwinner-tools/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/bin:$PATH ; cd u-boot-sunxi ; ./bpi-m2z.sh legacy);;
+	2) make u-boot;;
 	3) make kernel;;
 	4) make kernel-config;;
 	5) make pack;;

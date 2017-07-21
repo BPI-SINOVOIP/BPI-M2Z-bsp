@@ -47,15 +47,19 @@ $(U_CONFIG_H): u-boot-sunxi
 #	$(Q)$(MAKE) -C u-boot-sunxi $(UBOOT_CONFIG)_config CROSS_COMPILE=$(U_CROSS_COMPILE) -j$J
 	$(Q)$(MAKE) -C u-boot-sunxi Sinovoip_BPI_M2_Zero_defconfig CROSS_COMPILE=$(U_CROSS_COMPILE) -j$J
 
-u-boot: $(U_CONFIG_H)
-	$(Q)$(MAKE) -C u-boot-sunxi all CROSS_COMPILE=$(U_CROSS_COMPILE) -j$J
+#u-boot: $(U_CONFIG_H)
+#	$(Q)$(MAKE) -C u-boot-sunxi all CROSS_COMPILE=$(U_CROSS_COMPILE) -j$J
+u-boot: 
+	./build_uboot.sh
 
 u-boot-clean:
-	$(Q)$(MAKE) -C u-boot-sunxi CROSS_COMPILE=$(U_CROSS_COMPILE) -j$J distclean
+#	$(Q)$(MAKE) -C u-boot-sunxi CROSS_COMPILE=$(U_CROSS_COMPILE) -j$J distclean
+	rm -rf u-boot-sunxi/out
 
 ## linux
 $(K_DOT_CONFIG): linux-sunxi
 	$(Q)$(MAKE) -C linux-sunxi ARCH=arm $(KERNEL_CONFIG)
+	mkdir -p linux-sunxi/output/lib/firmware
 
 kernel: $(K_DOT_CONFIG)
 	$(Q)$(MAKE) -C linux-sunxi ARCH=arm CROSS_COMPILE=${K_CROSS_COMPILE} -j$J INSTALL_MOD_PATH=output uImage modules
