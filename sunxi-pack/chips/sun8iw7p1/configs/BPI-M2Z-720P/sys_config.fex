@@ -213,7 +213,7 @@ modalias = "spidev"
 max_speed_hz = 33000000
 bus_num = 0
 chip_select = 0
-mode = 0
+mode = 3
 full_duplex = 1
 manual_cs = 0
 
