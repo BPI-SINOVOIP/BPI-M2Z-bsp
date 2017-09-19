@@ -444,7 +444,12 @@ static int sunxi_mmc_getcd(struct mmc *mmc)
 	if (cd_pin < 0)
 		return 1;
 
+#ifdef BPI
 	return !gpio_get_value(cd_pin);
+#else
+	printf("BPI: skip sunxi_mmc_getcd pin %d(%d)\n",cd_pin, gpio_get_value(cd_pin));
+	return 1;
+#endif
 }
 
 static const struct mmc_ops sunxi_mmc_ops = {
