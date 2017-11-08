@@ -1,6 +1,6 @@
 [product]
 version = "100"
-machine = "Banana Pi BPI-M2-Plus"
+machine = "Banana Pi BPI-M2-Zero"
 
 [platform]
 debug_mode = 1
@@ -738,8 +738,8 @@ ir_used = 0
 ir_tx = port:PH07<2><default><default><default>
 
 [dvfs_table]
-pmuic_type = 0
-pmu_gpio0 = port:PL06<1><1><2><1>
+pmuic_type = 1
+pmu_gpio0 = port:PL01<1><1><2><1>
 pmu_level0 = 11300
 pmu_level1 = 1100
 max_freq = 1200000000
