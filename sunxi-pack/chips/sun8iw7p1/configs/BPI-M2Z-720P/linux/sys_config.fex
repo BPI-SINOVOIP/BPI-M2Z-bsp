@@ -1,6 +1,6 @@
 [product]
 version = "100"
-machine = "Banana Pi BPI-M2-Plus"
+machine = "Banana Pi BPI-M2-Zero"
 
 [platform]
 debug_mode = 1
@@ -589,9 +589,9 @@ usb_not_suspend = 0
 vendor_id = 6353
 mass_storage_id = 1
 adb_id = 2
-manufacturer_name = "Sinovoip"
-product_name = "Overheating device"
-serial_number = "0001"
+manufacturer_name = "USB Developer"
+product_name = "Android"
+serial_number = "20080411"
 
 [msc_feature]
 vendor_name = "USB 2.0"
@@ -738,8 +738,8 @@ ir_used = 0
 ir_tx = port:PH07<2><default><default><default>
 
 [dvfs_table]
-pmuic_type = 0
-pmu_gpio0 = port:PL06<1><1><2><1>
+pmuic_type = 1
+pmu_gpio0 = port:PL01<1><1><2><1>
 pmu_level0 = 11300
 pmu_level1 = 1100
 max_freq = 1200000000
@@ -788,7 +788,7 @@ s_uart_tx = port:PL02<2><default><default><default>
 s_uart_rx = port:PL03<2><default><default><default>
 
 [s_rsb0]
-s_rsb_used = 1
+s_rsb_used = 0
 s_rsb_sck = port:PL00<2><1><2><default>
 s_rsb_sda = port:PL01<2><1><2><default>
 
