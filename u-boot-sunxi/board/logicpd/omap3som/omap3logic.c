@@ -33,6 +33,10 @@
 #include <linux/usb/gadget.h>
 #include <linux/usb/musb.h>
 #include "omap3logic.h"
+#ifdef CONFIG_USB_EHCI_HCD
+#include <usb.h>
+#include <asm/ehci-omap.h>
+#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -139,6 +143,33 @@ static struct musb_hdrc_platform_data musb_plat = {
 };
 #endif
 
+#if defined(CONFIG_USB_EHCI_HCD) && !defined(CONFIG_SPL_BUILD)
+/* Call usb_stop() before starting the kernel */
+void show_boot_progress(int val)
+{
+	if (val == BOOTSTAGE_ID_RUN_OS)
+		usb_stop();
+}
+
+static struct omap_usbhs_board_data usbhs_bdata = {
+	.port_mode[0] = OMAP_EHCI_PORT_MODE_PHY,
+	.port_mode[1] = OMAP_EHCI_PORT_MODE_PHY,
+	.port_mode[2] = OMAP_USBHS_PORT_MODE_UNUSED
+};
+
+int ehci_hcd_init(int index, enum usb_init_type init,
+		struct ehci_hccr **hccr, struct ehci_hcor **hcor)
+{
+	return omap_ehci_hcd_init(index, &usbhs_bdata, hccr, hcor);
+}
+
+int ehci_hcd_stop(int index)
+{
+	return omap_ehci_hcd_stop();
+}
+
+#endif /* CONFIG_USB_EHCI_HCD */
+
 
 /*
  * Routine: misc_init_r
@@ -219,8 +250,8 @@ int board_late_init(void)
 			gd->bd->bi_arch_number = board->machine_id;
 
 		/* If the user has not set fdtimage, set the default */
-		if (!getenv("fdtimage"))
-			setenv("fdtimage", board->fdtfile);
+		if (!env_get("fdtimage"))
+			env_set("fdtimage", board->fdtfile);
 	}
 
 	/* restore hsusb0_data5 pin as hsusb0_data5 */
@@ -320,7 +351,7 @@ void set_muxconf_regs(void)
 	MUX_VAL(CP(SDRC_DQS2), (IEN  | PTD | DIS | M0)); /*SDRC_DQS2*/
 	MUX_VAL(CP(SDRC_DQS3), (IEN  | PTD | DIS | M0)); /*SDRC_DQS3*/
 	MUX_VAL(CP(SDRC_CKE0), (IDIS | PTU | EN  | M0)); /*SDRC_CKE0*/
-	MUX_VAL(CP(SDRC_CKE1), (IDIS | PTD | DIS | M7)); /*SDRC_CKE1*/
+	MUX_VAL(CP(SDRC_CKE1), (IDIS | PTU | DIS | M0)); /*SDRC_CKE1*/
 
 	MUX_VAL(CP(GPMC_A1), (IDIS | PTU | EN  | M0)); /*GPMC_A1*/
 	MUX_VAL(CP(GPMC_A2), (IDIS | PTU | EN  | M0)); /*GPMC_A2*/

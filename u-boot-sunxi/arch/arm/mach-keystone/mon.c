@@ -13,7 +13,7 @@
 #include <spl.h>
 asm(".arch_extension sec\n\t");
 
-int mon_install(u32 addr, u32 dpsc, u32 freq)
+int mon_install(u32 addr, u32 dpsc, u32 freq, u32 bm_addr)
 {
 	int result;
 
@@ -22,11 +22,13 @@ int mon_install(u32 addr, u32 dpsc, u32 freq)
 		"mov r0, %1\n"
 		"mov r1, %2\n"
 		"mov r2, %3\n"
+		"mov r3, %4\n"
 		"blx r0\n"
+		"mov %0, r0\n"
 		"ldmfd r13!, {lr}\n"
 		: "=&r" (result)
-		: "r" (addr), "r" (dpsc), "r" (freq)
-		: "cc", "r0", "r1", "r2", "memory");
+		: "r" (addr), "r" (dpsc), "r" (freq), "r" (bm_addr)
+		: "cc", "r0", "r1", "r2", "r3", "memory");
 	return result;
 }
 
@@ -40,6 +42,7 @@ int mon_power_on(int core_id, void *ep)
 		"mov r2, %2\n"
 		"mov r0, #0\n"
 		"smc	#0\n"
+		"mov %0, r0\n"
 		"ldmfd  r13!, {lr}\n"
 		: "=&r" (result)
 		: "r" (core_id), "r" (ep)
@@ -56,6 +59,7 @@ int mon_power_off(int core_id)
 		"mov r1, %1\n"
 		"mov r0, #1\n"
 		"smc	#1\n"
+		"mov %0, r0\n"
 		"ldmfd  r13!, {lr}\n"
 		: "=&r" (result)
 		: "r" (core_id)
@@ -89,6 +93,7 @@ static int k2_hs_bm_auth(int cmd, void *arg1)
 		"mov r0, %1\n"
 		"mov r1, %2\n"
 		"smc #2\n"
+		"mov %0, r0\n"
 		"ldmfd r13!, {r4-r12, lr}\n"
 		: "=&r" (result)
 		: "r" (cmd), "r" (arg1)
@@ -114,12 +119,12 @@ void board_fit_image_post_process(void **p_image, size_t *p_size)
 	}
 
 	/*
-	* Overwrite the image headers after authentication
-	* and decryption. Update size to reflect removal
-	* of header.
-	*/
-	memcpy(image, image + KS2_HS_SEC_HEADER_LEN, *p_size);
+	 * Overwrite the image headers after authentication
+	 * and decryption. Update size to reflect removal
+	 * of header.
+	 */
 	*p_size -= KS2_HS_SEC_HEADER_LEN;
+	memcpy(image, image + KS2_HS_SEC_HEADER_LEN, *p_size);
 
 	/*
 	 * Output notification of successful authentication to re-assure the

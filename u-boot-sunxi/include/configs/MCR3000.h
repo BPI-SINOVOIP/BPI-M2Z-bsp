@@ -62,10 +62,6 @@
 #define CONFIG_NETMASK			255.0.0.0
 
 #define CONFIG_BOOTCOMMAND		"run flashboot"
-#define CONFIG_BOOTARGS		"ubi.mtd=4 root=ubi0:rootfs rw "	\
-				"rootfstype=ubifs rootflags=sync "	\
-				"console=ttyCPM0,115200N8 "		\
-				"ip=${ipaddr}:::${netmask}:mcr3k:eth0:off"
 
 #define CONFIG_LOADS_ECHO	1	/* echo on for serial download	*/
 #undef	CONFIG_LOADS_BAUD_CHANGE	/* don't allow baudrate change	*/
@@ -74,10 +70,6 @@
 
 /* Miscellaneous configurable options */
 #define	CONFIG_SYS_LONGHELP
-#define	CONFIG_SYS_CBSIZE		256
-#define	CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-#define	CONFIG_SYS_MAXARGS		16
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 
 #define CONFIG_CMDLINE_EDITING		1
 #ifdef	CONFIG_HUSH_PARSER
@@ -125,7 +117,6 @@
 /* Environment Configuration */
 
 /* environment is in FLASH */
-#define CONFIG_ENV_IS_IN_FLASH	1
 #define CONFIG_ENV_SECT_SIZE	(64 * 1024)
 #define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
 #define CONFIG_ENV_ADDR		(CONFIG_SYS_FLASH_BASE + CONFIG_SYS_MONITOR_LEN)
@@ -151,8 +142,5 @@
 /* Boot Flags*/
 #define	BOOTFLAG_COLD			0x01
 #define BOOTFLAG_WARM			0x02
-
-/* Misc Settings */
-#define CONFIG_CMD_REGINFO
 
 #endif /* __CONFIG_H */

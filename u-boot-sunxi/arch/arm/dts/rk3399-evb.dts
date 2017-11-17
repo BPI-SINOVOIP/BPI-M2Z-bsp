@@ -60,6 +60,18 @@
 		gpio = <&gpio4 25 GPIO_ACTIVE_HIGH>;
 	};
 
+	vcc5v0_typec0: vcc5v0-typec0-en {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc5v0_typec0";
+		gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+	};
+
+	vcc5v0_typec1: vcc5v0-typec1-en {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc5v0_typec1";
+		gpio = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+	};
+
 	clkin_gmac: external-gmac-clock {
 		compatible = "fixed-clock";
 		clock-frequency = <125000000>;
@@ -137,6 +149,10 @@
 	status = "okay";
 };
 
+&saradc {
+	status = "okay";
+};
+
 &sdmmc {
 	bus-width = <4>;
 	status = "okay";
@@ -163,7 +179,7 @@
 };
 
 &dwc3_typec0 {
-	rockchip,vbus-gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+	vbus-supply = <&vcc5v0_typec0>;
 	status = "okay";
 };
 
@@ -176,7 +192,7 @@
 };
 
 &dwc3_typec1 {
-	rockchip,vbus-gpio = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+	vbus-supply = <&vcc5v0_typec1>;
 	status = "okay";
 };
 
@@ -247,22 +263,6 @@
 				<1 18 RK_FUNC_GPIO &pcfg_pull_down>;
 		};
 	};
-};
-
-&gmac {
-        phy-supply = <&vcc_phy>;
-	phy-mode = "rgmii";
-	clock_in_out = "input";
-	snps,reset-gpio = <&gpio3 RK_PB7 GPIO_ACTIVE_LOW>;
-	snps,reset-active-low;
-	snps,reset-delays-us = <0 10000 50000>;
-	assigned-clocks = <&cru SCLK_RMII_SRC>;
-	assigned-clock-parents = <&clkin_gmac>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&rgmii_pins>;
-	tx_delay = <0x10>;
-	rx_delay = <0x10>;
-	status = "okay";
 };
 
 &gmac {

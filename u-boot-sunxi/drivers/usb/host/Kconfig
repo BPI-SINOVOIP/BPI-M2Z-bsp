@@ -31,12 +31,30 @@ config USB_XHCI_MVEBU
 	  SoCs, which includes Armada8K, Armada3700 and other Armada
 	  family SoCs.
 
+config USB_XHCI_PCI
+	bool "Support for PCI-based xHCI USB controller"
+	depends on DM_USB
+	default y if X86
+	help
+	  Enables support for the PCI-based xHCI controller.
+
 config USB_XHCI_ROCKCHIP
 	bool "Support for Rockchip on-chip xHCI USB controller"
 	depends on ARCH_ROCKCHIP
+	depends on DM_REGULATOR
+	depends on DM_USB
 	default y
 	help
 	  Enables support for the on-chip xHCI controller on Rockchip SoCs.
+
+config USB_XHCI_STI
+	bool "Support for STMicroelectronics STiH407 family on-chip xHCI USB controller"
+	depends on ARCH_STI
+	default y
+	help
+	  Enables support for the on-chip xHCI controller on STMicroelectronics
+	  STiH407 family SoCs. This is a driver for the dwc3 to provide the glue logic
+	  to configure the controller.
 
 config USB_XHCI_ZYNQMP
 	bool "Support for Xilinx ZynqMP on-chip xHCI USB controller"
@@ -53,6 +71,12 @@ config USB_XHCI_DRA7XX_INDEX
 	  Select the DRA7XX xHCI USB index.
 	  Current supported values: 0, 1.
 
+config USB_XHCI_FSL
+	bool "Support for NXP Layerscape on-chip xHCI USB controller"
+	default y if ARCH_LS1021A || FSL_LSCH3 || FSL_LSCH2
+	depends on !SPL_NO_USB
+	help
+	  Enables support for the on-chip xHCI controller on NXP Layerscape SoCs.
 endif # USB_XHCI_HCD
 
 config USB_EHCI_HCD
@@ -133,13 +157,11 @@ config USB_EHCI_MSM
 	  This driver supports combination of Chipidea USB controller
 	  and Synapsys USB PHY in host mode only.
 
-config USB_EHCI_RCAR_GEN3
-	bool "Support for Renesas RCar M3/H3 EHCI USB controller"
-	depends on RCAR_GEN3
-	default y
-	---help---
-	  Enables support for the on-chip EHCI controller on Renesas
-	  R8A7795 and R8A7796 SoCs.
+config USB_EHCI_PCI
+	bool "Support for PCI-based EHCI USB controller"
+	default y if X86
+	help
+	  Enables support for the PCI-based EHCI controller.
 
 config USB_EHCI_ZYNQ
 	bool "Support for Xilinx Zynq on-chip EHCI USB controller"
@@ -199,3 +221,13 @@ config USB_UHCI_HCD
 if USB_UHCI_HCD
 
 endif # USB_UHCI_HCD
+
+config USB_DWC2
+	bool "DesignWare USB2 Core support"
+	select USB_HOST
+	---help---
+	  The DesignWare USB 2.0 controller is compliant with the
+	  USB-Implementers Forum (USB-IF) USB 2.0 specifications.
+	  Hi-Speed (480 Mbps), Full-Speed (12 Mbps), and Low-Speed (1.5 Mbps)
+	  operation is compliant to the controller Supplement. If you want to
+	  enable this controller in host mode, say Y.

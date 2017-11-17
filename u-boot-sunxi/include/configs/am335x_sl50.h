@@ -13,7 +13,6 @@
 
 #ifndef CONFIG_SPL_BUILD
 # define CONFIG_TIMESTAMP
-# define CONFIG_LZO
 #endif
 
 #define CONFIG_SYS_BOOTM_LEN		(16 << 20)
@@ -79,24 +78,14 @@
 #define CONFIG_BOOTCOUNT_AM33XX
 #define CONFIG_SYS_BOOTCOUNT_BE
 
-#define CONFIG_SPL_LDSCRIPT		"arch/arm/mach-omap2/u-boot-spl.lds"
-
-#ifndef CONFIG_SPL_USBETH_SUPPORT
-#define CONFIG_FASTBOOT_FLASH_MMC_DEV   1
-#endif
-
 #if defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_USBETH_SUPPORT)
 /* Remove other SPL modes. */
-#define CONFIG_ENV_IS_NOWHERE
-#undef CONFIG_ENV_IS_IN_NAND
 /* disable host part of MUSB in SPL */
 #undef CONFIG_MUSB_HOST
 /* disable EFI partitions and partition UUID support */
 #endif
 
 #if defined(CONFIG_EMMC_BOOT)
-#undef CONFIG_ENV_IS_NOWHERE
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV		1
 #define CONFIG_SYS_MMC_ENV_PART		2
 #define CONFIG_ENV_OFFSET		0x0
@@ -105,8 +94,6 @@
 #endif
 
 /* Network. */
-#define CONFIG_PHY_GIGE
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_SMSC
 
 #endif	/* ! __CONFIG_AM335X_SL50_H */

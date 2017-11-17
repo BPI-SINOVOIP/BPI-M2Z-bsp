@@ -97,7 +97,6 @@
 #endif
 
 /* Network Configuration */
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_MARVELL
 #define CONFIG_MII
 #define CONFIG_BOOTP_DEFAULT
@@ -161,7 +160,6 @@
 #define CONFIG_SYS_DAVINCI_I2C_SLAVE1	0x10 /* SMBus host address */
 #define CONFIG_SYS_DAVINCI_I2C_SPEED2	100000
 #define CONFIG_SYS_DAVINCI_I2C_SLAVE2	0x10 /* SMBus host address */
-#define I2C_BUS_MAX			3
 
 /* EEPROM definitions */
 #define CONFIG_SYS_I2C_EEPROM_ADDR_LEN		2
@@ -186,24 +184,13 @@
 #define CONFIG_SYS_NAND_MAX_CHIPS		1
 #define CONFIG_SYS_NAND_NO_SUBPAGE_WRITE
 #define CONFIG_MTD_PARTITIONS
-#define CONFIG_RBTREE
-#define CONFIG_LZO
-#define MTDIDS_DEFAULT			"nand0=davinci_nand.0"
-#define MTDPARTS_DEFAULT		"mtdparts=davinci_nand.0:" \
-					"1024k(bootloader)ro,512k(params)ro," \
-					"-(ubifs)"
 
 /* USB Configuration */
 #define CONFIG_USB_XHCI_KEYSTONE
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS	2
 #define CONFIG_USB_SS_BASE			KS2_USB_SS_BASE
 #define CONFIG_USB_HOST_XHCI_BASE		KS2_USB_HOST_XHCI_BASE
 #define CONFIG_DEV_USB_PHY_BASE			KS2_DEV_USB_PHY_BASE
 #define CONFIG_USB_PHY_CFG_BASE			KS2_USB_PHY_CFG_BASE
-
-/* U-Boot command configuration */
-#define CONFIG_CMD_SAVES
-#define CONFIG_CMD_UBIFS
 
 /* U-Boot general configuration */
 #define CONFIG_MISC_INIT_R
@@ -252,7 +239,11 @@
 	"addr_secdb_key=0xc000000\0"					\
 	"name_kern=zImage\0"						\
 	"addr_mon=0x87000000\0"						\
+	"addr_non_sec_mon=0x0c087fc0\0"					\
+	"addr_load_sec_bm=0x0c08c000\0"					\
 	"run_mon=mon_install ${addr_mon}\0"				\
+	"run_mon_hs=mon_install ${addr_non_sec_mon} "			\
+			"${addr_load_sec_bm}\0"				\
 	"run_kern=bootz ${loadaddr} ${rd_spec} ${fdtaddr}\0"		\
 	"init_net=run args_all args_net\0"				\
 	"init_nfs=setenv autoload no; dhcp; run args_all args_net\0"	\
@@ -266,10 +257,16 @@
 	"get_kern_ubi=ubifsload ${loadaddr} ${bootdir}/${name_kern}\0"		\
 	"get_mon_net=dhcp ${addr_mon} ${tftp_root}/${name_mon}\0"	\
 	"get_mon_nfs=nfs ${addr_mon} ${nfs_root}/boot/${name_mon}\0"	\
-	"get_mon_ubi=ubifsload ${addr_mon} ${bootdir}/${name_mon}\0"		\
+	"get_mon_ubi=ubifsload ${addr_mon} ${bootdir}/${name_mon}\0"	\
+	"get_fit_net=dhcp ${fit_loadaddr} ${tftp_root}"			\
+						"/${fit_bootfile}\0"	\
+	"get_fit_nfs=nfs ${fit_loadaddr} ${nfs_root}/boot/${fit_bootfile}\0"\
+	"get_fit_ubi=ubifsload ${fit_loadaddr} ${bootdir}/${fit_bootfile}\0"\
+	"get_fit_mmc=load mmc ${bootpart} ${fit_loadaddr} "		\
+					"${bootdir}/${fit_bootfile}\0"	\
 	"get_uboot_net=dhcp ${loadaddr} ${tftp_root}/${name_uboot}\0"	\
 	"get_uboot_nfs=nfs ${loadaddr} ${nfs_root}/boot/${name_uboot}\0" \
-	"burn_uboot_spi=sf probe; sf erase 0 0x80000; "		\
+	"burn_uboot_spi=sf probe; sf erase 0 0x90000; "		\
 		"sf write ${loadaddr} 0 ${filesize}\0"		\
 	"burn_uboot_nand=nand erase 0 0x100000; "			\
 		"nand write ${loadaddr} 0 ${filesize}\0"		\
@@ -282,6 +279,8 @@
 	"get_fdt_ramfs=dhcp ${fdtaddr} ${tftp_root}/${name_fdt}\0"	\
 	"get_kern_ramfs=dhcp ${loadaddr} ${tftp_root}/${name_kern}\0"	\
 	"get_mon_ramfs=dhcp ${addr_mon} ${tftp_root}/${name_mon}\0"	\
+	"get_fit_ramfs=dhcp ${fit_loadaddr} ${tftp_root}"		\
+						"/${fit_bootfile}\0"	\
 	"get_fs_ramfs=dhcp ${rdaddr} ${tftp_root}/${name_fs}\0"	\
 	"get_ubi_net=dhcp ${addr_ubi} ${tftp_root}/${name_ubi}\0"	\
 	"get_ubi_nfs=nfs ${addr_ubi} ${nfs_root}/boot/${name_ubi}\0"	\
@@ -296,12 +295,22 @@
 		"1024k(bootloader)ro,512k(params)ro,-(ubifs)\0"
 
 #ifndef CONFIG_BOOTCOMMAND
+#ifndef CONFIG_TI_SECURE_DEVICE
 #define CONFIG_BOOTCOMMAND						\
-	"run init_${boot} get_mon_${boot} run_mon init_fw_rd_${boot} "	\
-	"get_fdt_${boot} get_kern_${boot} run_kern"
+	"run init_${boot}; "						\
+	"run get_mon_${boot} run_mon; "					\
+	"run get_kern_${boot}; "					\
+	"run init_fw_rd_${boot}; "					\
+	"run get_fdt_${boot}; "						\
+	"run run_kern"
+#else
+#define CONFIG_BOOTCOMMAND						\
+	"run run_mon_hs; "						\
+	"run init_${boot}; "						\
+	"run get_fit_${boot}; "						\
+	"bootm ${fit_loadaddr}#${name_fdt}"
 #endif
-
-#define CONFIG_BOOTARGS							\
+#endif
 
 /* Now for the remaining common defines */
 #include <configs/ti_armv7_common.h>

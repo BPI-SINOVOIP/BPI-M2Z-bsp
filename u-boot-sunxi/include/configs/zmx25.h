@@ -12,7 +12,6 @@
 
 #include <asm/arch/imx-regs.h>
 
-#define CONFIG_MX25
 #define CONFIG_SYS_TEXT_BASE		0xA0000000
 
 #define CONFIG_SYS_TIMER_RATE		32768
@@ -33,11 +32,6 @@
 #define CONFIG_CMDLINE_TAG		/* enable passing of ATAGs	*/
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_INITRD_TAG
-
-/*
- * Compressions
- */
-#define CONFIG_LZO
 
 /*
  * Hardware drivers
@@ -107,7 +101,6 @@
 #define CONFIG_SYS_MAX_FLASH_SECT	256
 
 #define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + 0x00040000)
-#define CONFIG_ENV_IS_IN_FLASH		1
 #define CONFIG_ENV_SECT_SIZE		(128 * 1024)
 #define CONFIG_ENV_SIZE			(128 * 1024)
 
@@ -123,10 +116,6 @@
 #define CONFIG_SYS_MEMTEST_START	(PHYS_SDRAM + (512*1024))
 #define CONFIG_SYS_MEMTEST_END		(PHYS_SDRAM + PHYS_SDRAM_SIZE)
 
-#define CONFIG_SYS_CBSIZE	256
-#define CONFIG_SYS_MAXARGS	16
-#define CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE + \
-				sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_CMDLINE_EDITING
 

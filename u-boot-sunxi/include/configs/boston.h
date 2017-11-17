@@ -20,7 +20,6 @@
 /*
  * PCI
  */
-#define CONFIG_CMD_PCI
 
 /*
  * Memory map
@@ -45,10 +44,6 @@
 /*
  * Console
  */
-#define CONFIG_SYS_MAXARGS		16
-#define CONFIG_SYS_CBSIZE		256
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					 sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_SYS_LONGHELP
 
 /*
@@ -64,7 +59,6 @@
 /*
  * Environment
  */
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_SECT_SIZE		0x20000
 #define CONFIG_ENV_SIZE			CONFIG_ENV_SECT_SIZE
 #ifdef CONFIG_64BIT

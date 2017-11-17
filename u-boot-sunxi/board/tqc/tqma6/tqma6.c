@@ -16,8 +16,8 @@
 #include <linux/errno.h>
 #include <asm/gpio.h>
 #include <asm/io.h>
-#include <asm/imx-common/mxc_i2c.h>
-#include <asm/imx-common/spi.h>
+#include <asm/mach-imx/mxc_i2c.h>
+#include <asm/mach-imx/spi.h>
 #include <common.h>
 #include <fsl_esdhc.h>
 #include <libfdt.h>
@@ -251,7 +251,7 @@ int power_init_board(void)
 
 int board_late_init(void)
 {
-	setenv("board_name", tqma6_get_boardname());
+	env_set("board_name", tqma6_get_boardname());
 
 	tqma6_bb_board_late_init();
 

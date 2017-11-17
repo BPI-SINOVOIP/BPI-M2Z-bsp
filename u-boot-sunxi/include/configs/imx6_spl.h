@@ -24,7 +24,6 @@
  *    and some padding thus 'our' max size is really 0x00908000 - 0x00918000
  *    or 64KB
  */
-#define CONFIG_SPL_LDSCRIPT	"arch/arm/mach-omap2/u-boot-spl.lds"
 #define CONFIG_SPL_TEXT_BASE		0x00908000
 #define CONFIG_SPL_MAX_SIZE		0x10000
 #define CONFIG_SPL_STACK		0x0091FFB8
@@ -49,7 +48,11 @@
 
 /* Define the payload for FAT/EXT support */
 #if defined(CONFIG_SPL_FAT_SUPPORT) || defined(CONFIG_SPL_EXT_SUPPORT)
-#define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME  "u-boot.img"
+# ifdef CONFIG_OF_CONTROL
+#  define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME	"u-boot-dtb.img"
+# else
+#  define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME	"u-boot.img"
+# endif
 #endif
 
 #if defined(CONFIG_MX6SX) || defined(CONFIG_MX6UL) || defined(CONFIG_MX6SL)

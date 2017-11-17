@@ -14,7 +14,6 @@
 #define CONFIG_ZYNQ_I2C1
 
 /* Speed up boot time by ignoring the environment which we never used */
-#define CONFIG_ENV_IS_NOWHERE
 
 #include "zynq-common.h"
 
@@ -135,7 +134,6 @@
 #undef CONFIG_DISPLAY_BOARDINFO
 
 /* Further tweaks to reduce image size */
-#undef CONFIG_CMD_BOOTZ
 #undef CONFIG_CMD_NET
 
 #endif /* __CONFIG_TOPIC_MIAMI_H */

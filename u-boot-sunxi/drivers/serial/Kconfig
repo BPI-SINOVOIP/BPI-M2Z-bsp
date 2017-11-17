@@ -64,6 +64,21 @@ config DM_SERIAL
 	  implements serial_putc() etc. The uclass interface is
 	  defined in include/serial.h.
 
+config SERIAL_RX_BUFFER
+	bool "Enable RX buffer for serial input"
+	depends on DM_SERIAL
+	help
+	  Enable RX buffer support for the serial driver. This enables
+	  pasting longer strings, even when the RX FIFO of the UART is
+	  not big enough (e.g. 16 bytes on the normal NS16550).
+
+config SERIAL_RX_BUFFER_SIZE
+	int "RX buffer size"
+	depends on SERIAL_RX_BUFFER
+	default 256
+	help
+	  The size of the RX buffer (needs to be power of 2)
+
 config SPL_DM_SERIAL
 	bool "Enable Driver Model for serial drivers in SPL"
 	depends on DM_SERIAL
@@ -248,6 +263,14 @@ config DEBUG_UART_PIC32
 	  will need to provide parameters to make this work. The driver will
 	  be available until the real driver model serial is running.
 
+config DEBUG_UART_MXC
+	bool "IMX Serial port"
+	depends on MXC_UART
+	help
+	  Select this to enable a debug UART using the serial_mxc driver. You
+	  will need to provide parameters to make this work. The driver will
+	  be available until the real driver model serial is running.
+
 config DEBUG_UART_UNIPHIER
 	bool "UniPhier on-chip UART"
 	depends on ARCH_UNIPHIER
@@ -391,6 +414,13 @@ config MXC_UART
 	  If you have a machine based on a Motorola IMX CPU you
 	  can enable its onboard serial port by enabling this option.
 
+config NULLDEV_SERIAL
+	bool "Null serial device"
+	help
+	  Select this to enable null serial device support. A null serial
+	  device merely acts as a placeholder for a serial device and does
+	  nothing for all it's operation.
+
 config PIC32_SERIAL
 	bool "Support for Microchip PIC32 on-chip UART"
 	depends on DM_SERIAL && MACH_PIC32
@@ -446,6 +476,14 @@ config SANDBOX_SERIAL
 	     -t raw		Raw mode, Ctrl-C is processed by U-Boot
 	     -t cooked		Cooked mode, Ctrl-C terminates
 
+config SCIF_CONSOLE
+	bool "Renesas SCIF UART support"
+	depends on SH || ARCH_RMOBILE
+	help
+	  Select this to enable Renesas SCIF UART. To operate serial ports
+	  on systems with RCar or SH SoCs, say Y to this option. If unsure,
+	  say N.
+
 config UNIPHIER_SERIAL
 	bool "Support for UniPhier on-chip UART"
 	depends on ARCH_UNIPHIER
@@ -490,6 +528,14 @@ config STI_ASC_SERIAL
 	  Select this to enable Asynchronous Serial Controller available
 	  on STiH410 SoC. This is a basic implementation,  it supports
 	  following baudrate 9600, 19200, 38400, 57600 and 115200.
+
+config STM32X7_SERIAL
+	bool "STMicroelectronics STM32 SoCs on-chip UART"
+	depends on DM_SERIAL && (STM32F4 || STM32F7 || STM32H7)
+	help
+	  If you have a machine based on a STM32 F4, F7 or H7 SoC you can
+	  enable its onboard serial ports, say Y to this option.
+	  If unsure, say N.
 
 config MPC8XX_CONS
 	bool "Console driver for MPC8XX"

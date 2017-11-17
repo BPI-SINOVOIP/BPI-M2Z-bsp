@@ -32,7 +32,7 @@
 #define CONFIG_SYS_DDR_BLOCK2_BASE     0x880000000ULL
 
 /* Generic Timer Definitions */
-#define COUNTER_FREQUENCY		CONFIG_SYS_CLK_FREQ/4	/* 25MHz */
+#define COUNTER_FREQUENCY		25000000	/* 25MHz */
 
 /* CSU */
 #define CONFIG_LAYERSCAPE_NS_ACCESS
@@ -64,7 +64,6 @@
  */
 #define CONFIG_ENV_OVERWRITE
 
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SIZE			0x40000          /* 256KB */
 #define CONFIG_ENV_OFFSET		0x200000        /* 2MB */
 #define CONFIG_ENV_SECT_SIZE		0x40000
@@ -83,9 +82,6 @@
 
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 
-/* Command line configuration */
-#undef CONFIG_CMD_IMLS
-
 #define CONFIG_SYS_HZ			1000
 
 #define CONFIG_HWCONFIG
@@ -102,17 +98,12 @@
 	"kernel_load=0xa0000000\0"		\
 	"kernel_size=0x2800000\0"		\
 
-#define CONFIG_BOOTARGS		"console=ttyS0,115200 root=/dev/ram0 " \
-				"earlycon=uart8250,mmio,0x21c0500 quiet lpj=250000"
 #define CONFIG_BOOTCOMMAND		"sf probe 0:0; sf read $kernel_load "\
 					"$kernel_start $kernel_size && "\
 					"bootm $kernel_load"
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		512	/* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE /* Boot args buffer */
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_CMDLINE_EDITING		1
 #define CONFIG_AUTO_COMPLETE

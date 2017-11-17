@@ -190,8 +190,8 @@ static int mc_fixup_mac_addr(void *blob, int nodeoffset,
 	/* MAC address property present */
 	if (fdt_get_property(blob, nodeoffset, propname, NULL)) {
 		/* u-boot MAC addr randomly assigned - leave the present one */
-		if (!eth_getenv_enetaddr_by_index("eth", eth_dev->index,
-						  env_enetaddr))
+		if (!eth_env_get_enetaddr_by_index("eth", eth_dev->index,
+						   env_enetaddr))
 			return err;
 	} else {
 		size = MC_DT_INCREASE_SIZE + strlen(propname) + len;
@@ -530,7 +530,7 @@ static unsigned long get_mc_boot_timeout_ms(void)
 {
 	unsigned long timeout_ms = CONFIG_SYS_LS_MC_BOOT_TIMEOUT_MS;
 
-	char *timeout_ms_env_var = getenv(MC_BOOT_TIMEOUT_ENV_VAR);
+	char *timeout_ms_env_var = env_get(MC_BOOT_TIMEOUT_ENV_VAR);
 
 	if (timeout_ms_env_var) {
 		timeout_ms = simple_strtoul(timeout_ms_env_var, NULL, 10);
@@ -725,9 +725,9 @@ int mc_init(u64 mc_fw_addr, u64 mc_dpc_addr)
 	 * Initialize the global default MC portal
 	 * And check that the MC firmware is responding portal commands:
 	 */
-	root_mc_io = (struct fsl_mc_io *)malloc(sizeof(struct fsl_mc_io));
+	root_mc_io = (struct fsl_mc_io *)calloc(sizeof(struct fsl_mc_io), 1);
 	if (!root_mc_io) {
-		printf(" No memory: malloc() failed\n");
+		printf(" No memory: calloc() failed\n");
 		return -ENOMEM;
 	}
 
@@ -800,12 +800,19 @@ int get_dpl_apply_status(void)
 	return mc_dpl_applied;
 }
 
-/**
+/*
  * Return the MC address of private DRAM block.
+ * As per MC design document, MC initial base address
+ * should be least significant 512MB address of MC private
+ * memory, i.e. address should point to end address masked
+ * with 512MB offset in private DRAM block.
  */
 u64 mc_get_dram_addr(void)
 {
-	return gd->arch.resv_ram;
+	size_t mc_ram_size = mc_get_dram_block_size();
+
+	return (gd->arch.resv_ram + mc_ram_size - 1) &
+		MC_RAM_BASE_ADDR_ALIGNMENT_MASK;
 }
 
 /**
@@ -815,7 +822,7 @@ unsigned long mc_get_dram_block_size(void)
 {
 	unsigned long dram_block_size = CONFIG_SYS_LS_MC_DRAM_BLOCK_MIN_SIZE;
 
-	char *dram_block_size_env_var = getenv(MC_MEM_SIZE_ENV_VAR);
+	char *dram_block_size_env_var = env_get(MC_MEM_SIZE_ENV_VAR);
 
 	if (dram_block_size_env_var) {
 		dram_block_size = simple_strtoul(dram_block_size_env_var, NULL,
@@ -872,11 +879,12 @@ static int dpio_init(void)
 	struct dpio_cfg dpio_cfg;
 	int err = 0;
 
-	dflt_dpio = (struct fsl_dpio_obj *)malloc(sizeof(struct fsl_dpio_obj));
+	dflt_dpio = (struct fsl_dpio_obj *)calloc(
+					sizeof(struct fsl_dpio_obj), 1);
 	if (!dflt_dpio) {
-		printf("No memory: malloc() failed\n");
+		printf("No memory: calloc() failed\n");
 		err = -ENOMEM;
-		goto err_malloc;
+		goto err_calloc;
 	}
 
 	dpio_cfg.channel_mode = DPIO_LOCAL_CHANNEL;
@@ -941,7 +949,7 @@ err_get_attr:
 	dpio_destroy(dflt_mc_io, MC_CMD_NO_FLAGS, dflt_dpio->dpio_handle);
 err_create:
 	free(dflt_dpio);
-err_malloc:
+err_calloc:
 	return err;
 }
 
@@ -1023,11 +1031,11 @@ static int dprc_init(void)
 		goto err_create;
 	}
 
-	dflt_mc_io = (struct fsl_mc_io *)malloc(sizeof(struct fsl_mc_io));
+	dflt_mc_io = (struct fsl_mc_io *)calloc(sizeof(struct fsl_mc_io), 1);
 	if (!dflt_mc_io) {
 		err  = -ENOMEM;
-		printf(" No memory: malloc() failed\n");
-		goto err_malloc;
+		printf(" No memory: calloc() failed\n");
+		goto err_calloc;
 	}
 
 	child_portal_id = MC_PORTAL_OFFSET_TO_PORTAL_ID(mc_portal_offset);
@@ -1052,7 +1060,7 @@ static int dprc_init(void)
 	return 0;
 err_child_open:
 	free(dflt_mc_io);
-err_malloc:
+err_calloc:
 	dprc_destroy_container(root_mc_io, MC_CMD_NO_FLAGS,
 			       root_dprc_handle, child_dprc_id);
 err_create:
@@ -1103,11 +1111,12 @@ static int dpbp_init(void)
 	struct dpbp_attr dpbp_attr;
 	struct dpbp_cfg dpbp_cfg;
 
-	dflt_dpbp = (struct fsl_dpbp_obj *)malloc(sizeof(struct fsl_dpbp_obj));
+	dflt_dpbp = (struct fsl_dpbp_obj *)calloc(
+					sizeof(struct fsl_dpbp_obj), 1);
 	if (!dflt_dpbp) {
-		printf("No memory: malloc() failed\n");
+		printf("No memory: calloc() failed\n");
 		err = -ENOMEM;
-		goto err_malloc;
+		goto err_calloc;
 	}
 
 	dpbp_cfg.options = 512;
@@ -1157,7 +1166,7 @@ err_get_attr:
 	dpbp_close(dflt_mc_io, MC_CMD_NO_FLAGS, dflt_dpbp->dpbp_handle);
 	dpbp_destroy(dflt_mc_io, MC_CMD_NO_FLAGS, dflt_dpbp->dpbp_handle);
 err_create:
-err_malloc:
+err_calloc:
 	return err;
 }
 
@@ -1199,11 +1208,12 @@ static int dpni_init(void)
 	struct dpni_extended_cfg dpni_extended_cfg;
 	struct dpni_cfg dpni_cfg;
 
-	dflt_dpni = (struct fsl_dpni_obj *)malloc(sizeof(struct fsl_dpni_obj));
+	dflt_dpni = (struct fsl_dpni_obj *)calloc(
+					sizeof(struct fsl_dpni_obj), 1);
 	if (!dflt_dpni) {
-		printf("No memory: malloc() failed\n");
+		printf("No memory: calloc() failed\n");
 		err = -ENOMEM;
-		goto err_malloc;
+		goto err_calloc;
 	}
 
 	memset(&dpni_extended_cfg, 0, sizeof(dpni_extended_cfg));
@@ -1265,7 +1275,7 @@ err_get_attr:
 err_create:
 err_prepare_extended_cfg:
 	free(dflt_dpni);
-err_malloc:
+err_calloc:
 	return err;
 }
 
@@ -1336,14 +1346,18 @@ int fsl_mc_ldpaa_exit(bd_t *bd)
 {
 	int err = 0;
 	bool is_dpl_apply_status = false;
+	bool mc_boot_status = false;
 
 	if (bd && mc_lazy_dpl_addr && !fsl_mc_ldpaa_exit(NULL)) {
 		mc_apply_dpl(mc_lazy_dpl_addr);
 		mc_lazy_dpl_addr = 0;
 	}
 
+	if (!get_mc_boot_status())
+		mc_boot_status = true;
+
 	/* MC is not loaded intentionally, So return success. */
-	if (bd && get_mc_boot_status() != 0)
+	if (bd && !mc_boot_status)
 		return 0;
 
 	/* If DPL is deployed, set is_dpl_apply_status as TRUE. */
@@ -1354,10 +1368,13 @@ int fsl_mc_ldpaa_exit(bd_t *bd)
 	 * For case MC is loaded but DPL is not deployed, return success and
 	 * print message on console. Else FDT fix-up code execution hanged.
 	 */
-	if (bd && !get_mc_boot_status() && !is_dpl_apply_status) {
+	if (bd && mc_boot_status && !is_dpl_apply_status) {
 		printf("fsl-mc: DPL not deployed, DPAA2 ethernet not work\n");
 		return 0;
 	}
+
+	if (bd && mc_boot_status && is_dpl_apply_status)
+		return 0;
 
 	err = dpbp_exit();
 	if (err < 0) {
@@ -1511,7 +1528,7 @@ void mc_env_boot(void)
 	 * address info properly. Without MAC addresses, the MC code
 	 * can not properly initialize the DPC.
 	 */
-	mc_boot_env_var = getenv(MC_BOOT_ENV_VAR);
+	mc_boot_env_var = env_get(MC_BOOT_ENV_VAR);
 	if (mc_boot_env_var)
 		run_command_list(mc_boot_env_var, -1, 0);
 #endif /* CONFIG_FSL_MC_ENET */

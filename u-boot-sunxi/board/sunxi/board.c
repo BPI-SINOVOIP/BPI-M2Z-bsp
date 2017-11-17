@@ -32,6 +32,7 @@
 #include <libfdt.h>
 #include <nand.h>
 #include <net.h>
+#include <spl.h>
 #include <sy8106a.h>
 #include <asm/setup.h>
 
@@ -216,6 +217,8 @@ int board_init(void)
 	satapwr_pin = sunxi_name_to_gpio(CONFIG_SATAPWR);
 	gpio_request(satapwr_pin, "satapwr");
 	gpio_direction_output(satapwr_pin, 1);
+	/* Give attached sata device time to power-up to avoid link timeouts */
+	mdelay(500);
 #endif
 #ifdef CONFIG_MACPWR
 	macpwr_pin = sunxi_name_to_gpio(CONFIG_MACPWR);
@@ -491,20 +494,6 @@ int board_mmc_init(bd_t *bis)
 		return -1;
 #endif
 
-#if !defined(CONFIG_SPL_BUILD) && CONFIG_MMC_SUNXI_SLOT_EXTRA == 2
-	/*
-	 * On systems with an emmc (mmc2), figure out if we are booting from
-	 * the emmc and if we are make it "mmc dev 0" so that boot.scr, etc.
-	 * are searched there first. Note we only do this for u-boot proper,
-	 * not for the SPL, see spl_boot_device().
-	 */
-	if (readb(SPL_ADDR + 0x28) == SUNXI_BOOTED_FROM_MMC2) {
-		/* Booting from emmc / mmc2, swap */
-		mmc0->block_dev.devnum = 1;
-		mmc1->block_dev.devnum = 0;
-	}
-#endif
-
 	return 0;
 }
 #endif
@@ -602,7 +591,7 @@ void get_board_serial(struct tag_serialnr *serialnr)
 	char *serial_string;
 	unsigned long long serial;
 
-	serial_string = getenv("serial#");
+	serial_string = env_get("serial#");
 
 	if (serial_string) {
 		serial = simple_strtoull(serial_string, NULL, 16);
@@ -646,7 +635,7 @@ static void parse_spl_header(const uint32_t spl_addr)
 		return;
 	}
 	/* otherwise assume .scr format (mkimage-type script) */
-	setenv_hex("fel_scriptaddr", spl->fel_script_address);
+	env_set_hex("fel_scriptaddr", spl->fel_script_address);
 }
 
 /*
@@ -694,7 +683,7 @@ static void setup_environment(const void *fdt)
 			else
 				sprintf(ethaddr, "eth%daddr", i);
 
-			if (getenv(ethaddr))
+			if (env_get(ethaddr))
 				continue;
 
 			/* Non OUI / registered MAC address */
@@ -705,14 +694,14 @@ static void setup_environment(const void *fdt)
 			mac_addr[4] = (sid[3] >>  8) & 0xff;
 			mac_addr[5] = (sid[3] >>  0) & 0xff;
 
-			eth_setenv_enetaddr(ethaddr, mac_addr);
+			eth_env_set_enetaddr(ethaddr, mac_addr);
 		}
 
-		if (!getenv("serial#")) {
+		if (!env_get("serial#")) {
 			snprintf(serial_string, sizeof(serial_string),
 				"%08x%08x", sid[0], sid[3]);
 
-			setenv("serial#", serial_string);
+			env_set("serial#", serial_string);
 		}
 	}
 }
@@ -720,13 +709,22 @@ static void setup_environment(const void *fdt)
 int misc_init_r(void)
 {
 	__maybe_unused int ret;
+	uint boot;
 
-	setenv("fel_booted", NULL);
-	setenv("fel_scriptaddr", NULL);
+	env_set("fel_booted", NULL);
+	env_set("fel_scriptaddr", NULL);
+	env_set("mmc_bootdev", NULL);
+
+	boot = sunxi_get_boot_device();
 	/* determine if we are running in FEL mode */
-	if (!is_boot0_magic(SPL_ADDR + 4)) { /* eGON.BT0 */
-		setenv("fel_booted", "1");
+	if (boot == BOOT_DEVICE_BOARD) {
+		env_set("fel_booted", "1");
 		parse_spl_header(SPL_ADDR);
+	/* or if we booted from MMC, and which one */
+	} else if (boot == BOOT_DEVICE_MMC1) {
+		env_set("mmc_bootdev", "0");
+	} else if (boot == BOOT_DEVICE_MMC2) {
+		env_set("mmc_bootdev", "1");
 	}
 
 	setup_environment(gd->fdt_blob);
@@ -736,7 +734,10 @@ int misc_init_r(void)
 	if (ret)
 		return ret;
 #endif
-	sunxi_musb_board_init();
+
+#ifdef CONFIG_USB_ETHER
+	usb_ether_init();
+#endif
 
 	return 0;
 }

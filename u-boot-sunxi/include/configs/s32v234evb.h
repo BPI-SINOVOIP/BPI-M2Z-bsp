@@ -73,8 +73,6 @@
 #define CONFIG_ENV_OVERWRITE
 #define CONFIG_SYS_UART_PORT		(1)
 
-#undef CONFIG_CMD_IMLS
-
 #define CONFIG_FSL_ESDHC
 #define CONFIG_FSL_USDHC
 #define CONFIG_SYS_FSL_ESDHC_ADDR	USDHC_BASE_ADDR
@@ -93,8 +91,6 @@
 #define IMX_FEC_BASE            ENET_BASE_ADDR
 #define CONFIG_FEC_XCV_TYPE     RMII
 #define CONFIG_FEC_MXC_PHYADDR  0
-#define CONFIG_PHYLIB
-#define CONFIG_PHY_MICREL
 #endif
 
 #if 0				/* Disable until the FLASH will be implemented */
@@ -103,7 +99,6 @@
 
 #ifdef CONFIG_SYS_USE_NAND
 /* Nand Flash Configs */
-#define	CONFIG_CMD_NAND
 #define CONFIG_JFFS2_NAND
 #define MTD_NAND_FSL_NFC_SWECC 1
 #define CONFIG_NAND_FSL_NFC
@@ -115,7 +110,6 @@
 #endif
 
 #define CONFIG_LOADADDR			0xC307FFC0
-#define CONFIG_BOOTARGS			"console=ttyLF0 root=/dev/ram rw"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"boot_scripts=boot.scr.uimg boot.scr\0" \
@@ -168,11 +162,6 @@
 #define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
 #define CONFIG_SYS_PROMPT		"=> "
 #undef CONFIG_AUTO_COMPLETE
-#define CONFIG_SYS_CBSIZE		256	/* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE		\
-			(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_MAXARGS		16	/* max number of command args */
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 #define CONFIG_CMDLINE_EDITING
 
 #define CONFIG_CMD_MEMTEST
@@ -211,7 +200,6 @@
 
 /* environment organization */
 #define CONFIG_ENV_SIZE			(8 * 1024)
-#define CONFIG_ENV_IS_IN_MMC
 
 #define CONFIG_ENV_OFFSET		(12 * 64 * 1024)
 #define CONFIG_SYS_MMC_ENV_DEV		0

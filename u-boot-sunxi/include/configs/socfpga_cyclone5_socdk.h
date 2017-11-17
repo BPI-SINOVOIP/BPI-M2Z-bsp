@@ -18,12 +18,6 @@
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
 
 /* Ethernet on SoC (EMAC) */
-#if defined(CONFIG_CMD_NET)
-#define CONFIG_PHY_MICREL
-#define CONFIG_PHY_MICREL_KSZ9021
-#endif
-
-#define CONFIG_ENV_IS_IN_MMC
 
 /* The rest of the configuration is shared */
 #include <configs/socfpga_common.h>

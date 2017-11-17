@@ -6,6 +6,7 @@
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
+
 #include <common.h>
 #include <dm.h>
 #include <spl.h>
@@ -157,7 +158,7 @@ int spl_parse_image_header(struct spl_image_info *spl_image,
 			spl_image->load_addr, spl_image->size);
 #else
 		/* LEGACY image not supported */
-		debug("Legacy boot image support not enabled, proceeding to other boot methods");
+		debug("Legacy boot image support not enabled, proceeding to other boot methods\n");
 		return -EINVAL;
 #endif
 	} else {
@@ -195,7 +196,7 @@ int spl_parse_image_header(struct spl_image_info *spl_image,
 		spl_set_header_raw_uboot(spl_image);
 #else
 		/* RAW image not supported, proceed to other boot methods. */
-		debug("Raw boot image support not enabled, proceeding to other boot methods");
+		debug("Raw boot image support not enabled, proceeding to other boot methods\n");
 		return -EINVAL;
 #endif
 	}
@@ -220,12 +221,12 @@ static int spl_common_init(bool setup_malloc)
 
 	debug("spl_early_init()\n");
 
-#if defined(CONFIG_SYS_MALLOC_F_LEN)
+#if CONFIG_VAL(SYS_MALLOC_F_LEN)
 	if (setup_malloc) {
 #ifdef CONFIG_MALLOC_F_ADDR
 		gd->malloc_base = CONFIG_MALLOC_F_ADDR;
 #endif
-		gd->malloc_limit = CONFIG_SYS_MALLOC_F_LEN;
+		gd->malloc_limit = CONFIG_VAL(SYS_MALLOC_F_LEN);
 		gd->malloc_ptr = 0;
 	}
 #endif
@@ -243,7 +244,7 @@ static int spl_common_init(bool setup_malloc)
 			return ret;
 		}
 	}
-	if (IS_ENABLED(CONFIG_SPL_DM)) {
+	if (CONFIG_IS_ENABLED(DM)) {
 		bootstage_start(BOOTSTATE_ID_ACCUM_DM_SPL, "dm_spl");
 		/* With CONFIG_SPL_OF_PLATDATA, bring in all devices */
 		ret = dm_init_and_scan(!CONFIG_IS_ENABLED(OF_PLATDATA));
@@ -255,6 +256,12 @@ static int spl_common_init(bool setup_malloc)
 	}
 
 	return 0;
+}
+
+void spl_set_bd(void)
+{
+	if (!gd->bd)
+		gd->bd = &bdata;
 }
 
 int spl_early_init(void)
@@ -364,7 +371,9 @@ void board_init_r(gd_t *dummy1, ulong dummy2)
 	struct spl_image_info spl_image;
 
 	debug(">>spl:board_init_r()\n");
-	gd->bd = &bdata;
+
+	spl_set_bd();
+
 #ifdef CONFIG_SPL_OS_BOOT
 	dram_init_banksize();
 #endif
@@ -378,7 +387,7 @@ void board_init_r(gd_t *dummy1, ulong dummy2)
 		if (spl_init())
 			hang();
 	}
-#ifndef CONFIG_PPC
+#if !defined(CONFIG_PPC) && !defined(CONFIG_ARCH_MX6)
 	/*
 	 * timer_init() does not exist on PPC systems. The timer is initialized
 	 * and enabled (decrementer) in interrupt_init() here.
@@ -419,17 +428,10 @@ void board_init_r(gd_t *dummy1, ulong dummy2)
 	default:
 		debug("Unsupported OS image.. Jumping nevertheless..\n");
 	}
-#if defined(CONFIG_SYS_MALLOC_F_LEN) && !defined(CONFIG_SYS_SPL_MALLOC_SIZE)
+#if CONFIG_VAL(SYS_MALLOC_F_LEN) && !defined(CONFIG_SYS_SPL_MALLOC_SIZE)
 	debug("SPL malloc() used %#lx bytes (%ld KB)\n", gd->malloc_ptr,
 	      gd->malloc_ptr / 1024);
 #endif
-
-	if (IS_ENABLED(CONFIG_SPL_ATF_SUPPORT)) {
-		debug("loaded - jumping to U-Boot via ATF BL31.\n");
-		bl31_entry();
-	}
-
-	debug("loaded - jumping to U-Boot...\n");
 #ifdef CONFIG_BOOTSTAGE_STASH
 	int ret;
 
@@ -439,6 +441,13 @@ void board_init_r(gd_t *dummy1, ulong dummy2)
 	if (ret)
 		debug("Failed to stash bootstage: err=%d\n", ret);
 #endif
+
+	if (CONFIG_IS_ENABLED(ATF_SUPPORT)) {
+		debug("loaded - jumping to U-Boot via ATF BL31.\n");
+		bl31_entry();
+	}
+
+	debug("loaded - jumping to U-Boot...\n");
 	spl_board_prepare_for_boot();
 	jump_to_image_no_args(&spl_image);
 }
@@ -486,7 +495,7 @@ ulong spl_relocate_stack_gd(void)
 	gd_t *new_gd;
 	ulong ptr = CONFIG_SPL_STACK_R_ADDR;
 
-#ifdef CONFIG_SPL_SYS_MALLOC_SIMPLE
+#if defined(CONFIG_SPL_SYS_MALLOC_SIMPLE) && CONFIG_VAL(SYS_MALLOC_F_LEN)
 	if (CONFIG_SPL_STACK_R_MALLOC_SIMPLE_LEN) {
 		ptr -= CONFIG_SPL_STACK_R_MALLOC_SIMPLE_LEN;
 		gd->malloc_base = ptr;

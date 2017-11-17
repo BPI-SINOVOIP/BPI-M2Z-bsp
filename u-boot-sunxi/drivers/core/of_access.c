@@ -96,6 +96,30 @@ int of_n_size_cells(const struct device_node *np)
 	return OF_ROOT_NODE_SIZE_CELLS_DEFAULT;
 }
 
+int of_simple_addr_cells(const struct device_node *np)
+{
+	const __be32 *ip;
+
+	ip = of_get_property(np, "#address-cells", NULL);
+	if (ip)
+		return be32_to_cpup(ip);
+
+	/* Return a default of 2 to match fdt_address_cells()*/
+	return 2;
+}
+
+int of_simple_size_cells(const struct device_node *np)
+{
+	const __be32 *ip;
+
+	ip = of_get_property(np, "#size-cells", NULL);
+	if (ip)
+		return be32_to_cpup(ip);
+
+	/* Return a default of 2 to match fdt_size_cells()*/
+	return 2;
+}
+
 struct property *of_find_property(const struct device_node *np,
 				  const char *name, int *lenp)
 {
@@ -639,6 +663,13 @@ int of_parse_phandle_with_args(const struct device_node *np,
 
 	return __of_parse_phandle_with_args(np, list_name, cells_name, 0,
 					    index, out_args);
+}
+
+int of_count_phandle_with_args(const struct device_node *np,
+			       const char *list_name, const char *cells_name)
+{
+	return __of_parse_phandle_with_args(np, list_name, cells_name, 0,
+					    -1, NULL);
 }
 
 static void of_alias_add(struct alias_prop *ap, struct device_node *np,

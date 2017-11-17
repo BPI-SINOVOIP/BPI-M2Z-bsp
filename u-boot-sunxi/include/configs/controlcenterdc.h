@@ -33,8 +33,6 @@
  * Commands configuration
  */
 #define CONFIG_CMD_I2C
-#define CONFIG_CMD_PCI
-#define CONFIG_CMD_SCSI
 #define CONFIG_CMD_SPI
 
 /* SPI NOR flash default params, used by sf commands */
@@ -51,7 +49,6 @@
  * SATA/SCSI/AHCI configuration
  */
 #define CONFIG_LIBATA
-#define CONFIG_SCSI
 #define CONFIG_SCSI_AHCI
 #define CONFIG_SCSI_AHCI_PLAT
 #define CONFIG_SYS_SCSI_MAX_SCSI_ID	2
@@ -66,7 +63,6 @@
 #define CONFIG_EHCI_IS_TDI
 
 /* Environment in SPI NOR flash */
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SPI_BUS		1
 #define CONFIG_ENV_OFFSET		(1 << 20) /* 1MiB in */
 #define CONFIG_ENV_SIZE			(64 << 10) /* 64KiB */

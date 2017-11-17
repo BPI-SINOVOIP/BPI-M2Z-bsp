@@ -51,15 +51,11 @@
 /* PWM */
 #define CONFIG_PWM			1
 
-#define CONFIG_CMD_REGINFO
-#define CONFIG_CMD_ONENAND
-
 /* USB Composite download gadget - g_dnl */
 #define CONFIG_SYS_DFU_DATA_BUF_SIZE SZ_32M
 #define DFU_DEFAULT_POLL_TIMEOUT 300
 
 /* TIZEN THOR downloader support */
-#define CONFIG_CMD_THOR_DOWNLOAD
 #define CONFIG_USB_FUNCTION_THOR
 
 /* USB Samsung's IDs */
@@ -70,15 +66,6 @@
 #define CONFIG_G_DNL_UMS_PRODUCT_NUM 0xA4A5
 
 /* Actual modem binary size is 16MiB. Add 2MiB for bad block handling */
-#define MTDIDS_DEFAULT		"onenand0=samsung-onenand"
-#define MTDPARTS_DEFAULT	"mtdparts=samsung-onenand:1m(bootloader)"\
-				",256k(params)"\
-				",2816k(config)"\
-				",8m(csa)"\
-				",7m(kernel)"\
-				",1m(log)"\
-				",12m(modem)"\
-				",60m(qboot)\0"
 
 /* partitions definitions */
 #define PARTS_CSA			"csa-mmc"
@@ -114,9 +101,6 @@
 		" ${console} ${meminfo}"
 
 #define CONFIG_COMMON_BOOT	"${console} ${meminfo} ${mtdparts}"
-
-#define CONFIG_BOOTARGS	"root=/dev/mtdblock8 rootfstype=ext4 " \
-			CONFIG_COMMON_BOOT
 
 #define CONFIG_UPDATEB	"updateb=onenand erase 0x0 0x100000;" \
 			" onenand write 0x32008000 0x0 0x100000\0"
@@ -175,11 +159,7 @@
 	"dfu_alt_info=" CONFIG_DFU_ALT "\0"
 
 #define CONFIG_SYS_LONGHELP		/* undef to save memory */
-#define CONFIG_SYS_CBSIZE	256	/* Console I/O Buffer Size */
 #define CONFIG_SYS_PBSIZE	384	/* Print Buffer Size */
-#define CONFIG_SYS_MAXARGS	16	/* max number of command args */
-/* Boot Argument Buffer Size */
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 /* memtest works on */
 #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + 0x5000000)
@@ -199,7 +179,6 @@
 
 /* FLASH and environment organization */
 #define CONFIG_MMC_DEFAULT_DEV	0
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV		CONFIG_MMC_DEFAULT_DEV
 #define CONFIG_ENV_SIZE			4096
 #define CONFIG_ENV_OFFSET		((32 - 4) << 10) /* 32KiB - 4KiB */

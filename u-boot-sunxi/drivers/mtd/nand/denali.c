@@ -10,7 +10,7 @@
 #include <malloc.h>
 #include <nand.h>
 #include <linux/errno.h>
-#include <asm/io.h>
+#include <linux/io.h>
 
 #include "denali.h"
 
@@ -433,17 +433,13 @@ static void find_valid_banks(struct denali_nand_info *denali)
  */
 static void detect_max_banks(struct denali_nand_info *denali)
 {
-	uint32_t features = readl(denali->flash_reg + FEATURES);
-	/*
-	 * Read the revision register, so we can calculate the max_banks
-	 * properly: the encoding changed from rev 5.0 to 5.1
-	 */
-	u32 revision = MAKE_COMPARABLE_REVISION(
-				readl(denali->flash_reg + REVISION));
-	if (revision < REVISION_5_1)
-		denali->max_banks = 2 << (features & FEATURES__N_BANKS);
-	else
-		denali->max_banks = 1 << (features & FEATURES__N_BANKS);
+	uint32_t features = ioread32(denali->flash_reg + FEATURES);
+
+	denali->max_banks = 1 << (features & FEATURES__N_BANKS);
+
+	/* the encoding changed from rev 5.0 to 5.1 */
+	if (denali->revision < 0x0501)
+		denali->max_banks <<= 1;
 }
 
 static void detect_partition_feature(struct denali_nand_info *denali)
@@ -1154,6 +1150,13 @@ static void denali_cmdfunc(struct mtd_info *mtd, unsigned int cmd, int col,
 static void denali_hw_init(struct denali_nand_info *denali)
 {
 	/*
+	 * The REVISION register may not be reliable.  Platforms are allowed to
+	 * override it.
+	 */
+	if (!denali->revision)
+		denali->revision = swab16(ioread32(denali->flash_reg + REVISION));
+
+	/*
 	 * tell driver how many bit controller will skip before writing
 	 * ECC code in OOB. This is normally used for bad block marker
 	 */
@@ -1175,7 +1178,7 @@ static void denali_hw_init(struct denali_nand_info *denali)
 
 static struct nand_ecclayout nand_oob;
 
-static int denali_init(struct denali_nand_info *denali)
+int denali_init(struct denali_nand_info *denali)
 {
 	struct mtd_info *mtd = nand_to_mtd(&denali->nand);
 	int ret;
@@ -1273,6 +1276,7 @@ fail:
 	return ret;
 }
 
+#ifndef CONFIG_NAND_DENALI_DT
 static int __board_nand_init(void)
 {
 	struct denali_nand_info *denali;
@@ -1296,3 +1300,4 @@ void board_nand_init(void)
 	if (__board_nand_init() < 0)
 		pr_warn("Failed to initialize Denali NAND controller.\n");
 }
+#endif

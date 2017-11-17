@@ -16,16 +16,16 @@
  * This needs to be defined for the OHCI code to work but it is defined as
  * ATMEL_ID_UHPHS in the CPU specific header files.
  */
-#define ATMEL_ID_UHP			ATMEL_ID_UHPHS
+#define ATMEL_ID_UHP			32
 
 /*
  * Specify the clock enable bit in the PMC_SCER register.
  */
-#define ATMEL_PMC_UHP			AT91SAM926x_PMC_UHP
+#define ATMEL_PMC_UHP			(1 <<  6)
 
 /* SDRAM */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_SDRAM_BASE           ATMEL_BASE_DDRCS
+#define CONFIG_SYS_SDRAM_BASE           0x20000000
 #define CONFIG_SYS_SDRAM_SIZE		0x10000000
 
 #ifdef CONFIG_SPL_BUILD
@@ -36,31 +36,24 @@
 #endif
 
 /* NAND flash */
-#define CONFIG_CMD_NAND
-
 #ifdef CONFIG_CMD_NAND
 #define CONFIG_NAND_ATMEL
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_SYS_NAND_BASE		ATMEL_BASE_CS3
+#define CONFIG_SYS_NAND_BASE		0x60000000
 /* our ALE is AD21 */
 #define CONFIG_SYS_NAND_MASK_ALE	(1 << 21)
 /* our CLE is AD22 */
 #define CONFIG_SYS_NAND_MASK_CLE	(1 << 22)
 #define CONFIG_SYS_NAND_ONFI_DETECTION
+
+#define CONFIG_MTD_DEVICE
+#define CONFIG_MTD_PARTITIONS
+#endif
 /* PMECC & PMERRLOC */
 #define CONFIG_ATMEL_NAND_HWECC
 #define CONFIG_ATMEL_NAND_HW_PMECC
 #define CONFIG_PMECC_CAP		4
 #define CONFIG_PMECC_SECTOR_SIZE	512
-#define CONFIG_CMD_NAND_TRIMFFS
-#define CONFIG_CMD_MTDPARTS
-
-#define CONFIG_MTD_DEVICE
-#define CONFIG_MTD_PARTITIONS
-#define CONFIG_RBTREE
-#define CONFIG_LZO
-#define CONFIG_CMD_UBIFS
-#endif
 
 /* USB */
 
@@ -69,20 +62,12 @@
 #define CONFIG_USB_ATMEL_CLK_SEL_UPLL
 #define CONFIG_USB_OHCI_NEW
 #define CONFIG_SYS_USB_OHCI_CPU_INIT
-#define CONFIG_SYS_USB_OHCI_REGS_BASE		ATMEL_BASE_OHCI
+#define CONFIG_SYS_USB_OHCI_REGS_BASE		0x00600000
 #define CONFIG_SYS_USB_OHCI_SLOT_NAME		"SAMA5D3 Xplained"
 #define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS	2
 #endif
 
 #define CONFIG_SYS_LOAD_ADDR			0x22000000 /* load address */
-
-#if CONFIG_SYS_USE_NANDFLASH
-/* override the bootcmd, bootargs and other configuration for nandflash env */
-#elif CONFIG_SYS_USE_MMC
-/* override the bootcmd, bootargs and other configuration for sd/mmc env */
-#else
-#define CONFIG_ENV_IS_NOWHERE
-#endif
 
 /* SPL */
 #define CONFIG_SPL_FRAMEWORK
@@ -95,14 +80,14 @@
 
 #define CONFIG_SYS_MONITOR_LEN		(512 << 10)
 
-#ifdef CONFIG_SYS_USE_MMC
-#define CONFIG_SPL_LDSCRIPT		arch/arm/mach-at91/armv7/u-boot-spl.lds
+#ifdef CONFIG_SD_BOOT
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME	"u-boot.img"
 
-#elif CONFIG_SYS_USE_NANDFLASH
+#elif CONFIG_NAND_BOOT
 #define CONFIG_SPL_NAND_DRIVERS
 #define CONFIG_SPL_NAND_BASE
+#endif
 #define CONFIG_SYS_NAND_U_BOOT_OFFS	0x40000
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
 #define CONFIG_SYS_NAND_PAGE_SIZE	0x800
@@ -111,7 +96,5 @@
 #define CONFIG_SYS_NAND_BLOCK_SIZE	0x20000
 #define CONFIG_SYS_NAND_BAD_BLOCK_POS	0x0
 #define CONFIG_SPL_GENERATE_ATMEL_PMECC_HEADER
-
-#endif
 
 #endif

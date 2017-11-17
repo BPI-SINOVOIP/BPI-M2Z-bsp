@@ -36,11 +36,13 @@
 
 #define board_is_x15()		board_ti_is("BBRDX15_")
 #define board_is_x15_revb1()	(board_ti_is("BBRDX15_") && \
-				 (strncmp("B.10", board_ti_get_rev(), 3) <= 0))
+				 !strncmp("B.10", board_ti_get_rev(), 3))
+#define board_is_x15_revc()	(board_ti_is("BBRDX15_") && \
+				 !strncmp("C.00", board_ti_get_rev(), 3))
 #define board_is_am572x_evm()	board_ti_is("AM572PM_")
 #define board_is_am572x_evm_reva3()	\
 				(board_ti_is("AM572PM_") && \
-				 (strncmp("A.30", board_ti_get_rev(), 3) <= 0))
+				 !strncmp("A.30", board_ti_get_rev(), 3))
 #define board_is_am572x_idk()	board_ti_is("AM572IDK")
 #define board_is_am571x_idk()	board_ti_is("AM571IDK")
 
@@ -221,11 +223,39 @@ static const u32 beagle_x15_emif2_ddr3_ext_phy_ctrl_const_regs[] = {
 	0x0
 };
 
+static const struct emif_regs am571x_emif1_ddr3_666mhz_emif_regs = {
+	.sdram_config_init		= 0x61863332,
+	.sdram_config			= 0x61863332,
+	.sdram_config2			= 0x08000000,
+	.ref_ctrl			= 0x0000514d,
+	.ref_ctrl_final			= 0x0000144a,
+	.sdram_tim1			= 0xd333887c,
+	.sdram_tim2			= 0x40b37fe3,
+	.sdram_tim3			= 0x409f8ada,
+	.read_idle_ctrl			= 0x00050000,
+	.zq_config			= 0x5007190b,
+	.temp_alert_config		= 0x00000000,
+	.emif_ddr_phy_ctlr_1_init	= 0x0024400f,
+	.emif_ddr_phy_ctlr_1		= 0x0e24400f,
+	.emif_ddr_ext_phy_ctrl_1	= 0x10040100,
+	.emif_ddr_ext_phy_ctrl_2	= 0x00910091,
+	.emif_ddr_ext_phy_ctrl_3	= 0x00950095,
+	.emif_ddr_ext_phy_ctrl_4	= 0x009b009b,
+	.emif_ddr_ext_phy_ctrl_5	= 0x009e009e,
+	.emif_rd_wr_lvl_rmp_win		= 0x00000000,
+	.emif_rd_wr_lvl_rmp_ctl		= 0x80000000,
+	.emif_rd_wr_lvl_ctl		= 0x00000000,
+	.emif_rd_wr_exec_thresh		= 0x00000305
+};
+
 void emif_get_reg_dump(u32 emif_nr, const struct emif_regs **regs)
 {
 	switch (emif_nr) {
 	case 1:
-		*regs = &beagle_x15_emif1_ddr3_532mhz_emif_regs;
+		if (board_is_am571x_idk())
+			*regs = &am571x_emif1_ddr3_666mhz_emif_regs;
+		else
+			*regs = &beagle_x15_emif1_ddr3_532mhz_emif_regs;
 		break;
 	case 2:
 		*regs = &beagle_x15_emif2_ddr3_532mhz_emif_regs;
@@ -474,6 +504,8 @@ static void setup_board_eeprom_env(void)
 	if (board_is_x15()) {
 		if (board_is_x15_revb1())
 			name = "beagle_x15_revb1";
+		else if (board_is_x15_revc())
+			name = "beagle_x15_revc";
 		else
 			name = "beagle_x15";
 	} else if (board_is_am572x_evm()) {
@@ -509,7 +541,10 @@ void vcores_init(void)
 void hw_data_init(void)
 {
 	*prcm = &dra7xx_prcm;
-	*dplls_data = &dra7xx_dplls;
+	if (is_dra72x())
+		*dplls_data = &dra72x_dplls;
+	else
+		*dplls_data = &dra7xx_dplls;
 	*ctrl = &dra7xx_ctrl;
 }
 
@@ -588,7 +623,7 @@ void am57x_idk_lcd_detect(void)
 		/* we will let default be "no lcd" */
 	}
 out:
-	setenv("idk_lcd", idk_lcd);
+	env_set("idk_lcd", idk_lcd);
 	return;
 }
 
@@ -608,7 +643,7 @@ int board_late_init(void)
 	 * on HS devices.
 	 */
 	if (get_device_type() == HS_DEVICE)
-		setenv("boot_fit", "1");
+		env_set("boot_fit", "1");
 
 	/*
 	 * Set the GPIO7 Pad to POWERHOLD. This has higher priority
@@ -683,7 +718,8 @@ void recalibrate_iodelay(void)
 
 	/* Now do the weird minor deltas that should be safe */
 	if (board_is_x15() || board_is_am572x_evm()) {
-		if (board_is_x15_revb1() || board_is_am572x_evm_reva3()) {
+		if (board_is_x15_revb1() || board_is_am572x_evm_reva3() ||
+		    board_is_x15_revc()) {
 			pconf = core_padconf_array_delta_x15_sr2_0;
 			pconf_sz = ARRAY_SIZE(core_padconf_array_delta_x15_sr2_0);
 		} else {
@@ -737,8 +773,8 @@ int spl_start_uboot(void)
 
 #ifdef CONFIG_SPL_ENV_SUPPORT
 	env_init();
-	env_relocate_spec();
-	if (getenv_yesno("boot_os") != 1)
+	env_load();
+	if (env_get_yesno("boot_os") != 1)
 		return 1;
 #endif
 
@@ -928,11 +964,11 @@ int board_eth_init(bd_t *bis)
 	mac_addr[4] = (mac_lo & 0xFF00) >> 8;
 	mac_addr[5] = mac_lo & 0xFF;
 
-	if (!getenv("ethaddr")) {
+	if (!env_get("ethaddr")) {
 		printf("<ethaddr> not set. Validating first E-fuse MAC\n");
 
 		if (is_valid_ethaddr(mac_addr))
-			eth_setenv_enetaddr("ethaddr", mac_addr);
+			eth_env_set_enetaddr("ethaddr", mac_addr);
 	}
 
 	mac_lo = readl((*ctrl)->control_core_mac_id_1_lo);
@@ -944,9 +980,9 @@ int board_eth_init(bd_t *bis)
 	mac_addr[4] = (mac_lo & 0xFF00) >> 8;
 	mac_addr[5] = mac_lo & 0xFF;
 
-	if (!getenv("eth1addr")) {
+	if (!env_get("eth1addr")) {
 		if (is_valid_ethaddr(mac_addr))
-			eth_setenv_enetaddr("eth1addr", mac_addr);
+			eth_env_set_enetaddr("eth1addr", mac_addr);
 	}
 
 	ctrl_val = readl((*ctrl)->control_core_control_io1) & (~0x33);
@@ -981,9 +1017,9 @@ int board_eth_init(bd_t *bis)
 			for (i = 0; i < num_macs; i++) {
 				u64_to_mac(mac1 + i, mac_addr);
 				if (is_valid_ethaddr(mac_addr)) {
-					eth_setenv_enetaddr_by_index("eth",
-								     i + 2,
-								     mac_addr);
+					eth_env_set_enetaddr_by_index("eth",
+								      i + 2,
+								      mac_addr);
 				}
 			}
 		}
@@ -1026,6 +1062,9 @@ int board_fit_config_name_match(const char *name)
 	if (board_is_x15()) {
 		if (board_is_x15_revb1()) {
 			if (!strcmp(name, "am57xx-beagle-x15-revb1"))
+				return 0;
+		} else if (board_is_x15_revc()) {
+			if (!strcmp(name, "am57xx-beagle-x15-revc"))
 				return 0;
 		} else if (!strcmp(name, "am57xx-beagle-x15")) {
 			return 0;

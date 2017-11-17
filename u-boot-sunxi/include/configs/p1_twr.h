@@ -50,7 +50,6 @@
 #define CONFIG_TSEC_ENET	/* tsec ethernet support */
 #define CONFIG_ENV_OVERWRITE
 
-#define CONFIG_CMD_SATA
 #define CONFIG_SATA_SIL3114
 #define CONFIG_SYS_SATA_MAX_DEVICE	2
 #define CONFIG_LIBATA
@@ -267,8 +266,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 #define CONFIG_SYS_PCIE1_IO_PHYS	0xffc00000
 #define CONFIG_SYS_PCIE1_IO_SIZE	0x00010000	/* 64k */
 
-#define CONFIG_CMD_PCI
-
 #define CONFIG_PCI_SCAN_SHOW	/* show pci devices on startup */
 #endif /* CONFIG_PCI */
 
@@ -295,8 +292,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 #define TSEC3_PHYIDX	0
 
 #define CONFIG_ETHPRIME	"eTSEC1"
-
-#define CONFIG_PHY_GIGE	1	/* Include GbE speed/duplex detection */
 
 #define CONFIG_HAS_ETH0
 #define CONFIG_HAS_ETH1
@@ -351,28 +346,20 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
  */
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#define CONFIG_CMD_MTDPARTS
 #define CONFIG_FLASH_CFI_MTD
-#define MTDIDS_DEFAULT "nor0=ec000000.nor"
-#define MTDPARTS_DEFAULT "mtdparts=ec000000.nor:256k(vsc7385-firmware)," \
-			"256k(dtb),5632k(kernel),57856k(fs)," \
-			"256k(qe-ucode-firmware),1280k(u-boot)"
 
 /*
  * Environment
  */
 #ifdef CONFIG_SYS_RAMBOOT
 #ifdef CONFIG_RAMBOOT_SDCARD
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_ENV_SIZE		0x2000
 #define CONFIG_SYS_MMC_ENV_DEV	0
 #else
-#define CONFIG_ENV_IS_NOWHERE	/* Store ENV in memory only */
 #define CONFIG_ENV_ADDR		(CONFIG_SYS_MONITOR_BASE - 0x1000)
 #define CONFIG_ENV_SIZE		0x2000
 #endif
 #else
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_ADDR	(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SECT_SIZE)
 #define CONFIG_ENV_SIZE		0x2000
 #define CONFIG_ENV_SECT_SIZE	0x20000 /* 128K (one sector) */
@@ -380,11 +367,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 
 #define CONFIG_LOADS_ECHO		/* echo on for serial download */
 #define CONFIG_SYS_LOADS_BAUD_CHANGE	/* allow baudrate change */
-
-/*
- * Command line configuration.
- */
-#define CONFIG_CMD_REGINFO
 
 /*
  * USB
@@ -411,15 +393,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 #define CONFIG_SYS_LONGHELP			/* undef to save memory */
 #define CONFIG_CMDLINE_EDITING			/* Command-line editing */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
-#if defined(CONFIG_CMD_KGDB)
-#define CONFIG_SYS_CBSIZE	1024		/* Console I/O Buffer Size */
-#else
-#define CONFIG_SYS_CBSIZE	256		/* Console I/O Buffer Size */
-#endif
-#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-	/* Print Buffer Size */
-#define CONFIG_SYS_MAXARGS	16	/* max number of command args */
-#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE/* Boot Argument Buffer Size */
 
 /*
  * For booting Linux, the board info and command line data
@@ -439,8 +412,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 
 /* default location for tftp and bootm */
 #define CONFIG_LOADADDR	1000000
-
-#define CONFIG_BOOTARGS	/* the boot command will set bootargs */
 
 #define	CONFIG_EXTRA_ENV_SETTINGS	\
 "netdev=eth0\0"	\

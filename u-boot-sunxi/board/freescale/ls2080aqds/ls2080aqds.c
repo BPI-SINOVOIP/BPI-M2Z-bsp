@@ -204,7 +204,7 @@ int board_init(void)
 
 	val = in_le32(dcfg_ccsr + DCFG_RCWSR13 / 4);
 
-	env_hwconfig = getenv("hwconfig");
+	env_hwconfig = env_get("hwconfig");
 
 	if (hwconfig_f("dspi", env_hwconfig) &&
 	    DCFG_RCWSR13_DSPI == (val & (u32)(0xf << 8)))
@@ -226,13 +226,12 @@ int board_init(void)
 #endif
 	select_i2c_ch_pca9547(I2C_MUX_CH_DEFAULT);
 	rtc_enable_32khz_output();
+#ifdef CONFIG_FSL_CAAM
+	sec_init();
+#endif
 
 #ifdef CONFIG_FSL_LS_PPA
 	ppa_init();
-#endif
-
-#ifdef CONFIG_FSL_CAAM
-	sec_init();
 #endif
 
 	return 0;

@@ -58,9 +58,6 @@
  * Console Configuration
  */
 #define CONFIG_SYS_CBSIZE		1024 /* Console I/O Buffer Size   */
-#define CONFIG_SYS_MAXARGS		16   /* max number of command args*/
-#define CONFIG_SYS_PBSIZE		\
-		(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_CMDLINE_EDITING		1
 
 /*-----------------------------------------------------------------------
@@ -97,7 +94,6 @@
 /* -------------------------------------------------
  * Environment
  */
-#define CONFIG_ENV_IS_NOWHERE	1
 #define CONFIG_ENV_SIZE		0x4000
 
 /* ---------------------------------------------------------------------

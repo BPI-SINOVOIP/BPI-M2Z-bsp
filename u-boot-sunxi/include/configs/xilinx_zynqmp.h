@@ -73,14 +73,9 @@
 # ifndef CONFIG_ZYNQ_SDHCI_MAX_FREQ
 #  define CONFIG_ZYNQ_SDHCI_MAX_FREQ	200000000
 # endif
-# define CONFIG_ENV_IS_IN_FAT
-# define FAT_ENV_DEVICE_AND_PART	"0:auto"
-# define FAT_ENV_FILE			"uboot.env"
-# define FAT_ENV_INTERFACE		"mmc"
 #endif
 
 #ifdef CONFIG_NAND_ARASAN
-# define CONFIG_CMD_NAND_LOCK_UNLOCK
 # define CONFIG_SYS_MAX_NAND_DEVICE	1
 # define CONFIG_SYS_NAND_SELF_INIT
 # define CONFIG_SYS_NAND_ONFI_DETECTION
@@ -91,12 +86,9 @@
 #define CONFIG_SYS_LOAD_ADDR		0x8000000
 
 #if defined(CONFIG_ZYNQMP_USB)
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS      2
-
 #define CONFIG_SYS_DFU_DATA_BUF_SIZE	0x1800000
 #define DFU_DEFAULT_POLL_TIMEOUT	300
 #define CONFIG_USB_CABLE_CHECK
-#define CONFIG_CMD_THOR_DOWNLOAD
 #define CONFIG_USB_FUNCTION_THOR
 #define CONFIG_THOR_RESET_OFF
 #define DFU_ALT_INFO_RAM \
@@ -111,17 +103,6 @@
 		DFU_ALT_INFO_RAM
 
 #ifndef CONFIG_SPL_BUILD
-# define CONFIG_USB_FUNCTION_FASTBOOT
-# define CONFIG_CMD_FASTBOOT
-# define CONFIG_ANDROID_BOOT_IMAGE
-# define CONFIG_FASTBOOT_BUF_ADDR 0x100000
-# define CONFIG_FASTBOOT_BUF_SIZE 0x6000000
-# define CONFIG_FASTBOOT_FLASH
-# ifdef CONFIG_MMC_SDHCI_ZYNQ
-#  define CONFIG_FASTBOOT_FLASH_MMC_DEV 0
-# endif
-
-# define CONFIG_RANDOM_UUID
 # define PARTS_DEFAULT \
 	"partitions=uuid_disk=${uuid_gpt_disk};" \
 	"name=""boot"",size=16M,uuid=${uuid_gpt_boot};" \
@@ -138,16 +119,11 @@
 #endif
 
 /* Do not preserve environment */
-#if !defined(CONFIG_ENV_IS_IN_FAT)
-#define CONFIG_ENV_IS_NOWHERE		1
-#endif
 #define CONFIG_ENV_SIZE			0x8000
 
 /* Monitor Command Prompt */
 /* Console I/O Buffer Size */
 #define CONFIG_SYS_CBSIZE		2048
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_CMDLINE_EDITING
@@ -155,13 +131,11 @@
 
 /* Ethernet driver */
 #if defined(CONFIG_ZYNQ_GEM)
-# define CONFIG_NET_MULTI
 # define CONFIG_MII
 # define CONFIG_SYS_FAULT_ECHO_LINK_DOWN
 # define CONFIG_PHY_MARVELL
 # define CONFIG_PHY_NATSEMI
 # define CONFIG_PHY_TI
-# define CONFIG_PHY_GIGE
 # define CONFIG_PHY_VITESSE
 # define CONFIG_PHY_REALTEK
 # define PHY_ANEG_TIMEOUT       20000
@@ -190,7 +164,6 @@
 #define CONFIG_SYS_SCSI_MAX_LUN		1
 #define CONFIG_SYS_SCSI_MAX_DEVICE	(CONFIG_SYS_SCSI_MAX_SCSI_ID * \
 					 CONFIG_SYS_SCSI_MAX_LUN)
-#define CONFIG_SCSI
 #endif
 
 #define CONFIG_SYS_BOOTM_LEN	(60 * 1024 * 1024)

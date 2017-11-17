@@ -22,7 +22,7 @@
 #if (defined(CONFIG_SPL_BUILD) && defined(CONFIG_NAND_BOOT))
 #define SPL_NO_MMC
 #endif
-#if (defined(CONFIG_SPL_BUILD) && defined(CONFIG_SD_BOOT))
+#if (defined(CONFIG_SPL_BUILD) && defined(CONFIG_SD_BOOT_QSPI))
 #define SPL_NO_IFC
 #endif
 
@@ -66,7 +66,6 @@
 /* SD boot SPL */
 #ifdef CONFIG_SD_BOOT
 #define CONFIG_SPL_FRAMEWORK
-#define CONFIG_SPL_LDSCRIPT		"arch/arm/cpu/armv8/u-boot-spl.lds"
 #define CONFIG_SPL_TARGET		"u-boot-with-spl.bin"
 
 #define CONFIG_SPL_TEXT_BASE		0x10000000
@@ -74,10 +73,10 @@
 #define CONFIG_SPL_STACK		0x1001e000
 #define CONFIG_SPL_PAD_TO		0x1d000
 
-#define CONFIG_SYS_SPL_MALLOC_START	(CONFIG_SYS_TEXT_BASE + \
-					CONFIG_SYS_MONITOR_LEN)
+#define CONFIG_SYS_SPL_MALLOC_START	(CONFIG_SPL_BSS_START_ADDR + \
+					CONFIG_SPL_BSS_MAX_SIZE)
 #define CONFIG_SYS_SPL_MALLOC_SIZE	0x100000
-#define CONFIG_SPL_BSS_START_ADDR	0x80100000
+#define CONFIG_SPL_BSS_START_ADDR	0x8f000000
 #define CONFIG_SPL_BSS_MAX_SIZE		0x80000
 
 #ifdef CONFIG_SECURE_BOOT
@@ -98,7 +97,6 @@
 #ifdef CONFIG_NAND_BOOT
 #define CONFIG_SPL_PBL_PAD
 #define CONFIG_SPL_FRAMEWORK
-#define CONFIG_SPL_LDSCRIPT		"arch/arm/cpu/armv8/u-boot-spl.lds"
 #define CONFIG_SPL_TARGET		"u-boot-with-spl.bin"
 #define CONFIG_SPL_TEXT_BASE		0x10000000
 #define CONFIG_SPL_MAX_SIZE		0x1a000
@@ -167,9 +165,7 @@
 #define CONFIG_PCIE3		/* PCIE controller 3 */
 
 #ifdef CONFIG_PCI
-#define CONFIG_NET_MULTI
 #define CONFIG_PCI_SCAN_SHOW
-#define CONFIG_CMD_PCI
 #endif
 #endif
 
@@ -242,57 +238,87 @@
 #define HWCONFIG_BUFFER_SIZE		128
 
 #ifndef SPL_NO_MISC
-#if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT_QSPI)
-#define MTDPARTS_DEFAULT "mtdparts=spi0.0:1m(uboot)," \
-			"5m(kernel),1m(dtb),9m(file_system)"
-#else
-#define MTDPARTS_DEFAULT "mtdparts=60000000.nor:" \
-			"2m@0x100000(nor_bank0_uboot),"\
-			"40m@0x1100000(nor_bank0_fit)," \
-			"7m(nor_bank0_user)," \
-			"2m@0x4100000(nor_bank4_uboot)," \
-			"40m@0x5100000(nor_bank4_fit),"\
-			"-(nor_bank4_user);" \
-			"7e800000.flash:" \
-			"1m(nand_uboot),1m(nand_uboot_env)," \
-			"20m(nand_fit);spi0.0:1m(uboot)," \
-			"5m(kernel),1m(dtb),9m(file_system)"
+#include <config_distro_defaults.h>
+#ifndef CONFIG_SPL_BUILD
+#define BOOT_TARGET_DEVICES(func) \
+	func(MMC, mmc, 0) \
+	func(USB, usb, 0)
+#include <config_distro_bootcmd.h>
 #endif
 
 /* Initial environment variables */
 #define CONFIG_EXTRA_ENV_SETTINGS		\
 	"hwconfig=fsl_ddr:bank_intlv=auto\0"	\
-	"loadaddr=0x80100000\0"			\
 	"fdt_high=0xffffffffffffffff\0"		\
 	"initrd_high=0xffffffffffffffff\0"	\
-	"kernel_start=0x61100000\0"		\
-	"kernel_load=0xa0000000\0"		\
+	"fdt_addr=0x64f00000\0"		 	\
+	"kernel_addr=0x65000000\0"		\
+	"scriptaddr=0x80000000\0"		\
+	"scripthdraddr=0x80080000\0"		\
+	"fdtheader_addr_r=0x80100000\0"		\
+	"kernelheader_addr_r=0x80200000\0"	\
+	"kernel_addr_r=0x81000000\0"		\
+	"fdt_addr_r=0x90000000\0"		\
+	"load_addr=0xa0000000\0"		\
 	"kernel_size=0x2800000\0"		\
-	"console=ttyS0,115200\0"                \
-	"mtdparts=" MTDPARTS_DEFAULT "\0"
+	"console=ttyS0,115200\0"		\
+	"boot_os=y\0"				\
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0"	\
+	BOOTENV					\
+	"boot_scripts=ls1043ardb_boot.scr\0"	\
+	"boot_script_hdr=hdr_ls1043ardb_bs.out\0"	\
+	"scan_dev_for_boot_part="		\
+		"part list ${devtype} ${devnum} devplist; "	\
+		"env exists devplist || setenv devplist 1; "	\
+		"for distro_bootpart in ${devplist}; do "	\
+			"if fstype ${devtype} "			\
+				"${devnum}:${distro_bootpart} "	\
+				"bootfstype; then "		\
+				"run scan_dev_for_boot; "	\
+			"fi; "					\
+		"done\0"			\
+	"scan_dev_for_boot="					\
+		"echo Scanning ${devtype} "			\
+			"${devnum}:${distro_bootpart}...; "	\
+		"for prefix in ${boot_prefixes}; do "		\
+			"run scan_dev_for_scripts; "		\
+		"done;\0"					\
+	"boot_a_script="					\
+		"load ${devtype} ${devnum}:${distro_bootpart} "	\
+			"${scriptaddr} ${prefix}${script}; "	\
+		"env exists secureboot && load ${devtype} "	\
+			"${devnum}:${distro_bootpart} "		\
+			"${scripthdraddr} ${prefix}${boot_script_hdr} "	\
+			"&& esbc_validate ${scripthdraddr};"	\
+		"source ${scriptaddr}\0"			\
+	"installer=load mmc 0:2 $load_addr "	\
+		"/flex_installer_arm64.itb; "	\
+		"bootm $load_addr#ls1043ardb\0"	\
+	"qspi_bootcmd=echo Trying load from qspi..;"	\
+		"sf probe && sf read $load_addr "	\
+		"$kernel_addr $kernel_size && bootm $load_addr#$board\0" \
+	"nor_bootcmd=echo Trying load from nor..;"	\
+		"cp.b $kernel_addr $load_addr "	\
+		"$kernel_size && bootm $load_addr#$board\0"
 
-#define CONFIG_BOOTARGS			"console=ttyS0,115200 root=/dev/ram0 " \
-					"earlycon=uart8250,mmio,0x21c0500 "    \
-					MTDPARTS_DEFAULT
-
+#undef CONFIG_BOOTCOMMAND
 #if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT_QSPI)
-#define CONFIG_BOOTCOMMAND		"sf probe && sf read $kernel_load "    \
-					"e0000 f00000 && bootm $kernel_load"
+#define CONFIG_BOOTCOMMAND "run distro_bootcmd; env exists secureboot"	\
+			   "&& esbc_halt; run qspi_bootcmd;"
 #else
-#define CONFIG_BOOTCOMMAND		"cp.b $kernel_start $kernel_load "     \
-					"$kernel_size && bootm $kernel_load"
+#define CONFIG_BOOTCOMMAND "run distro_bootcmd; env exists secureboot"	\
+			   "&& esbc_halt; run nor_bootcmd;"
 #endif
 #endif
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		512	/* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE /* Boot args buffer */
 #define CONFIG_SYS_LONGHELP
 
 #ifndef SPL_NO_MISC
+#ifndef CONFIG_CMDLINE_EDITING
 #define CONFIG_CMDLINE_EDITING		1
+#endif
 #endif
 
 #define CONFIG_AUTO_COMPLETE

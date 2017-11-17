@@ -23,7 +23,6 @@
 
 #define CONFIG_LMB
 
-#define CONFIG_LZO
 #undef CONFIG_ZLIB
 #undef CONFIG_GZIP
 #define CONFIG_SYS_BOOTM_LEN		(16 << 20)
@@ -64,19 +63,10 @@
 
 #define CONFIG_SUPPORT_VFAT
 
-/* x86 GPIOs are accessed through a PCI device */
-#define CONFIG_INTEL_ICH6_GPIO
-
 /*-----------------------------------------------------------------------
  * Command line configuration.
  */
-#define CONFIG_CMD_PCI
-#define CONFIG_SCSI
 
-#define CONFIG_CMD_ZBOOT
-
-#define CONFIG_BOOTARGS		\
-	"root=/dev/sdb3 init=/sbin/init rootwait ro"
 #define CONFIG_BOOTCOMMAND	\
 	"ext2load scsi 0:3 01000000 /boot/vmlinuz; zboot 01000000"
 
@@ -89,11 +79,6 @@
  */
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_CBSIZE			512
-#define CONFIG_SYS_PBSIZE			(CONFIG_SYS_CBSIZE + \
-						 sizeof(CONFIG_SYS_PROMPT) + \
-						 16)
-#define CONFIG_SYS_MAXARGS			16
-#define CONFIG_SYS_BARGSIZE			CONFIG_SYS_CBSIZE
 
 #define CONFIG_SYS_MEMTEST_START		0x00100000
 #define CONFIG_SYS_MEMTEST_END			0x01000000
@@ -113,13 +98,11 @@
 /*-----------------------------------------------------------------------
  * FLASH configuration
  */
-#define CONFIG_CMD_SF_TEST
 #define CONFIG_SPI
 
 /*-----------------------------------------------------------------------
  * Environment configuration
  */
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SIZE			0x01000
 
 /*-----------------------------------------------------------------------
@@ -130,13 +113,7 @@
 /*-----------------------------------------------------------------------
  * USB configuration
  */
-#define CONFIG_USB_EHCI_PCI
-#define CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS     12
-#define CONFIG_SYS_USB_EVENT_POLL
 
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_ASIX
-#define CONFIG_USB_ETHER_SMSC95XX
 #define CONFIG_TFTP_TSIZE
 #define CONFIG_BOOTP_BOOTFILESIZE
 #define CONFIG_BOOTP_BOOTPATH

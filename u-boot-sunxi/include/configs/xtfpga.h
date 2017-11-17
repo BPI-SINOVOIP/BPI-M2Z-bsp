@@ -115,19 +115,8 @@
 #define CONFIG_BOOTFILE			"uImage"
 	/* Console I/O Buffer Size  */
 #define CONFIG_SYS_CBSIZE		1024
-	/* Prt buf */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					 sizeof(CONFIG_SYS_PROMPT) + 16)
-	/* max number of command args */
-#define CONFIG_SYS_MAXARGS		16
 	/* Boot Argument Buffer Size */
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
-
-/*=================*/
-/* U-Boot commands */
-/*=================*/
-
-#define CONFIG_CMD_SAVES
 
 /*==============================*/
 /* U-Boot autoboot configuration */
@@ -250,7 +239,6 @@
  * Put environment in top block (64kB)
  * Another option would be to put env. in 2nd param block offs 8KB, size 8KB
  */
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_OFFSET    (CONFIG_SYS_FLASH_SIZE - CONFIG_SYS_FLASH_SECT_SZ)
 #define CONFIG_ENV_SIZE	     CONFIG_SYS_FLASH_SECT_SZ
 

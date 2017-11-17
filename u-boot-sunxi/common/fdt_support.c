@@ -197,7 +197,7 @@ int fdt_root(void *fdt)
 		return err;
 	}
 
-	serial = getenv("serial#");
+	serial = env_get("serial#");
 	if (serial) {
 		err = fdt_setprop(fdt, 0, "serial-number", serial,
 				  strlen(serial) + 1);
@@ -289,7 +289,7 @@ int fdt_chosen(void *fdt)
 	if (nodeoffset < 0)
 		return nodeoffset;
 
-	str = getenv("bootargs");
+	str = env_get("bootargs");
 	if (str) {
 		err = fdt_setprop(fdt, nodeoffset, "bootargs", str,
 				  strlen(str) + 1);
@@ -509,7 +509,7 @@ void fdt_fixup_ethernet(void *fdt)
 			} else {
 				continue;
 			}
-			tmp = getenv(mac);
+			tmp = env_get(mac);
 			if (!tmp)
 				continue;
 
@@ -1464,14 +1464,11 @@ int fdt_verify_alias_address(void *fdt, int anode, const char *alias, u64 addr)
 u64 fdt_get_base_address(const void *fdt, int node)
 {
 	int size;
-	u32 naddr;
 	const fdt32_t *prop;
 
-	naddr = fdt_address_cells(fdt, node);
+	prop = fdt_getprop(fdt, node, "reg", &size);
 
-	prop = fdt_getprop(fdt, node, "ranges", &size);
-
-	return prop ? fdt_translate_address(fdt, node, prop + naddr) : 0;
+	return prop ? fdt_translate_address(fdt, node, prop) : 0;
 }
 
 /*
@@ -1658,3 +1655,34 @@ int fdt_fixup_display(void *blob, const char *path, const char *display)
 	}
 	return toff;
 }
+
+#ifdef CONFIG_OF_LIBFDT_OVERLAY
+/**
+ * fdt_overlay_apply_verbose - Apply an overlay with verbose error reporting
+ *
+ * @fdt: ptr to device tree
+ * @fdto: ptr to device tree overlay
+ *
+ * Convenience function to apply an overlay and display helpful messages
+ * in the case of an error
+ */
+int fdt_overlay_apply_verbose(void *fdt, void *fdto)
+{
+	int err;
+	bool has_symbols;
+
+	err = fdt_path_offset(fdt, "/__symbols__");
+	has_symbols = err >= 0;
+
+	err = fdt_overlay_apply(fdt, fdto);
+	if (err < 0) {
+		printf("failed on fdt_overlay_apply(): %s\n",
+				fdt_strerror(err));
+		if (!has_symbols) {
+			printf("base fdt does did not have a /__symbols__ node\n");
+			printf("make sure you've compiled with -@\n");
+		}
+	}
+	return err;
+}
+#endif

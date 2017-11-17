@@ -14,10 +14,10 @@
 #include <asm/arch/mxc_hdmi.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/gpio.h>
-#include <asm/imx-common/boot_mode.h>
-#include <asm/imx-common/sata.h>
-#include <asm/imx-common/spi.h>
-#include <asm/imx-common/video.h>
+#include <asm/mach-imx/boot_mode.h>
+#include <asm/mach-imx/sata.h>
+#include <asm/mach-imx/spi.h>
+#include <asm/mach-imx/video.h>
 #include <asm/io.h>
 #include <asm/setup.h>
 #include <dm.h>
@@ -298,11 +298,11 @@ int board_eth_init(bd_t *bis)
 #endif
 
 	/* default to the first detected enet dev */
-	if (!getenv("ethprime")) {
+	if (!env_get("ethprime")) {
 		struct eth_device *dev = eth_get_dev_by_index(0);
 		if (dev) {
-			setenv("ethprime", dev->name);
-			printf("set ethprime to %s\n", getenv("ethprime"));
+			env_set("ethprime", dev->name);
+			printf("set ethprime to %s\n", env_get("ethprime"));
 		}
 	}
 
@@ -579,7 +579,7 @@ void board_pci_fixup_dev(struct pci_controller *hose, pci_dev_t dev,
  */
 void get_board_serial(struct tag_serialnr *serialnr)
 {
-	char *serial = getenv("serial#");
+	char *serial = env_get("serial#");
 
 	if (serial) {
 		serialnr->high = 0;
@@ -633,7 +633,7 @@ int board_init(void)
 #endif
 	setup_ventana_i2c();
 
-#ifdef CONFIG_CMD_SATA
+#ifdef CONFIG_SATA
 	setup_sata();
 #endif
 	/* read Gateworks EEPROM into global struct (used later) */
@@ -658,11 +658,11 @@ int checkboard(void)
 	int quiet; /* Quiet or minimal output mode */
 
 	quiet = 0;
-	p = getenv("quiet");
+	p = env_get("quiet");
 	if (p)
 		quiet = simple_strtol(p, NULL, 10);
 	else
-		setenv("quiet", "0");
+		env_set("quiet", "0");
 
 	puts("\nGateworks Corporation Copyright 2014\n");
 	if (info->model[0]) {
@@ -737,26 +737,26 @@ int misc_init_r(void)
 		else if (is_cpu_type(MXC_CPU_MX6DL) ||
 			 is_cpu_type(MXC_CPU_MX6SOLO))
 			cputype = "imx6dl";
-		setenv("soctype", cputype);
+		env_set("soctype", cputype);
 		if (8 << (ventana_info.nand_flash_size-1) >= 2048)
-			setenv("flash_layout", "large");
+			env_set("flash_layout", "large");
 		else
-			setenv("flash_layout", "normal");
+			env_set("flash_layout", "normal");
 		memset(str, 0, sizeof(str));
 		for (i = 0; i < (sizeof(str)-1) && info->model[i]; i++)
 			str[i] = tolower(info->model[i]);
-		setenv("model", str);
-		if (!getenv("fdt_file")) {
+		env_set("model", str);
+		if (!env_get("fdt_file")) {
 			sprintf(fdt, "%s-%s.dtb", cputype, str);
-			setenv("fdt_file", fdt);
+			env_set("fdt_file", fdt);
 		}
 		p = strchr(str, '-');
 		if (p) {
 			*p++ = 0;
 
-			setenv("model_base", str);
+			env_set("model_base", str);
 			sprintf(fdt, "%s-%s.dtb", cputype, str);
-			setenv("fdt_file1", fdt);
+			env_set("fdt_file1", fdt);
 			if (board_type != GW551x &&
 			    board_type != GW552x &&
 			    board_type != GW553x &&
@@ -765,30 +765,30 @@ int misc_init_r(void)
 			str[5] = 'x';
 			str[6] = 0;
 			sprintf(fdt, "%s-%s.dtb", cputype, str);
-			setenv("fdt_file2", fdt);
+			env_set("fdt_file2", fdt);
 		}
 
 		/* initialize env from EEPROM */
 		if (test_bit(EECONFIG_ETH0, info->config) &&
-		    !getenv("ethaddr")) {
-			eth_setenv_enetaddr("ethaddr", info->mac0);
+		    !env_get("ethaddr")) {
+			eth_env_set_enetaddr("ethaddr", info->mac0);
 		}
 		if (test_bit(EECONFIG_ETH1, info->config) &&
-		    !getenv("eth1addr")) {
-			eth_setenv_enetaddr("eth1addr", info->mac1);
+		    !env_get("eth1addr")) {
+			eth_env_set_enetaddr("eth1addr", info->mac1);
 		}
 
 		/* board serial-number */
 		sprintf(str, "%6d", info->serial);
-		setenv("serial#", str);
+		env_set("serial#", str);
 
 		/* memory MB */
 		sprintf(str, "%d", (int) (gd->ram_size >> 20));
-		setenv("mem_mb", str);
+		env_set("mem_mb", str);
 	}
 
 	/* Set a non-initialized hwconfig based on board configuration */
-	if (!strcmp(getenv("hwconfig"), "_UNKNOWN_")) {
+	if (!strcmp(env_get("hwconfig"), "_UNKNOWN_")) {
 		buf[0] = 0;
 		if (gpio_cfg[board_type].rs232_en)
 			strcat(buf, "rs232;");
@@ -798,7 +798,7 @@ int misc_init_r(void)
 			if (strlen(buf) + strlen(buf1) < sizeof(buf))
 				strcat(buf, buf1);
 		}
-		setenv("hwconfig", buf);
+		env_set("hwconfig", buf);
 	}
 
 	/* setup baseboard specific GPIO based on board and env */
@@ -1035,7 +1035,7 @@ int fdt_fixup_sky2(void *blob, int np, struct pci_dev *dev)
 	int j;
 
 	sprintf(mac, "eth1addr");
-	tmp = getenv(mac);
+	tmp = env_get(mac);
 	if (tmp) {
 		for (j = 0; j < 6; j++) {
 			mac_addr[j] = tmp ?
@@ -1118,8 +1118,8 @@ int ft_board_setup(void *blob, bd_t *bd)
 		{ "sst,w25q256",          MTD_DEV_TYPE_NOR, },  /* SPI flash */
 		{ "fsl,imx6q-gpmi-nand",  MTD_DEV_TYPE_NAND, }, /* NAND flash */
 	};
-	const char *model = getenv("model");
-	const char *display = getenv("display");
+	const char *model = env_get("model");
+	const char *display = env_get("display");
 	int i;
 	char rev = 0;
 
@@ -1131,7 +1131,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 		}
 	}
 
-	if (getenv("fdt_noauto")) {
+	if (env_get("fdt_noauto")) {
 		puts("   Skiping ft_board_setup (fdt_noauto defined)\n");
 		return 0;
 	}
@@ -1152,15 +1152,15 @@ int ft_board_setup(void *blob, bd_t *bd)
 	printf("   Adjusting FDT per EEPROM for %s...\n", model);
 
 	/* board serial number */
-	fdt_setprop(blob, 0, "system-serial", getenv("serial#"),
-		    strlen(getenv("serial#")) + 1);
+	fdt_setprop(blob, 0, "system-serial", env_get("serial#"),
+		    strlen(env_get("serial#")) + 1);
 
 	/* board (model contains model from device-tree) */
 	fdt_setprop(blob, 0, "board", info->model,
 		    strlen((const char *)info->model) + 1);
 
 	/* set desired digital video capture format */
-	ft_sethdmiinfmt(blob, getenv("hdmiinfmt"));
+	ft_sethdmiinfmt(blob, env_get("hdmiinfmt"));
 
 	/*
 	 * Board model specific fixups
@@ -1315,7 +1315,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 	}
 
 #if defined(CONFIG_CMD_PCI)
-	if (!getenv("nopcifixup"))
+	if (!env_get("nopcifixup"))
 		ft_board_pci_fixup(blob, bd);
 #endif
 
@@ -1324,7 +1324,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 	 *  remove nodes by alias path if EEPROM config tells us the
 	 *  peripheral is not loaded on the board.
 	 */
-	if (getenv("fdt_noconfig")) {
+	if (env_get("fdt_noconfig")) {
 		puts("   Skiping periperhal config (fdt_noconfig defined)\n");
 		return 0;
 	}

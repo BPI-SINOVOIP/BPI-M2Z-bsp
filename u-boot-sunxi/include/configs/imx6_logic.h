@@ -30,7 +30,6 @@
 #define CONFIG_FEC_XCV_TYPE            RMII
 #define CONFIG_ETHPRIME                "FEC"
 #define CONFIG_FEC_MXC_PHYADDR         0
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_SMSC
 
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
@@ -141,12 +140,10 @@
 
 /* Environment organization */
 #define CONFIG_ENV_SIZE                        (8 * 1024)
-#define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_OFFSET             0x400000
 #define CONFIG_ENV_SECT_SIZE          CONFIG_ENV_SIZE
 
 /* NAND stuff */
-#define CONFIG_CMD_NAND_TRIMFFS
 #define CONFIG_SYS_MAX_NAND_DEVICE     1
 #define CONFIG_SYS_NAND_BASE           0x40000000
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
@@ -156,11 +153,7 @@
 
 /* MTD device */
 # define CONFIG_MTD_DEVICE
-# define CONFIG_CMD_MTDPARTS
 # define CONFIG_MTD_PARTITIONS
-# define MTDIDS_DEFAULT		"nand0=gpmi-nand"
-# define MTDPARTS_DEFAULT	"mtdparts=gpmi-nand:4m(uboot)," \
-					"1m(env),16m(kernel),1m(dtb),-(fs)"
 
 /* DMA stuff, needed for GPMI/MXS NAND support */
 #define CONFIG_APBH_DMA

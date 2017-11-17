@@ -15,11 +15,6 @@
 #define CONFIG_MX28				/* i.MX28 SoC */
 #define CONFIG_MACH_TYPE	MACH_TYPE_MX28EVK
 
-/* U-Boot Commands */
-
-#define CONFIG_CMD_NAND
-#define CONFIG_CMD_NAND_TRIMFFS
-
 /* Memory configuration */
 #define CONFIG_NR_DRAM_BANKS		1		/* 1 bank of DRAM */
 #define PHYS_SDRAM_1			0x40000000	/* Base address */
@@ -64,22 +59,8 @@
 
 /* UBI and NAND partitioning */
 #ifdef CONFIG_CMD_NAND
-#define CONFIG_CMD_UBIFS
-#define CONFIG_CMD_MTDPARTS
-#define CONFIG_RBTREE
-#define CONFIG_LZO
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#define MTDIDS_DEFAULT			"nand0=gpmi-nand"
-#define MTDPARTS_DEFAULT			\
-	"mtdparts=gpmi-nand:"			\
-		"3m(bootloader)ro,"		\
-		"512k(environment),"		\
-		"512k(redundant-environment),"	\
-		"4m(kernel),"			\
-		"512k(fdt),"			\
-		"8m(ramdisk),"			\
-		"-(filesystem)"
 #endif
 
 /* FEC Ethernet on SoC */
@@ -97,9 +78,6 @@
 #ifdef	CONFIG_CMD_USB
 #define CONFIG_EHCI_MXS_PORT1
 #define CONFIG_USB_MAX_CONTROLLER_COUNT	1
-#define	CONFIG_USB_HOST_ETHER
-#define	CONFIG_USB_ETHER_ASIX
-#define	CONFIG_USB_ETHER_SMSC95XX
 #endif
 
 /* SPI */

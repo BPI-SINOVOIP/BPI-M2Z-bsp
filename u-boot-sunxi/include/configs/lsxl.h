@@ -60,10 +60,7 @@
 #ifdef CONFIG_SPI_FLASH
 #define CONFIG_SYS_MAX_FLASH_BANKS	1
 #define CONFIG_SYS_MAX_FLASH_SECT	8
-#define CONFIG_ENV_IS_IN_SPI_FLASH	1
 #define CONFIG_ENV_SECT_SIZE		0x10000 /* 64K */
-#else
-#define CONFIG_ENV_IS_NOWHERE
 #endif
 
 #define CONFIG_ENV_SIZE			0x10000 /* 64k */
@@ -74,7 +71,6 @@
  */
 #define CONFIG_LOADADDR		0x00800000
 #define CONFIG_BOOTCOMMAND	"run bootcmd_${bootsource}"
-#define CONFIG_BOOTARGS		"console=ttyS0,115200 root=/dev/sda2"
 
 #if defined(CONFIG_LSXHL)
 #define CONFIG_FDTFILE "kirkwood-lsxhl.dtb"
@@ -146,7 +142,6 @@
 #endif /* CONFIG_CMD_NET */
 
 #ifdef CONFIG_IDE
-#undef CONFIG_IDE_LED
 #undef CONFIG_SYS_IDE_MAXBUS
 #define CONFIG_SYS_IDE_MAXBUS		1
 #undef CONFIG_SYS_IDE_MAXDEVICE

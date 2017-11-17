@@ -23,7 +23,7 @@
 
 #include <asm/arch/clock.h>
 #include <asm/arch/imx-regs.h>
-#include <asm/imx-common/sys_proto.h>
+#include <asm/mach-imx/sys_proto.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -882,7 +882,7 @@ static int fec_recv(struct eth_device *dev)
 			len = frame_length;
 		} else {
 			if (bd_status & FEC_RBD_ERR)
-				printf("error frame: 0x%08x 0x%08x\n",
+				debug("error frame: 0x%08x 0x%08x\n",
 				       addr, bd_status);
 		}
 
@@ -985,9 +985,18 @@ static void fec_free_descs(struct fec_priv *fec)
 	free(fec->tbd_base);
 }
 
+#ifdef CONFIG_DM_ETH
+struct mii_dev *fec_get_miibus(struct udevice *dev, int dev_id)
+#else
 struct mii_dev *fec_get_miibus(uint32_t base_addr, int dev_id)
+#endif
 {
+#ifdef CONFIG_DM_ETH
+	struct fec_priv *priv = dev_get_priv(dev);
+	struct ethernet_regs *eth = priv->eth;
+#else
 	struct ethernet_regs *eth = (struct ethernet_regs *)base_addr;
+#endif
 	struct mii_dev *bus;
 	int ret;
 
@@ -1096,8 +1105,8 @@ static int fec_probe(bd_t *bd, int dev_id, uint32_t base_addr,
 			sprintf(mac, "eth%daddr", fec->dev_id);
 		else
 			strcpy(mac, "ethaddr");
-		if (!getenv(mac))
-			eth_setenv_enetaddr(mac, ethaddr);
+		if (!env_get(mac))
+			eth_env_set_enetaddr(mac, ethaddr);
 	}
 	return ret;
 err4:
@@ -1223,17 +1232,6 @@ static int fecmxc_probe(struct udevice *dev)
 	if (ret)
 		return ret;
 
-	bus = fec_get_miibus((uint32_t)priv->eth, dev_id);
-	if (!bus)
-		goto err_mii;
-
-	priv->bus = bus;
-	priv->xcv_type = CONFIG_FEC_XCV_TYPE;
-	priv->interface = pdata->phy_interface;
-	ret = fec_phy_init(priv, dev);
-	if (ret)
-		goto err_phy;
-
 	/* Reset chip. */
 	writel(readl(&priv->eth->ecntrl) | FEC_ECNTRL_RESET,
 	       &priv->eth->ecntrl);
@@ -1248,6 +1246,19 @@ static int fecmxc_probe(struct udevice *dev)
 
 	fec_reg_setup(priv);
 	priv->dev_id = (dev_id == -1) ? 0 : dev_id;
+
+	bus = fec_get_miibus(dev, dev_id);
+	if (!bus) {
+		ret = -ENOMEM;
+		goto err_mii;
+	}
+
+	priv->bus = bus;
+	priv->xcv_type = CONFIG_FEC_XCV_TYPE;
+	priv->interface = pdata->phy_interface;
+	ret = fec_phy_init(priv, dev);
+	if (ret)
+		goto err_phy;
 
 	return 0;
 

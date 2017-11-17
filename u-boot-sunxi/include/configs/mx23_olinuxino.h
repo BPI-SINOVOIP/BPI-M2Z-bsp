@@ -19,7 +19,6 @@
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1
 
 /* Environment */
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_ENV_OVERWRITE
 
 /* Environment is in MMC */
@@ -38,10 +37,6 @@
 #endif
 
 /* Ethernet */
-#ifdef CONFIG_CMD_NET
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_SMSC95XX
-#endif
 
 /* Booting Linux */
 #define CONFIG_BOOTFILE		"uImage"

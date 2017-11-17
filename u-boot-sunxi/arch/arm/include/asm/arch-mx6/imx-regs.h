@@ -346,6 +346,9 @@
 #define IOMUXC_SNVS_BASE_ADDR       (AIPS3_ARB_BASE_ADDR + 0x90000)
 #define SNVS_GPR_BASE_ADDR          (AIPS3_ARB_BASE_ADDR + 0x94000)
 #endif
+
+#define NOC_DDR_BASE_ADDR           (GPV0_BASE_ADDR + 0xB0000)
+
 /* Only for i.MX6SX */
 #define LCDIF2_BASE_ADDR            (AIPS3_ARB_BASE_ADDR + 0x24000)
 #define MX6SX_LCDIF1_BASE_ADDR      (AIPS3_ARB_BASE_ADDR + 0x20000)
@@ -359,7 +362,7 @@
 #endif
 #define FEC_QUIRK_ENET_MAC
 
-#include <asm/imx-common/regs-lcdif.h>
+#include <asm/mach-imx/regs-lcdif.h>
 #if !(defined(__KERNEL_STRICT_NAMES) || defined(__ASSEMBLY__))
 #include <asm/types.h>
 

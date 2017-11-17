@@ -11,9 +11,9 @@
 #include <asm/arch/mx6-ddr.h>
 #include <asm/arch/mx6-pins.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/imx-common/boot_mode.h>
-#include <asm/imx-common/iomux-v3.h>
-#include <asm/imx-common/mxc_i2c.h>
+#include <asm/mach-imx/boot_mode.h>
+#include <asm/mach-imx/iomux-v3.h>
+#include <asm/mach-imx/mxc_i2c.h>
 #include <environment.h>
 #include <i2c.h>
 #include <spl.h>
@@ -583,17 +583,6 @@ static void ccgr_init(void)
 	writel(0x000003FF, &ccm->CCGR6);
 }
 
-static void gpr_init(void)
-{
-	struct iomuxc *iomux = (struct iomuxc *)IOMUXC_BASE_ADDR;
-
-	/* enable AXI cache for VDOA/VPU/IPU */
-	writel(0xF00000CF, &iomux->gpr[4]);
-	/* set IPU AXI-id0 Qos=0xf(bypass) AXI-id1 Qos=0x7 */
-	writel(0x007F007F, &iomux->gpr[6]);
-	writel(0x007F007F, &iomux->gpr[7]);
-}
-
 /*
  * called from C runtime startup code (arch/arm/lib/crt0.S:_main)
  * - we have a stack and a place to store GD, both in SRAM
@@ -637,9 +626,6 @@ void board_init_f(ulong dummy)
 	spl_dram_init(8 << ventana_info.sdram_width,
 		      16 << ventana_info.sdram_size,
 		      board_model);
-
-	/* Clear the BSS. */
-	memset(__bss_start, 0, __bss_end - __bss_start);
 }
 
 void board_boot_order(u32 *spl_boot_list)
@@ -690,9 +676,9 @@ int spl_start_uboot(void)
 	debug("%s\n", __func__);
 #ifdef CONFIG_SPL_ENV_SUPPORT
 	env_init();
-	env_relocate_spec();
-	debug("boot_os=%s\n", getenv("boot_os"));
-	if (getenv_yesno("boot_os") == 1)
+	env_load();
+	debug("boot_os=%s\n", env_get("boot_os"));
+	if (env_get_yesno("boot_os") == 1)
 		ret = 0;
 #else
 	/* use i2c-0:0x50:0x00 for falcon boot mode (0=linux, else uboot) */

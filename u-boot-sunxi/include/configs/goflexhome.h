@@ -43,7 +43,6 @@
  * Commands configuration
  */
 
-#define CONFIG_CMD_NAND
 #define CONFIG_SYS_MVFS         /* Picks up Filesystem from mv-common.h */
 
 /*
@@ -56,10 +55,7 @@
  *  Environment variables configurations
  */
 #ifdef CONFIG_CMD_NAND
-#define CONFIG_ENV_IS_IN_NAND		1
 #define CONFIG_ENV_SECT_SIZE		0x20000	/* 128K */
-#else
-#define CONFIG_ENV_IS_NOWHERE		1	/* if env in SDRAM */
 #endif
 /*
  * max 4k env size is enough, but in case of nand
@@ -79,13 +75,10 @@
 	"ubifsload 0x800000 ${kernel}; " \
 	"bootm 0x800000"
 
-#define CONFIG_MTDPARTS \
-	"mtdparts=orion_nand:1m(uboot),6M(uImage),-(root)\0"
-
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"console=console=ttyS0,115200\0" \
 	"mtdids=nand0=orion_nand\0" \
-	"mtdparts="CONFIG_MTDPARTS \
+	"mtdparts="CONFIG_MTDPARTS_DEFAULT \
 	"kernel=/boot/uImage\0" \
 	"bootargs_root=ubi.mtd=root root=ubi0:root rootfstype=ubifs ro\0"
 

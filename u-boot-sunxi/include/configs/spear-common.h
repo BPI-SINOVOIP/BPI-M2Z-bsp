@@ -17,7 +17,6 @@
 /* Ethernet driver configuration */
 #define CONFIG_MII
 #define CONFIG_PHY_RESET_DELAY			10000		/* in usec */
-#define CONFIG_PHY_GIGE			/* Include GbE speed/duplex detection */
 
 /* USBD driver configuration */
 #if defined(CONFIG_SPEAR_USBTTY)
@@ -94,12 +93,6 @@
 #define CONFIG_SYS_NAND_ONFI_DETECTION
 
 /*
- * Command support defines
- */
-#define CONFIG_CMD_NAND
-#define CONFIG_CMD_SAVES
-
-/*
  * Default Environment Varible definitions
  */
 #define CONFIG_ENV_OVERWRITE
@@ -146,11 +139,6 @@
 						"bootm 0x1600000"
 #endif
 
-#define CONFIG_BOOTARGS				"console=ttyAMA0,115200 " \
-						"mem=128M " \
-						"root="CONFIG_FSMTDBLK \
-						"rootfstype=jffs2"
-
 #define CONFIG_NFSBOOTCOMMAND						\
 	"bootp; "							\
 	"setenv bootargs root=/dev/nfs rw "				\
@@ -180,11 +168,6 @@
 #define CONFIG_SYS_MALLOC_LEN			(1024*1024)
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_CMDLINE_EDITING
-#define CONFIG_SYS_CBSIZE			256
-#define CONFIG_SYS_PBSIZE			(CONFIG_SYS_CBSIZE + \
-						sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_MAXARGS			16
-#define CONFIG_SYS_BARGSIZE			CONFIG_SYS_CBSIZE
 #define CONFIG_SYS_LOAD_ADDR			0x00800000
 
 #define CONFIG_SYS_FLASH_EMPTY_INFO

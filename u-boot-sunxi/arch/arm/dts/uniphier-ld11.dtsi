@@ -109,7 +109,6 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges = <0 0 0 0xffffffff>;
-		u-boot,dm-pre-reloc;
 
 		serial0: serial@54006800 {
 			compatible = "socionext,uniphier-uart";
@@ -153,6 +152,42 @@
 			pinctrl-0 = <&pinctrl_uart3>;
 			clocks = <&peri_clk 3>;
 			clock-frequency = <58820000>;
+		};
+
+		gpio: gpio@55000000 {
+			compatible = "socionext,uniphier-gpio";
+			reg = <0x55000000 0x200>;
+			interrupt-parent = <&aidet>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			gpio-ranges = <&pinctrl 0 0 0>,
+				      <&pinctrl 43 0 0>,
+				      <&pinctrl 51 0 0>,
+				      <&pinctrl 96 0 0>,
+				      <&pinctrl 160 0 0>,
+				      <&pinctrl 184 0 0>;
+			gpio-ranges-group-names = "gpio_range0",
+						  "gpio_range1",
+						  "gpio_range2",
+						  "gpio_range3",
+						  "gpio_range4",
+						  "gpio_range5";
+			ngpios = <200>;
+			socionext,interrupt-ranges = <0 48 16>, <16 154 5>,
+						     <21 217 3>;
+		};
+
+		adamv@57920000 {
+			compatible = "socionext,uniphier-ld11-adamv",
+				     "simple-mfd", "syscon";
+			reg = <0x57920000 0x1000>;
+
+			adamv_rst: reset {
+				compatible = "socionext,uniphier-ld11-adamv-reset";
+				#reset-cells = <1>;
+			};
 		};
 
 		i2c0: i2c@58780000 {
@@ -343,17 +378,17 @@
 			compatible = "socionext,uniphier-ld11-soc-glue",
 				     "simple-mfd", "syscon";
 			reg = <0x5f800000 0x2000>;
-			u-boot,dm-pre-reloc;
 
 			pinctrl: pinctrl {
 				compatible = "socionext,uniphier-ld11-pinctrl";
-				u-boot,dm-pre-reloc;
 			};
 		};
 
-		aidet@5fc20000 {
-			compatible = "simple-mfd", "syscon";
+		aidet: aidet@5fc20000 {
+			compatible = "socionext,uniphier-ld11-aidet";
 			reg = <0x5fc20000 0x200>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
 		};
 
 		gic: interrupt-controller@5fe00000 {
@@ -379,6 +414,10 @@
 				compatible = "socionext,uniphier-ld11-reset";
 				#reset-cells = <1>;
 			};
+
+			watchdog {
+				compatible = "socionext,uniphier-wdt";
+			};
 		};
 
 		nand: nand@68000000 {
@@ -390,9 +429,8 @@
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_nand>;
 			clocks = <&sys_clk 2>;
-			nand-ecc-strength = <8>;
 		};
 	};
 };
 
-/include/ "uniphier-pinctrl.dtsi"
+#include "uniphier-pinctrl.dtsi"

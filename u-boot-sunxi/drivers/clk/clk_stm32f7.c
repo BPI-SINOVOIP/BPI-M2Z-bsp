@@ -1,9 +1,10 @@
 /*
- * (C) Copyright 2017
- * Vikas Manocha, <vikas.manocha@st.com>
+ * Copyright (C) 2017, STMicroelectronics - All Rights Reserved
+ * Author(s): Vikas Manocha, <vikas.manocha@st.com> for STMicroelectronics.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
+
 #include <common.h>
 #include <clk-uclass.h>
 #include <dm.h>
@@ -11,6 +12,8 @@
 #include <asm/arch/rcc.h>
 #include <asm/arch/stm32.h>
 #include <asm/arch/stm32_periph.h>
+
+#include <dt-bindings/mfd/stm32f7-rcc.h>
 
 #define RCC_CR_HSION			BIT(0)
 #define RCC_CR_HSEON			BIT(16)
@@ -83,6 +86,10 @@ struct pll_psc {
 #define APB_PSC_8			0x6
 #define APB_PSC_16			0x7
 
+struct stm32_clk {
+	struct stm32_rcc_regs *base;
+};
+
 #if !defined(CONFIG_STM32_HSE_HZ)
 #error "CONFIG_STM32_HSE_HZ not defined!"
 #else
@@ -104,23 +111,26 @@ struct pll_psc sys_pll_psc = {
 #endif
 #endif
 
-int configure_clocks(void)
+static int configure_clocks(struct udevice *dev)
 {
+	struct stm32_clk *priv = dev_get_priv(dev);
+	struct stm32_rcc_regs *regs = priv->base;
+
 	/* Reset RCC configuration */
-	setbits_le32(&STM32_RCC->cr, RCC_CR_HSION);
-	writel(0, &STM32_RCC->cfgr); /* Reset CFGR */
-	clrbits_le32(&STM32_RCC->cr, (RCC_CR_HSEON | RCC_CR_CSSON
+	setbits_le32(&regs->cr, RCC_CR_HSION);
+	writel(0, &regs->cfgr); /* Reset CFGR */
+	clrbits_le32(&regs->cr, (RCC_CR_HSEON | RCC_CR_CSSON
 		| RCC_CR_PLLON));
-	writel(0x24003010, &STM32_RCC->pllcfgr); /* Reset value from RM */
-	clrbits_le32(&STM32_RCC->cr, RCC_CR_HSEBYP);
-	writel(0, &STM32_RCC->cir); /* Disable all interrupts */
+	writel(0x24003010, &regs->pllcfgr); /* Reset value from RM */
+	clrbits_le32(&regs->cr, RCC_CR_HSEBYP);
+	writel(0, &regs->cir); /* Disable all interrupts */
 
 	/* Configure for HSE+PLL operation */
-	setbits_le32(&STM32_RCC->cr, RCC_CR_HSEON);
-	while (!(readl(&STM32_RCC->cr) & RCC_CR_HSERDY))
+	setbits_le32(&regs->cr, RCC_CR_HSEON);
+	while (!(readl(&regs->cr) & RCC_CR_HSERDY))
 		;
 
-	setbits_le32(&STM32_RCC->cfgr, ((
+	setbits_le32(&regs->cfgr, ((
 		sys_pll_psc.ahb_psc << RCC_CFGR_HPRE_SHIFT)
 		| (sys_pll_psc.apb1_psc << RCC_CFGR_PPRE1_SHIFT)
 		| (sys_pll_psc.apb2_psc << RCC_CFGR_PPRE2_SHIFT)));
@@ -132,15 +142,15 @@ int configure_clocks(void)
 	pllcfgr |= sys_pll_psc.pll_n << RCC_PLLCFGR_PLLN_SHIFT;
 	pllcfgr |= ((sys_pll_psc.pll_p >> 1) - 1) << RCC_PLLCFGR_PLLP_SHIFT;
 	pllcfgr |= sys_pll_psc.pll_q << RCC_PLLCFGR_PLLQ_SHIFT;
-	writel(pllcfgr, &STM32_RCC->pllcfgr);
+	writel(pllcfgr, &regs->pllcfgr);
 
 	/* Enable the main PLL */
-	setbits_le32(&STM32_RCC->cr, RCC_CR_PLLON);
-	while (!(readl(&STM32_RCC->cr) & RCC_CR_PLLRDY))
+	setbits_le32(&regs->cr, RCC_CR_PLLON);
+	while (!(readl(&regs->cr) & RCC_CR_PLLRDY))
 		;
 
 	/* Enable high performance mode, System frequency up to 200 MHz */
-	setbits_le32(&STM32_RCC->apb1enr, RCC_APB1ENR_PWREN);
+	setbits_le32(&regs->apb1enr, RCC_APB1ENR_PWREN);
 	setbits_le32(&STM32_PWR->cr1, PWR_CR1_ODEN);
 	/* Infinite wait! */
 	while (!(readl(&STM32_PWR->csr1) & PWR_CSR1_ODRDY))
@@ -152,18 +162,20 @@ int configure_clocks(void)
 		;
 
 	stm32_flash_latency_cfg(5);
-	clrbits_le32(&STM32_RCC->cfgr, (RCC_CFGR_SW0 | RCC_CFGR_SW1));
-	setbits_le32(&STM32_RCC->cfgr, RCC_CFGR_SW_PLL);
+	clrbits_le32(&regs->cfgr, (RCC_CFGR_SW0 | RCC_CFGR_SW1));
+	setbits_le32(&regs->cfgr, RCC_CFGR_SW_PLL);
 
-	while ((readl(&STM32_RCC->cfgr) & RCC_CFGR_SWS_MASK) !=
+	while ((readl(&regs->cfgr) & RCC_CFGR_SWS_MASK) !=
 			RCC_CFGR_SWS_PLL)
 		;
 
 	return 0;
 }
 
-unsigned long clock_get(enum clock clck)
+static unsigned long stm32_clk_get_rate(struct clk *clk)
 {
+	struct stm32_clk *priv = dev_get_priv(clk->dev);
+	struct stm32_rcc_regs *regs = priv->base;
 	u32 sysclk = 0;
 	u32 shift = 0;
 	/* Prescaler table lookups for clock computation */
@@ -174,53 +186,61 @@ unsigned long clock_get(enum clock clck)
 		0, 0, 0, 0, 1, 2, 3, 4
 	};
 
-	if ((readl(&STM32_RCC->cfgr) & RCC_CFGR_SWS_MASK) ==
+	if ((readl(&regs->cfgr) & RCC_CFGR_SWS_MASK) ==
 			RCC_CFGR_SWS_PLL) {
 		u16 pllm, plln, pllp;
-		pllm = (readl(&STM32_RCC->pllcfgr) & RCC_PLLCFGR_PLLM_MASK);
-		plln = ((readl(&STM32_RCC->pllcfgr) & RCC_PLLCFGR_PLLN_MASK)
+		pllm = (readl(&regs->pllcfgr) & RCC_PLLCFGR_PLLM_MASK);
+		plln = ((readl(&regs->pllcfgr) & RCC_PLLCFGR_PLLN_MASK)
 			>> RCC_PLLCFGR_PLLN_SHIFT);
-		pllp = ((((readl(&STM32_RCC->pllcfgr) & RCC_PLLCFGR_PLLP_MASK)
+		pllp = ((((readl(&regs->pllcfgr) & RCC_PLLCFGR_PLLP_MASK)
 			>> RCC_PLLCFGR_PLLP_SHIFT) + 1) << 1);
 		sysclk = ((CONFIG_STM32_HSE_HZ / pllm) * plln) / pllp;
+	} else {
+		return -EINVAL;
 	}
 
-	switch (clck) {
-	case CLOCK_CORE:
-		return sysclk;
-		break;
-	case CLOCK_AHB:
+	switch (clk->id) {
+	/*
+	 * AHB CLOCK: 3 x 32 bits consecutive registers are used :
+	 * AHB1, AHB2 and AHB3
+	 */
+	case STM32F7_AHB1_CLOCK(GPIOA) ... STM32F7_AHB3_CLOCK(QSPI):
 		shift = ahb_psc_table[(
-			(readl(&STM32_RCC->cfgr) & RCC_CFGR_AHB_PSC_MASK)
+			(readl(&regs->cfgr) & RCC_CFGR_AHB_PSC_MASK)
 			>> RCC_CFGR_HPRE_SHIFT)];
 		return sysclk >>= shift;
 		break;
-	case CLOCK_APB1:
+	/* APB1 CLOCK */
+	case STM32F7_APB1_CLOCK(TIM2) ... STM32F7_APB1_CLOCK(UART8):
 		shift = apb_psc_table[(
-			(readl(&STM32_RCC->cfgr) & RCC_CFGR_APB1_PSC_MASK)
+			(readl(&regs->cfgr) & RCC_CFGR_APB1_PSC_MASK)
 			>> RCC_CFGR_PPRE1_SHIFT)];
 		return sysclk >>= shift;
 		break;
-	case CLOCK_APB2:
+	/* APB2 CLOCK */
+	case STM32F7_APB2_CLOCK(TIM1) ... STM32F7_APB2_CLOCK(LTDC):
 		shift = apb_psc_table[(
-			(readl(&STM32_RCC->cfgr) & RCC_CFGR_APB2_PSC_MASK)
+			(readl(&regs->cfgr) & RCC_CFGR_APB2_PSC_MASK)
 			>> RCC_CFGR_PPRE2_SHIFT)];
 		return sysclk >>= shift;
 		break;
 	default:
-		return 0;
+		pr_err("clock index %ld out of range\n", clk->id);
+		return -EINVAL;
 		break;
 	}
 }
 
 static int stm32_clk_enable(struct clk *clk)
 {
+	struct stm32_clk *priv = dev_get_priv(clk->dev);
+	struct stm32_rcc_regs *regs = priv->base;
 	u32 offset = clk->id / 32;
 	u32 bit_index = clk->id % 32;
 
 	debug("%s: clkid = %ld, offset from AHB1ENR is %d, bit_index = %d\n",
 	      __func__, clk->id, offset, bit_index);
-	setbits_le32(&STM32_RCC->ahb1enr + offset, BIT(bit_index));
+	setbits_le32(&regs->ahb1enr + offset, BIT(bit_index));
 
 	return 0;
 }
@@ -247,7 +267,17 @@ void clock_setup(int peripheral)
 static int stm32_clk_probe(struct udevice *dev)
 {
 	debug("%s: stm32_clk_probe\n", __func__);
-	configure_clocks();
+
+	struct stm32_clk *priv = dev_get_priv(dev);
+	fdt_addr_t addr;
+
+	addr = devfdt_get_addr(dev);
+	if (addr == FDT_ADDR_T_NONE)
+		return -EINVAL;
+
+	priv->base = (struct stm32_rcc_regs *)addr;
+
+	configure_clocks(dev);
 
 	return 0;
 }
@@ -272,6 +302,7 @@ static int stm32_clk_of_xlate(struct clk *clk, struct ofnode_phandle_args *args)
 static struct clk_ops stm32_clk_ops = {
 	.of_xlate	= stm32_clk_of_xlate,
 	.enable		= stm32_clk_enable,
+	.get_rate	= stm32_clk_get_rate,
 };
 
 static const struct udevice_id stm32_clk_ids[] = {
@@ -280,10 +311,11 @@ static const struct udevice_id stm32_clk_ids[] = {
 };
 
 U_BOOT_DRIVER(stm32f7_clk) = {
-	.name		= "stm32f7_clk",
-	.id		= UCLASS_CLK,
-	.of_match	= stm32_clk_ids,
-	.ops		= &stm32_clk_ops,
-	.probe		= stm32_clk_probe,
-	.flags		= DM_FLAG_PRE_RELOC,
+	.name			= "stm32f7_clk",
+	.id			= UCLASS_CLK,
+	.of_match		= stm32_clk_ids,
+	.ops			= &stm32_clk_ops,
+	.probe			= stm32_clk_probe,
+	.priv_auto_alloc_size	= sizeof(struct stm32_clk),
+	.flags			= DM_FLAG_PRE_RELOC,
 };

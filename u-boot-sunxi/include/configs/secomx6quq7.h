@@ -33,8 +33,6 @@
 #define CONFIG_FEC_XCV_TYPE		RGMII
 #define CONFIG_ETHPRIME			"FEC"
 #define CONFIG_FEC_MXC_PHYADDR		6
-#define CONFIG_PHYLIB
-#define CONFIG_PHY_MICREL
 
 #define CONFIG_EXTRA_ENV_SETTINGS					\
 	"netdev=eth0\0"							\
@@ -64,10 +62,6 @@
 	"stdin=serial\0"						\
 	"stdout=serial\0"						\
 	"stderr=serial\0"
-
-/* Print Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE +		\
-					 sizeof(CONFIG_SYS_PROMPT) + 16)
 
 #define CONFIG_SYS_HZ			1000
 

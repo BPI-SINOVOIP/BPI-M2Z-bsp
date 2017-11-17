@@ -25,8 +25,6 @@
 #endif
 
 /* NAND support */
-#define CONFIG_NAND
-#define CONFIG_NAND_OMAP_ELM
 #define CONFIG_SYS_NAND_ONFI_DETECTION
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
 #define CONFIG_SYS_NAND_PAGE_SIZE	2048
@@ -52,15 +50,11 @@
 #define CONFIG_BOOTP_DEFAULT
 #define CONFIG_BOOTP_SEND_HOSTNAME
 #define CONFIG_BOOTP_GATEWAY
-#define CONFIG_NET_MULTI
-#define CONFIG_PHY_GIGE
 #define CONFIG_PHY_ATHEROS
-#define CONFIG_PHYLIB
 #define CONFIG_SYS_RX_ETH_BUFFER	64
 
 /* USB support */
 #define CONFIG_USB_XHCI_OMAP
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS 2
 #define CONFIG_OMAP_USB_PHY
 #define CONFIG_AM437X_USB2PHY2_HOST
 
@@ -97,12 +91,9 @@
 #define V_OSCK				24000000  /* Clock output from T2 */
 #define V_SCLK				(V_OSCK)
 
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SECT_SIZE		(64 * 1024)
 #define CONFIG_ENV_OFFSET		(768 * 1024)
 #define CONFIG_ENV_SPI_MAX_HZ           48000000
-
-#define CONFIG_SPL_LDSCRIPT		"arch/arm/mach-omap2/u-boot-spl.lds"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"loadaddr=0x80200000\0" \

@@ -17,7 +17,6 @@
 #include "rcar-gen3-common.h"
 
 /* SCIF */
-#define CONFIG_SCIF_CONSOLE
 #define CONFIG_CONS_SCIF2
 #define CONFIG_CONS_INDEX	2
 #define CONFIG_SH_SCIF_CLK_FREQ        CONFIG_S3D4_CLK_FREQ
@@ -26,8 +25,6 @@
 /* use to RPC(SPI Multi I/O Bus Controller) */
 
 /* Ethernet RAVB */
-#define CONFIG_NET_MULTI
-#define CONFIG_PHY_MICREL
 #define CONFIG_BITBANGMII
 #define CONFIG_BITBANGMII_MULTI
 
@@ -73,7 +70,6 @@
 #define CONFIG_SH_SDHI_FREQ		200000000
 
 /* Environment in eMMC, at the end of 2nd "boot sector" */
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_ENV_OFFSET		(-CONFIG_ENV_SIZE)
 #define CONFIG_SYS_MMC_ENV_DEV		1
 #define CONFIG_SYS_MMC_ENV_PART		2

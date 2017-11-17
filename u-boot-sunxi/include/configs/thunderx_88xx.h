@@ -69,21 +69,11 @@
 					"fdt_addr=0x94C00000\0"		\
 					"fdt_high=0x9fffffff\0"
 
-#define CONFIG_BOOTARGS			\
-					"console=ttyAMA0,115200n8 " \
-					"earlycon=pl011,0x87e024000000 " \
-					"debug maxcpus=48 rootwait rw "\
-					"root=/dev/sda2 coherent_pool=16M"
-
 /* Do not preserve environment */
-#define CONFIG_ENV_IS_NOWHERE		1
 #define CONFIG_ENV_SIZE			0x1000
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		512	/* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					 sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_CMDLINE_EDITING		1
 #define CONFIG_SYS_MAXARGS		64		/* max command args */

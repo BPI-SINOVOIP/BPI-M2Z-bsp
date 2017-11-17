@@ -61,6 +61,26 @@ int of_n_addr_cells(const struct device_node *np);
 int of_n_size_cells(const struct device_node *np);
 
 /**
+ * of_simple_addr_cells() - Get the address cells property in a node
+ *
+ * This function matches fdt_address_cells().
+ *
+ * @np: Node pointer to check
+ * @return value of #address-cells property in this node, or 2 if none
+ */
+int of_simple_addr_cells(const struct device_node *np);
+
+/**
+ * of_simple_size_cells() - Get the size cells property in a node
+ *
+ * This function matches fdt_size_cells().
+ *
+ * @np: Node pointer to check
+ * @return value of #size-cells property in this node, or 2 if none
+ */
+int of_simple_size_cells(const struct device_node *np);
+
+/**
  * of_find_property() - find a property in a node
  *
  * @np: Pointer to device node holding property
@@ -261,6 +281,24 @@ static inline int of_property_read_string_index(const struct device_node *np,
 }
 
 /**
+ * of_property_count_strings() - Find and return the number of strings from a
+ * multiple strings property.
+ * @np:		device node from which the property value is to be read.
+ * @propname:	name of the property to be searched.
+ *
+ * Search for a property in a device tree node and retrieve the number of null
+ * terminated string contain in it. Returns the number of strings on
+ * success, -EINVAL if the property does not exist, -ENODATA if property
+ * does not have a value, and -EILSEQ if the string is not null-terminated
+ * within the length of the property data.
+ */
+static inline int of_property_count_strings(const struct device_node *np,
+					    const char *propname)
+{
+	return of_property_read_string_helper(np, propname, NULL, 0, 0);
+}
+
+/**
  * of_parse_phandle - Resolve a phandle property to a device_node pointer
  * @np: Pointer to device node holding phandle property
  * @phandle_name: Name of property holding a phandle value
@@ -313,6 +351,24 @@ struct device_node *of_parse_phandle(const struct device_node *np,
 int of_parse_phandle_with_args(const struct device_node *np,
 			       const char *list_name, const char *cells_name,
 			       int index, struct of_phandle_args *out_args);
+
+/**
+ * of_count_phandle_with_args() - Count the number of phandle in a list
+ *
+ * @np:		pointer to a device tree node containing a list
+ * @list_name:	property name that contains a list
+ * @cells_name:	property name that specifies phandles' arguments count
+ * @return number of phandle found, -ENOENT if
+ *	@list_name does not exist, -EINVAL if a phandle was not found,
+ *	@cells_name could not be found, the arguments were truncated or there
+ *	were too many arguments.
+ *
+ * Returns number of phandle found on success, on error returns appropriate
+ * errno value.
+ *
+ */
+int of_count_phandle_with_args(const struct device_node *np,
+			       const char *list_name, const char *cells_name);
 
 /**
  * of_alias_scan() - Scan all properties of the 'aliases' node

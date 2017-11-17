@@ -178,7 +178,6 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges = <0 0 0 0xffffffff>;
-		u-boot,dm-pre-reloc;
 
 		serial0: serial@54006800 {
 			compatible = "socionext,uniphier-uart";
@@ -222,6 +221,36 @@
 			pinctrl-0 = <&pinctrl_uart3>;
 			clocks = <&peri_clk 3>;
 			clock-frequency = <58820000>;
+		};
+
+		gpio: gpio@55000000 {
+			compatible = "socionext,uniphier-gpio";
+			reg = <0x55000000 0x200>;
+			interrupt-parent = <&aidet>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			gpio-ranges = <&pinctrl 0 0 0>,
+				      <&pinctrl 96 0 0>,
+				      <&pinctrl 160 0 0>;
+			gpio-ranges-group-names = "gpio_range0",
+						  "gpio_range1",
+						  "gpio_range2";
+			ngpios = <205>;
+			socionext,interrupt-ranges = <0 48 16>, <16 154 5>,
+						     <21 217 3>;
+		};
+
+		adamv@57920000 {
+			compatible = "socionext,uniphier-ld20-adamv",
+				     "simple-mfd", "syscon";
+			reg = <0x57920000 0x1000>;
+
+			adamv_rst: reset {
+				compatible = "socionext,uniphier-ld20-adamv-reset";
+				#reset-cells = <1>;
+			};
 		};
 
 		i2c0: i2c@58780000 {
@@ -314,7 +343,7 @@
 		sdctrl@59810000 {
 			compatible = "socionext,uniphier-ld20-sdctrl",
 				     "simple-mfd", "syscon";
-			reg = <0x59810000 0x800>;
+			reg = <0x59810000 0x400>;
 
 			sd_clk: clock {
 				compatible = "socionext,uniphier-ld20-sd-clock";
@@ -378,17 +407,17 @@
 			compatible = "socionext,uniphier-ld20-soc-glue",
 				     "simple-mfd", "syscon";
 			reg = <0x5f800000 0x2000>;
-			u-boot,dm-pre-reloc;
 
 			pinctrl: pinctrl {
 				compatible = "socionext,uniphier-ld20-pinctrl";
-				u-boot,dm-pre-reloc;
 			};
 		};
 
-		aidet@5fc20000 {
-			compatible = "simple-mfd", "syscon";
+		aidet: aidet@5fc20000 {
+			compatible = "socionext,uniphier-ld20-aidet";
 			reg = <0x5fc20000 0x200>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
 		};
 
 		gic: interrupt-controller@5fe00000 {
@@ -414,6 +443,10 @@
 				compatible = "socionext,uniphier-ld20-reset";
 				#reset-cells = <1>;
 			};
+
+			watchdog {
+				compatible = "socionext,uniphier-wdt";
+			};
 		};
 
 		usb: usb@65b00000 {
@@ -429,6 +462,7 @@
 				compatible = "snps,dwc3";
 				reg = <0x65a00000 0x10000>;
 				interrupts = <0 134 4>;
+				dr_mode = "host";
 				tx-fifo-resize;
 			};
 		};
@@ -442,9 +476,8 @@
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_nand>;
 			clocks = <&sys_clk 2>;
-			nand-ecc-strength = <8>;
 		};
 	};
 };
 
-/include/ "uniphier-pinctrl.dtsi"
+#include "uniphier-pinctrl.dtsi"

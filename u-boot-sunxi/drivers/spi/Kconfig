@@ -188,13 +188,6 @@ config ZYNQ_QSPI
 	  Zynq QSPI IP core. This IP is used to connect the flash in
 	  4-bit qspi, 8-bit dual stacked and shared 4-bit dual parallel.
 
-config OMAP3_SPI
-	bool "McSPI driver for OMAP"
-	help
-	  SPI master controller for OMAP24XX and later Multichannel SPI
-	  (McSPI). This driver be used to access SPI chips on platforms
-	  embedding this OMAP3 McSPI IP core.
-
 endif # if DM_SPI
 
 config SOFT_SPI
@@ -217,6 +210,13 @@ config FSL_QSPI
 	  used to access the SPI NOR flash on platforms embedding this
 	  Freescale IP core.
 
+config NDS_AE3XX_SPI
+	bool "Andestech AE3XX SPI driver"
+	help
+	  Enable the Andestech AE3XX SPI driver. This driver can be
+	  used to access the SPI flash on platforms embedding this
+	  Andestech IP core.
+
 config TI_QSPI
 	bool "TI QSPI driver"
 	help
@@ -228,5 +228,12 @@ config MPC8XX_SPI
 	depends on 8xx
 	help
 	  Enable support for SPI on MPC8XX
+
+config OMAP3_SPI
+	bool "McSPI driver for OMAP"
+	help
+	  SPI master controller for OMAP24XX and later Multichannel SPI
+	  (McSPI). This driver be used to access SPI chips on platforms
+	  embedding this OMAP3 McSPI IP core.
 
 endmenu # menu "SPI Support"

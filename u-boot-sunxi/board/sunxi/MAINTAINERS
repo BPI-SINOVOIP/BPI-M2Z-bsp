@@ -26,6 +26,7 @@ F:	configs/A13-OLinuXinoM_defconfig
 F:	configs/Auxtek-T003_defconfig
 F:	configs/Auxtek-T004_defconfig
 F:	configs/CHIP_defconfig
+F:	configs/CHIP_pro_defconfig
 F:	configs/difrnce_dit4350_defconfig
 F:	configs/Empire_electronix_d709_defconfig
 F:	configs/Empire_electronix_m712_defconfig
@@ -44,6 +45,7 @@ F:	configs/Mele_M9_defconfig
 F:	configs/Sinovoip_BPI_M2_defconfig
 F:	include/configs/sun7i.h
 F:	configs/A20-OLinuXino_MICRO_defconfig
+F:	configs/A20-OLinuXino_MICRO-eMMC_defconfig
 F:	configs/Bananapi_defconfig
 F:	configs/Bananapro_defconfig
 F:	configs/i12-tvbox_defconfig
@@ -54,6 +56,7 @@ F:	configs/Orangepi_mini_defconfig
 F:	configs/qt840a_defconfig
 F:	configs/Wits_Pro_A20_DKT_defconfig
 F:	include/configs/sun8i.h
+F:	configs/sun8i_a23_evb_defconfig
 F:	configs/ga10h_v1_1_defconfig
 F:	configs/gt90h_v4_defconfig
 F:	configs/inet86dz_defconfig
@@ -88,10 +91,20 @@ M:	Iain Paton <ipaton0@gmail.com>
 S:	Maintained
 F:	configs/A20-OLinuXino-Lime2_defconfig
 
+A20-OLINUXINO-LIME2-EMMC BOARD
+M:	Olliver Schinagl <oliver@schinagl.nl>
+S:	Maintained
+F:	configs/A20-OLinuXino-Lime2-eMMC_defconfig
+
 A33-OLINUXINO BOARD
 M:	Stefan Mavrodiev <stefan.mavrodiev@gmail.com>
 S:	Maintained
 F:	configs/A33-OLinuXino_defconfig
+
+A64-OLINUXINO BOARD
+M:	Jagan Teki <jagan@amarulasolutions.com>
+S:	Maintained
+F:	configs/a64-olinuxino_defconfig
 
 A80 OPTIMUS BOARD
 M:	Chen-Yu Tsai <wens@csie.org>
@@ -108,11 +121,22 @@ M:	Paul Kocialkowski <contact@paulk.fr>
 S:	Maintained
 F:	configs/Ampe_A76_defconfig
 
+BANANAPI M1 PLUS
+M:	Jagan Teki <jagan@amarulasolutions.com>
+S:	Maintained
+F:	configs/bananapi_m1_plus_defconfig
+
 BANANAPI M2 ULTRA BOARD
 M:	Chen-Yu Tsai <wens@csie.org>
 S:	Maintained
 F:	configs/Bananapi_M2_Ultra_defconfig
 F:	arch/arm/dts/sun8i-r40-bananapi-m2-ultra.dts
+
+BANANAPI M2 MAGIC BOARD
+M:	Maxime Ripard <maxime.ripard@free-electrons.com>
+S:	Maintained
+F:	configs/Bananapi_m2m_defconfig
+F:	arch/arm/dts/sun8i-r16-bananapi-m2m.dts
 
 BANANAPI M64
 M:	Jagan Teki <jagan@amarulasolutions.com>
@@ -266,6 +290,11 @@ NANOPI-NEO-AIR BOARD
 M:	Jelle van der Waa <jelle@vdwaa.nl>
 S:	Maintained
 F:	configs/nanopi_neo_air_defconfig
+
+NANOPI-A64 BOARD
+M:	Jagan Teki <jagan@amarulasolutions.com>
+S:	Maintained
+F:	configs/nanopi_a64_defconfig
 
 NINTENDO NES CLASSIC EDITION BOARD
 M:	FUKAUMI Naoki <naobsd@gmail.com>

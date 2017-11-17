@@ -19,16 +19,6 @@
 #define CONFIG_SYS_MEMTEST_START	0x80000000
 #define CONFIG_SYS_MEMTEST_END		0x9fffffff
 
-/*
-* USB
-*/
-#define CONFIG_HAS_FSL_XHCI_USB
-
-#ifdef CONFIG_HAS_FSL_XHCI_USB
-#define CONFIG_USB_XHCI_FSL
-#define CONFIG_USB_MAX_CONTROLLER_COUNT         1
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS      2
-#endif
 
 /*
  * I2C IO expander
@@ -51,10 +41,8 @@
 
 /* SATA */
 #define CONFIG_LIBATA
-#define	CONFIG_SCSI
 #define CONFIG_SCSI_AHCI
 #define CONFIG_SCSI_AHCI_PLAT
-#define CONFIG_CMD_SCSI
 
 #define CONFIG_SYS_SATA				AHCI_BASE_ADDR
 
@@ -65,9 +53,7 @@
 
 #define CONFIG_PCIE1		/* PCIE controller 1 */
 
-#define CONFIG_NET_MULTI
 #define CONFIG_PCI_SCAN_SHOW
-#define CONFIG_CMD_PCI
 
 #define CONFIG_CMD_MEMINFO
 #define CONFIG_CMD_MEMTEST

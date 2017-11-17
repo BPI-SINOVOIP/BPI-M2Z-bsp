@@ -11,8 +11,13 @@
 #include <asm/ti-common/keystone_net.h>
 #include <asm/arch/psc_defs.h>
 #include <asm/arch/mmc_host_def.h>
+#include <fdtdec.h>
+#include <i2c.h>
+#include <remoteproc.h>
 #include "mux-k2g.h"
 #include "../common/board_detect.h"
+
+#define K2G_GP_AUDIO_CODEC_ADDRESS	0x1B
 
 const unsigned int sysclk_array[MAX_SYSCLK] = {
 	19200000,
@@ -204,13 +209,47 @@ int board_mmc_init(bd_t *bis)
 		return -1;
 	}
 
-	omap_mmc_init(0, 0, 0, -1, -1);
+	if (board_is_k2g_gp())
+		omap_mmc_init(0, 0, 0, -1, -1);
+
 	omap_mmc_init(1, 0, 0, -1, -1);
 	return 0;
 }
 #endif
 
-#ifdef CONFIG_BOARD_EARLY_INIT_F
+#if defined(CONFIG_MULTI_DTB_FIT)
+int board_fit_config_name_match(const char *name)
+{
+	bool eeprom_read = board_ti_was_eeprom_read();
+
+	if (!strcmp(name, "keystone-k2g-generic") && !eeprom_read)
+		return 0;
+	else if (!strcmp(name, "keystone-k2g-evm") && board_ti_is("66AK2GGP"))
+		return 0;
+	else if (!strcmp(name, "keystone-k2g-ice") && board_ti_is("66AK2GIC"))
+		return 0;
+	else
+		return -1;
+}
+#endif
+
+#if defined(CONFIG_DTB_RESELECT)
+static int k2g_alt_board_detect(void)
+{
+	int rc;
+
+	rc = i2c_set_bus_num(1);
+	if (rc)
+		return rc;
+
+	rc = i2c_probe(K2G_GP_AUDIO_CODEC_ADDRESS);
+	if (rc)
+		return rc;
+
+	ti_i2c_eeprom_am_set("66AK2GGP", "1.0X");
+
+	return 0;
+}
 
 static void k2g_reset_mux_config(void)
 {
@@ -225,19 +264,32 @@ static void k2g_reset_mux_config(void)
 	setbits_le32(KS2_RSTMUX8, RSTMUX_LOCK8_MASK);
 }
 
-int board_early_init_f(void)
+int embedded_dtb_select(void)
 {
-	init_plls();
+	int rc;
+	rc = ti_i2c_eeprom_am_get(CONFIG_EEPROM_BUS_ADDRESS,
+			CONFIG_EEPROM_CHIP_ADDRESS);
+	if (rc) {
+		rc = k2g_alt_board_detect();
+		if (rc) {
+			printf("Unable to do board detection\n");
+			return -1;
+		}
+	}
+
+	fdtdec_setup();
 
 	k2g_mux_config();
 
 	k2g_reset_mux_config();
 
-	/* deassert FLASH_HOLD */
-	clrbits_le32(K2G_GPIO1_BANK2_BASE + K2G_GPIO_DIR_OFFSET,
-		     BIT(9));
-	setbits_le32(K2G_GPIO1_BANK2_BASE + K2G_GPIO_SETDATA_OFFSET,
-		     BIT(9));
+	if (board_is_k2g_gp()) {
+		/* deassert FLASH_HOLD */
+		clrbits_le32(K2G_GPIO1_BANK2_BASE + K2G_GPIO_DIR_OFFSET,
+			     BIT(9));
+		setbits_le32(K2G_GPIO1_BANK2_BASE + K2G_GPIO_SETDATA_OFFSET,
+			     BIT(9));
+	}
 
 	return 0;
 }
@@ -256,6 +308,23 @@ int board_late_init(void)
 
 	board_ti_set_ethaddr(1);
 #endif
+
+#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+	if (board_is_k2g_gp())
+		env_set("board_name", "66AK2GGP\0");
+	else if (board_is_k2g_ice())
+		env_set("board_name", "66AK2GIC\0");
+#endif
+	return 0;
+}
+#endif
+
+#ifdef CONFIG_BOARD_EARLY_INIT_F
+int board_early_init_f(void)
+{
+	init_plls();
+
+	k2g_mux_config();
 
 	return 0;
 }
@@ -284,4 +353,24 @@ int get_num_eth_ports(void)
 {
 	return sizeof(eth_priv_cfg) / sizeof(struct eth_priv_t);
 }
+#endif
+
+#ifdef CONFIG_TI_SECURE_DEVICE
+void board_pmmc_image_process(ulong pmmc_image, size_t pmmc_size)
+{
+	int id = getenv_ulong("dev_pmmc", 10, 0);
+	int ret;
+
+	if (!rproc_is_initialized())
+		rproc_init();
+
+	ret = rproc_load(id, pmmc_image, pmmc_size);
+	printf("Load Remote Processor %d with data@addr=0x%08lx %u bytes:%s\n",
+	       id, pmmc_image, pmmc_size, ret ? " Failed!" : " Success!");
+
+	if (!ret)
+		rproc_start(id);
+}
+
+U_BOOT_FIT_LOADABLE_HANDLER(IH_TYPE_PMMC, board_pmmc_image_process);
 #endif

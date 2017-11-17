@@ -18,13 +18,6 @@
 #define CONFIG_TIMESTAMP		/* Print image info with timestamp */
 
 /*
- * U-Boot Commands
- */
-#define CONFIG_CMD_NAND
-#define CONFIG_CMD_NAND_TRIMFFS
-#define CONFIG_CMD_SATA
-
-/*
  * Memory configurations
  */
 #define CONFIG_NR_DRAM_BANKS		2
@@ -53,9 +46,6 @@
  */
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_CBSIZE	1024		/* Console I/O buffer size */
-#define CONFIG_SYS_PBSIZE	\
-	(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-						/* Print buffer size */
 #define CONFIG_SYS_MAXARGS	32		/* Max number of command args */
 #define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
 						/* Boot argument buffer size */
@@ -85,7 +75,6 @@
 #ifdef CONFIG_CMD_NAND
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		NFC_BASE_ADDR_AXI
-#define CONFIG_NAND_MXC
 #define CONFIG_MXC_NAND_REGS_BASE	NFC_BASE_ADDR_AXI
 #define CONFIG_MXC_NAND_IP_REGS_BASE	NFC_BASE_ADDR
 #define CONFIG_SYS_NAND_LARGEPAGE
@@ -93,7 +82,6 @@
 #define CONFIG_SYS_NAND_USE_FLASH_BBT
 
 /* Environment is in NAND */
-#define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SIZE
 #define CONFIG_ENV_SECT_SIZE		(128 * 1024)
 #define CONFIG_ENV_RANGE		(4 * CONFIG_ENV_SECT_SIZE)
@@ -101,23 +89,8 @@
 #define CONFIG_ENV_OFFSET_REDUND	\
 		(CONFIG_ENV_OFFSET + CONFIG_ENV_RANGE)
 
-#define CONFIG_CMD_UBIFS
-#define CONFIG_CMD_MTDPARTS
-#define CONFIG_RBTREE
-#define CONFIG_LZO
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#define MTDIDS_DEFAULT			"nand0=mxc_nand"
-#define MTDPARTS_DEFAULT			\
-	"mtdparts=mxc_nand:"			\
-		"1024k(u-boot),"		\
-		"512k(env1),"			\
-		"512k(env2),"			\
-		"14m(boot),"			\
-		"240m(data),"			\
-		"-@2048k(UBI)"
-#else
-#define CONFIG_ENV_IS_NOWHERE
 #endif
 
 /*
@@ -130,8 +103,6 @@
 #define CONFIG_MII
 #define CONFIG_DISCOVER_PHY
 #define CONFIG_FEC_XCV_TYPE		RMII
-#define CONFIG_PHYLIB
-#define CONFIG_PHY_MICREL
 #define CONFIG_ETHPRIME			"FEC0"
 #endif
 
@@ -161,10 +132,6 @@
  */
 #ifdef CONFIG_CMD_USB
 #define CONFIG_USB_EHCI_MX5
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_ASIX
-#define CONFIG_USB_ETHER_MCS7830
-#define CONFIG_USB_ETHER_SMSC95XX
 #define CONFIG_MXC_USB_PORT		1
 #define CONFIG_MXC_USB_PORTSC		(PORT_PTS_UTMI | PORT_PTS_PTW)
 #define CONFIG_MXC_USB_FLAGS		0
@@ -195,7 +162,6 @@
 #define CONFIG_BMP_16BPP
 #define CONFIG_VIDEO_LOGO
 #define CONFIG_SYS_VIDEO_LOGO_MAX_SIZE	(2 << 20)
-#define CONFIG_IPUV3_CLK		200000000
 #endif
 
 /*
@@ -206,7 +172,6 @@
 #define CONFIG_REVISION_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_BOOTFILE		"fitImage"
-#define CONFIG_BOOTARGS		"console=ttymxc1,115200"
 #define CONFIG_LOADADDR		0x70800000
 #define CONFIG_BOOTCOMMAND	"run mmc_mmc"
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR

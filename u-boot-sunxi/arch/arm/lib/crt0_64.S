@@ -69,7 +69,9 @@ ENTRY(_main)
 /*
  * Set up initial C runtime environment and call board_init_f(0).
  */
-#if defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_STACK)
+#if defined(CONFIG_TPL_BUILD) && defined(CONFIG_TPL_NEEDS_SEPARATE_STACK)
+	ldr	x0, =(CONFIG_TPL_STACK)
+#elif defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_STACK)
 	ldr	x0, =(CONFIG_SPL_STACK)
 #else
 	ldr	x0, =(CONFIG_SYS_INIT_SP_ADDR)
@@ -93,8 +95,7 @@ ENTRY(_main)
  */
 	ldr	x0, [x18, #GD_START_ADDR_SP]	/* x0 <- gd->start_addr_sp */
 	bic	sp, x0, #0xf	/* 16-byte alignment for ABI compliance */
-	ldr	x18, [x18, #GD_BD]		/* x18 <- gd->bd */
-	sub	x18, x18, #GD_SIZE		/* new GD is below bd */
+	ldr	x18, [x18, #GD_NEW_GD]		/* x18 <- gd->new_gd */
 
 	adr	lr, relocation_return
 	ldr	x9, [x18, #GD_RELOC_OFF]	/* x9 <- gd->reloc_off */

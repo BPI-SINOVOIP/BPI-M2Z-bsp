@@ -8,7 +8,7 @@ fi
 
 echo ${BOARD}
 UBOOTBIN=out/${BOARD}/u-boot-sunxi-with-spl.bin
-UBOOTIMG=out/u-boot-2017.07-${BOARD}-8k.img
+UBOOTIMG=out/u-boot-2017.11-${BOARD}-8k.img
 cp -a ${UBOOTBIN} ${UBOOTIMG}
 rm -f ${UBOOTIMG}.gz
 gzip $UBOOTIMG

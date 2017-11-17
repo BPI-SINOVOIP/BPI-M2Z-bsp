@@ -77,8 +77,6 @@
 #define CONFIG_BOOTP_GATEWAY
 #define CONFIG_BOOTP_DNS
 
-#define CONFIG_CMD_NAND
-
 #define CONFIG_NET_RETRY_COUNT	100
 
 
@@ -87,10 +85,6 @@
 /*
  * Ethernet on the debug board (SMC911)
  */
-#define CONFIG_SMC911X
-#define CONFIG_SMC911X_16_BIT 1
-#define CONFIG_SMC911X_BASE CS5_BASE_ADDR
-
 #define CONFIG_HAS_ETH1
 #define CONFIG_ETHPRIME
 
@@ -112,9 +106,6 @@
 #define CONFIG_CMDLINE_EDITING
 
 #define CONFIG_AUTO_COMPLETE
-#define CONFIG_SYS_CBSIZE	256	/* Console I/O Buffer Size */
-#define CONFIG_SYS_MAXARGS	16	/* max number of command args */
-#define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE /* Boot Argument Buffer Size */
 
 #define CONFIG_SYS_MEMTEST_START	0	/* memtest works on */
 #define CONFIG_SYS_MEMTEST_END		0x10000
@@ -141,14 +132,9 @@
 /*
  * MTD Command for mtdparts
  */
-#define CONFIG_CMD_MTDPARTS
 #define CONFIG_MTD_DEVICE
 #define CONFIG_FLASH_CFI_MTD
 #define CONFIG_MTD_PARTITIONS
-#define MTDIDS_DEFAULT		"nand0=mxc_nand,nor0=physmap-flash.0"
-#define MTDPARTS_DEFAULT	"mtdparts=mxc_nand:1m(boot),5m(linux),"	\
-				"96m(root),8m(cfg),1938m(user);"	\
-				"physmap-flash.0:512k(b),4m(k),30m(u),28m(r)"
 
 /*
  * FLASH and environment organization
@@ -170,10 +156,7 @@
 #define CONFIG_ENV_ADDR		(CONFIG_SYS_MONITOR_BASE + \
 				CONFIG_SYS_MONITOR_LEN)
 
-#define CONFIG_ENV_IS_IN_FLASH
-
 #if defined(CONFIG_FSL_ENV_IN_NAND)
-	#define CONFIG_ENV_IS_IN_NAND
 	#define CONFIG_ENV_OFFSET       (1024 * 1024)
 #endif
 
@@ -191,7 +174,6 @@
 /*
  * NAND FLASH driver setup
  */
-#define CONFIG_NAND_MXC
 #define CONFIG_MXC_NAND_REGS_BASE	(NFC_BASE_ADDR)
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		(NFC_BASE_ADDR)
@@ -199,7 +181,6 @@
 #define CONFIG_SYS_NAND_LARGEPAGE
 
 /* EHCI driver */
-#define CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS	1
 #define CONFIG_EHCI_IS_TDI
 #define CONFIG_EHCI_HCD_INIT_AFTER_RESET
 #define CONFIG_USB_EHCI_MXC

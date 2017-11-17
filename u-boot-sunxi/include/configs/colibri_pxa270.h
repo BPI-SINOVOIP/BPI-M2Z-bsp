@@ -39,7 +39,6 @@
 		"bootm 0xa0000000; "					\
 	"fi; "								\
 	"bootm 0xc0000;"
-#define	CONFIG_BOOTARGS			"console=tty0 console=ttyS0,115200"
 #define	CONFIG_TIMESTAMP
 #define	CONFIG_CMDLINE_TAG
 #define	CONFIG_SETUP_MEMORY_TAGS
@@ -85,11 +84,6 @@
 #endif
 
 #undef	CONFIG_SYS_LONGHELP		/* Saves 10 KB */
-#define	CONFIG_SYS_CBSIZE		256
-#define	CONFIG_SYS_PBSIZE		\
-	(CONFIG_SYS_CBSIZE+sizeof(CONFIG_SYS_PROMPT)+16)
-#define	CONFIG_SYS_MAXARGS		16
-#define	CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 #define	CONFIG_SYS_DEVICE_NULLDEV	1
 #undef	CONFIG_CMDLINE_EDITING		/* Saves 2.5 KB */
 #undef	CONFIG_AUTO_COMPLETE		/* Saves 2.5 KB */
@@ -138,11 +132,6 @@
 
 #define	CONFIG_SYS_FLASH_USE_BUFFER_WRITE	1
 #define	CONFIG_SYS_FLASH_PROTECTION		1
-
-#define CONFIG_ENV_IS_IN_FLASH		1
-
-#else	/* No flash */
-#define	CONFIG_ENV_IS_NOWHERE
 #endif
 
 #define	CONFIG_SYS_MONITOR_BASE		0x0

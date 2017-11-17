@@ -38,12 +38,9 @@
 #define CONFIG_BAUDRATE				115200
 
 #define CONFIG_ENV_SIZE				SZ_8K
-#define CONFIG_ENV_IS_NOWHERE
 
 /* console configuration */
 #define CONFIG_SYS_CBSIZE			SZ_1K
-#define CONFIG_SYS_PBSIZE			(CONFIG_SYS_CBSIZE + \
-						 sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_SYS_MAXARGS			64
 #define CONFIG_SYS_BARGSIZE			CONFIG_SYS_CBSIZE
 

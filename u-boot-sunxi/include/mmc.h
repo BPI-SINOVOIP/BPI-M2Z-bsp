@@ -221,6 +221,10 @@
 #define EXT_CSD_BOOT_PART_NUM(x)	(x << 3)
 #define EXT_CSD_PARTITION_ACCESS(x)	(x << 0)
 
+#define EXT_CSD_EXTRACT_BOOT_ACK(x)		(((x) >> 6) & 0x1)
+#define EXT_CSD_EXTRACT_BOOT_PART(x)		(((x) >> 3) & 0x7)
+#define EXT_CSD_EXTRACT_PARTITION_ACCESS(x)	((x) & 0x7)
+
 #define EXT_CSD_BOOT_BUS_WIDTH_MODE(x)	(x << 3)
 #define EXT_CSD_BOOT_BUS_WIDTH_RESET(x)	(x << 2)
 #define EXT_CSD_BOOT_BUS_WIDTH_WIDTH(x)	(x)
@@ -321,7 +325,7 @@ struct mmc_data {
 /* forward decl. */
 struct mmc;
 
-#ifdef CONFIG_DM_MMC_OPS
+#if CONFIG_IS_ENABLED(DM_MMC)
 struct dm_mmc_ops {
 	/**
 	 * send_cmd() - Send a command to the MMC device
@@ -385,7 +389,7 @@ struct mmc_ops {
 
 struct mmc_config {
 	const char *name;
-#ifndef CONFIG_DM_MMC_OPS
+#if !CONFIG_IS_ENABLED(DM_MMC)
 	const struct mmc_ops *ops;
 #endif
 	uint host_caps;
@@ -409,7 +413,7 @@ struct sd_ssr {
  * TODO struct mmc should be in mmc_private but it's hard to fix right now
  */
 struct mmc {
-#ifndef CONFIG_BLK
+#if !CONFIG_IS_ENABLED(BLK)
 	struct list_head link;
 #endif
 	const struct mmc_config *cfg;	/* provided configuration */
@@ -444,14 +448,14 @@ struct mmc {
 	u64 capacity_gp[4];
 	u64 enh_user_start;
 	u64 enh_user_size;
-#ifndef CONFIG_BLK
+#if !CONFIG_IS_ENABLED(BLK)
 	struct blk_desc block_dev;
 #endif
 	char op_cond_pending;	/* 1 if we are waiting on an op_cond command */
 	char init_in_progress;	/* 1 if we have done mmc_start_init() */
 	char preinit;		/* start init as early as possible */
 	int ddr_mode;
-#ifdef CONFIG_DM_MMC
+#if CONFIG_IS_ENABLED(DM_MMC)
 	struct udevice *dev;	/* Device for this MMC controller */
 #endif
 };
@@ -519,7 +523,7 @@ int mmc_switch_part(struct mmc *mmc, unsigned int part_num);
 int mmc_hwpart_config(struct mmc *mmc, const struct mmc_hwpart_conf *conf,
 		      enum mmc_hwpart_conf_mode mode);
 
-#ifndef CONFIG_DM_MMC_OPS
+#if !CONFIG_IS_ENABLED(DM_MMC)
 int mmc_getcd(struct mmc *mmc);
 int board_mmc_getcd(struct mmc *mmc);
 int mmc_getwp(struct mmc *mmc);
@@ -584,18 +588,6 @@ int board_mmc_init(bd_t *bis);
 int cpu_mmc_init(bd_t *bis);
 int mmc_get_env_addr(struct mmc *mmc, int copy, u32 *env_addr);
 int mmc_get_env_dev(void);
-
-struct pci_device_id;
-
-/**
- * pci_mmc_init() - set up PCI MMC devices
- *
- * This finds all the matching PCI IDs and sets them up as MMC devices.
- *
- * @name:		Name to use for devices
- * @mmc_supported:	PCI IDs to search for, terminated by {0, 0}
- */
-int pci_mmc_init(const char *name, struct pci_device_id *mmc_supported);
 
 /* Set block count limit because of 16 bit register limit on some hardware*/
 #ifndef CONFIG_SYS_MMC_MAX_BLK_COUNT

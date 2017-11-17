@@ -149,7 +149,7 @@ void lcd_show_board_info(void)
 		dram_size += gd->bd->bi_dram[i].size;
 	nand_size = 0;
 	for (i = 0; i < CONFIG_SYS_MAX_NAND_DEVICE; i++)
-		nand_size += nand_info[i]->size;
+		nand_size += get_nand_dev_by_index(i)->size;
 	lcd_printf ("  %ld MB SDRAM, %ld MB NAND\n",
 		dram_size >> 20,
 		nand_size >> 20 );
@@ -183,9 +183,6 @@ int board_init(void)
 
 #ifdef CONFIG_CMD_NAND
 	at91sam9rlek_nand_hw_init();
-#endif
-#ifdef CONFIG_HAS_DATAFLASH
-	at91_spi0_hw_init(1 << 0);
 #endif
 #ifdef CONFIG_LCD
 	at91sam9rlek_lcd_hw_init();

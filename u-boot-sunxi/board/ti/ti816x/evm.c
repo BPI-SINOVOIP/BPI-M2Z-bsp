@@ -38,7 +38,7 @@ int board_eth_init(bd_t *bis)
 	uint32_t mac_hi, mac_lo;
 	struct ctrl_dev *cdev = (struct ctrl_dev *)CTRL_DEVICE_BASE;
 
-	if (!eth_getenv_enetaddr("ethaddr", mac_addr)) {
+	if (!eth_env_get_enetaddr("ethaddr", mac_addr)) {
 		printf("<ethaddr> not set. Reading from E-fuse\n");
 		/* try reading mac address from efuse */
 		mac_lo = readl(&cdev->macid0l);
@@ -51,7 +51,7 @@ int board_eth_init(bd_t *bis)
 		mac_addr[5] = (mac_lo & 0xFF00) >> 8;
 
 		if (is_valid_ethaddr(mac_addr))
-			eth_setenv_enetaddr("ethaddr", mac_addr);
+			eth_env_set_enetaddr("ethaddr", mac_addr);
 		else
 			printf("Unable to read MAC address. Set <ethaddr>\n");
 	}

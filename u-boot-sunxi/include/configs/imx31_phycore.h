@@ -49,10 +49,6 @@
  * Command definition
  ***********************************************************/
 
-
-#define MTDPARTS_DEFAULT	"mtdparts=physmap-flash.0:128k(uboot)ro," \
-					"1536k(kernel),-(root)"
-
 #define CONFIG_NETMASK		255.255.255.0
 #define CONFIG_IPADDR		192.168.23.168
 #define CONFIG_SERVERIP		192.168.23.2
@@ -70,7 +66,7 @@
 	"bootcmd_flash=run bootargs_base bootargs_mtd bootargs_flash;"	\
 		"bootm 0x80000000\0"					\
 	"unlock=yes\0"							\
-	"mtdparts=" MTDPARTS_DEFAULT "\0"				\
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0"				\
 	"prg_uboot=tftpboot 0x80000000 $(uboot);"			\
 		"protect off 0xa0000000 +0x20000;"			\
 		"erase 0xa0000000 +0x20000;"				\
@@ -85,23 +81,10 @@
 		"pclk:185925,le:9,ri:17,up:7,lo:10,hs:1,vs:1,"		\
 		"sync:1241513985,vmode:0\0"
 
-#define CONFIG_SMC911X
-#define CONFIG_SMC911X_BASE	0xa8000000
-#define CONFIG_SMC911X_32_BIT
-
 /*
  * Miscellaneous configurable options
  */
 #define CONFIG_SYS_LONGHELP		/* undef to save memory */
-/* Console I/O Buffer Size */
-#define CONFIG_SYS_CBSIZE		256
-/* Print Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					 sizeof(CONFIG_SYS_PROMPT) + 16)
-/* max number of command args */
-#define CONFIG_SYS_MAXARGS		16
-/* Boot Argument Buffer Size */
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 
 #define CONFIG_SYS_MEMTEST_START	0  /* memtest works on */
 #define CONFIG_SYS_MEMTEST_END		0x10000
@@ -135,7 +118,6 @@
 /* Monitor at beginning of flash */
 #define CONFIG_SYS_MONITOR_BASE		CONFIG_SYS_FLASH_BASE
 
-#define CONFIG_ENV_IS_IN_EEPROM
 #define CONFIG_ENV_OFFSET			0x00	/* env. starts here */
 #define CONFIG_ENV_SIZE				4096
 #define CONFIG_SYS_I2C_EEPROM_ADDR		0x52
@@ -161,7 +143,6 @@
 /*
  * JFFS2 partitions
  */
-#undef CONFIG_CMD_MTDPARTS
 #define CONFIG_JFFS2_DEV	"nor0"
 
 /* EET platform additions */

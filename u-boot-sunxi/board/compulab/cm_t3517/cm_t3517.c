@@ -168,7 +168,7 @@ static int cm_t3517_handle_mac_address(void)
 	unsigned char enetaddr[6];
 	int ret;
 
-	ret = eth_getenv_enetaddr("ethaddr", enetaddr);
+	ret = eth_env_get_enetaddr("ethaddr", enetaddr);
 	if (ret)
 		return 0;
 
@@ -182,7 +182,7 @@ static int cm_t3517_handle_mac_address(void)
 	if (!is_valid_ethaddr(enetaddr))
 		return -1;
 
-	return eth_setenv_enetaddr("ethaddr", enetaddr);
+	return eth_env_set_enetaddr("ethaddr", enetaddr);
 }
 
 #define SB_T35_ETH_RST_GPIO 164

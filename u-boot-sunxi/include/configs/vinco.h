@@ -23,12 +23,15 @@
 
 /* serial console */
 #define CONFIG_ATMEL_USART
-#define CONFIG_USART_BASE		ATMEL_BASE_USART3
-#define	CONFIG_USART_ID			ATMEL_ID_USART3
+#define CONFIG_USART_BASE		0xfc00c000
+#define CONFIG_USART_ID			30
+
+/* Timer */
+#define CONFIG_SYS_TIMER_COUNTER	0xfc06863c
 
 /* SDRAM */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_SDRAM_BASE           ATMEL_BASE_DDRCS
+#define CONFIG_SYS_SDRAM_BASE           0x20000000
 #define CONFIG_SYS_SDRAM_SIZE		0x4000000
 
 #define CONFIG_SYS_INIT_SP_ADDR \
@@ -55,24 +58,14 @@
 #ifdef CONFIG_CMD_MMC
 #define CONFIG_SUPPORT_EMMC_BOOT
 #define CONFIG_GENERIC_ATMEL_MCI
-#define ATMEL_BASE_MMCI			ATMEL_BASE_MCI1
+#define ATMEL_BASE_MMCI			0xfc000000
 #define CONFIG_SYS_MMC_CLK_OD		500000
 
 /* For generating MMC partitions */
-#define CONFIG_RANDOM_UUID
 
-#endif
-
-/* USB */
-
-#ifdef CONFIG_CMD_USB
-#define CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS	3
 #endif
 
 /* USB device */
-#define CONFIG_USB_ETHER
-#define CONFIG_USB_ETH_RNDIS
-#define CONFIG_USBNET_MANUFACTURER      "L+G VInCo"
 
 /* Ethernet Hardware */
 #define CONFIG_PHY_SMSC
@@ -81,11 +74,7 @@
 #define CONFIG_NET_RETRY_COUNT		20
 #define CONFIG_MACB_SEARCH_PHY
 
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_SMSC95XX
-#define CONFIG_USB_ETHER_RNDIS
-
-#ifdef CONFIG_SYS_USE_SERIALFLASH
+#ifdef CONFIG_SPI_BOOT
 /* bootstrap + u-boot + env + linux in serial flash */
 #define CONFIG_ENV_SPI_BUS	CONFIG_SF_DEFAULT_BUS
 #define CONFIG_ENV_SPI_CS	CONFIG_SF_DEFAULT_CS
@@ -102,9 +91,6 @@
 			    "mmc read ${loadaddr} ${k_offset} ${k_blksize};" \
 			    "mmc read ${oftaddr} ${dtb_offset} ${dtb_blksize};" \
 			    "bootz ${loadaddr} -  ${oftaddr}"
-
-#undef CONFIG_BOOTARGS
-#define CONFIG_BOOTARGS	    "console=ttyS0,115200 earlyprintk rw root=/dev/mmcblk0p2 rootfstype=ext4 rootwait quiet lpj=1990656"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"kernel_start=0x20000\0" \

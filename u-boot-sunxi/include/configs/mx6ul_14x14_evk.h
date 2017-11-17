@@ -11,7 +11,7 @@
 #include <asm/arch/imx-regs.h>
 #include <linux/sizes.h>
 #include "mx6_common.h"
-#include <asm/imx-common/gpio.h>
+#include <asm/mach-imx/gpio.h>
 
 #define is_mx6ul_9x9_evk()	CONFIG_IS_ENABLED(TARGET_MX6UL_9X9_EVK)
 
@@ -166,7 +166,6 @@
 
 /* environment organization */
 #define CONFIG_ENV_SIZE			SZ_8K
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_ENV_OFFSET		(8 * SZ_64K)
 #define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
 #define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
@@ -207,9 +206,6 @@
 #define CONFIG_FEC_XCV_TYPE		RMII
 #endif
 #define CONFIG_ETHPRIME			"FEC"
-
-#define CONFIG_PHYLIB
-#define CONFIG_PHY_MICREL
 #endif
 
 #define CONFIG_IMX_THERMAL

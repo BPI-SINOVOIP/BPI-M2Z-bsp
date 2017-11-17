@@ -46,12 +46,9 @@
 #define CONFIG_SYS_NS16550_SERIAL
 
 #define CONFIG_ENV_SIZE			0x2000
-#define CONFIG_ENV_IS_NOWHERE
 
 /* console configuration */
 #define CONFIG_SYS_CBSIZE		1024	/* Console buffer size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-			sizeof(CONFIG_SYS_PROMPT) + 16)	/* Printbuffer size */
 #define CONFIG_SYS_MAXARGS		64
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 

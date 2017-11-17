@@ -12,7 +12,7 @@
 #include <asm/arch/imx-regs.h>
 #include <linux/sizes.h>
 #include "mx6_common.h"
-#include <asm/imx-common/gpio.h>
+#include <asm/mach-imx/gpio.h>
 
 #ifdef CONFIG_SECURE_BOOT
 #ifndef CONFIG_CSF_SIZE
@@ -155,7 +155,6 @@
 #define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
 #define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 */
 
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_ENV_SIZE			SZ_8K
 #define CONFIG_ENV_OFFSET		(12 * SZ_64K)
 

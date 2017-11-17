@@ -66,6 +66,7 @@ config SANDBOX
 	select DM_SPI
 	select DM_GPIO
 	select DM_MMC
+	select LZO
 	imply CMD_GETTIME
 	imply CMD_HASH
 	imply CMD_IO
@@ -75,6 +76,9 @@ config SANDBOX
 	imply FAT_WRITE
 	imply HASH_VERIFY
 	imply LZMA
+	imply SCSI
+	imply CMD_SATA
+	imply CMD_SF_TEST
 
 config SH
 	bool "SuperH architecture"
@@ -84,18 +88,36 @@ config X86
 	bool "x86 architecture"
 	select CREATE_ARCH_SYMLINK
 	select HAVE_PRIVATE_LIBGCC
+	select USE_PRIVATE_LIBGCC
 	select SUPPORT_OF_CONTROL
+	select OF_CONTROL
 	select DM
-	select DM_KEYBOARD
-	select DM_SERIAL
-	select DM_GPIO
-	select DM_SPI
-	select DM_SPI_FLASH
-	select USB_EHCI_HCD
+	select DM_PCI
+	select PCI
+	select TIMER
+	select X86_TSC_TIMER
+	imply BLK
+	imply DM_ETH
+	imply DM_GPIO
+	imply DM_KEYBOARD
+	imply DM_MMC
+	imply DM_RTC
+	imply DM_SERIAL
+	imply DM_SCSI
+	imply DM_SPI
+	imply DM_SPI_FLASH
+	imply DM_USB
+	imply DM_VIDEO
 	imply CMD_FPGA_LOADMK
 	imply CMD_GETTIME
 	imply CMD_IO
 	imply CMD_IRQ
+	imply CMD_PCI
+	imply CMD_SF_TEST
+	imply CMD_ZBOOT
+	imply USB_HOST_ETHER
+	imply USB_ETHER_ASIX
+	imply USB_ETHER_SMSC95XX
 
 config XTENSA
 	bool "Xtensa architecture"

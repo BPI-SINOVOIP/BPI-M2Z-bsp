@@ -68,8 +68,6 @@
 #define CONFIG_SETUP_MEMORY_TAGS 1	/* enable memory tag */
 
 #define	CONFIG_SYS_CBSIZE	1024	/* Console I/O Buff Size */
-#define	CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE \
-		+sizeof(CONFIG_SYS_PROMPT) + 16)	/* Print Buff */
 
 /*
  * Size of malloc() pool
@@ -128,12 +126,8 @@
  * File system
  */
 #ifdef CONFIG_SYS_MVFS
-#define CONFIG_CMD_UBIFS
-#define CONFIG_RBTREE
 #define CONFIG_MTD_DEVICE               /* needed for mtdparts commands */
 #define CONFIG_MTD_PARTITIONS
-#define CONFIG_CMD_MTDPARTS
-#define CONFIG_LZO
 #endif
 
 #endif /* _MV_COMMON_H */

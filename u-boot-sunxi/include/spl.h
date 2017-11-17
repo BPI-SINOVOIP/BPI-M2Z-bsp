@@ -68,6 +68,7 @@ int spl_load_simple_fit(struct spl_image_info *spl_image,
 void preloader_console_init(void);
 u32 spl_boot_device(void);
 u32 spl_boot_mode(const u32 boot_device);
+void spl_set_bd(void);
 
 /**
  * spl_set_header_raw_uboot() - Set up a standard SPL image structure
@@ -268,4 +269,14 @@ int spl_mmc_load_image(struct spl_image_info *spl_image,
 		       struct spl_boot_device *bootdev);
 
 void bl31_entry(void);
+
+/**
+ * board_return_to_bootrom - allow for boards to continue with the boot ROM
+ *
+ * If a board (e.g. the Rockchip RK3368 boards) provide some
+ * supporting functionality for SPL in their boot ROM and the SPL
+ * stage wants to return to the ROM code to continue booting, boards
+ * can implement 'board_return_to_bootrom'.
+ */
+void board_return_to_bootrom(void);
 #endif

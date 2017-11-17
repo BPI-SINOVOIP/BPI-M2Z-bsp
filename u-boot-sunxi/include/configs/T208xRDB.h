@@ -127,7 +127,6 @@
 
 #if defined(CONFIG_SPIFLASH)
 #define CONFIG_SYS_EXTRA_ENV_RELOC
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SPI_BUS	0
 #define CONFIG_ENV_SPI_CS	0
 #define CONFIG_ENV_SPI_MAX_HZ	10000000
@@ -137,23 +136,19 @@
 #define CONFIG_ENV_SECT_SIZE	0x10000
 #elif defined(CONFIG_SDCARD)
 #define CONFIG_SYS_EXTRA_ENV_RELOC
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV	0
 #define CONFIG_ENV_SIZE		0x2000
 #define CONFIG_ENV_OFFSET	(512 * 0x800)
 #elif defined(CONFIG_NAND)
 #define CONFIG_SYS_EXTRA_ENV_RELOC
-#define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_SIZE		0x2000
 #define CONFIG_ENV_OFFSET	(2 * CONFIG_SYS_NAND_BLOCK_SIZE)
 #elif defined(CONFIG_SRIO_PCIE_BOOT_SLAVE)
-#define CONFIG_ENV_IS_IN_REMOTE
 #define CONFIG_ENV_ADDR		0xffe20000
 #define CONFIG_ENV_SIZE		0x2000
 #elif defined(CONFIG_ENV_IS_NOWHERE)
 #define CONFIG_ENV_SIZE		0x2000
 #else
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_ADDR		(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SECT_SIZE)
 #define CONFIG_ENV_SIZE		0x2000
 #define CONFIG_ENV_SECT_SIZE	0x20000 /* 128K (one sector) */
@@ -306,7 +301,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_NAND_DDR_LAW		11
 #define CONFIG_SYS_NAND_BASE_LIST	{ CONFIG_SYS_NAND_BASE }
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_CMD_NAND
 #define CONFIG_SYS_NAND_BLOCK_SIZE	(512 * 1024)
 
 #if defined(CONFIG_NAND)
@@ -628,7 +622,6 @@ unsigned long get_board_ddr_clk(void);
 #ifdef CONFIG_FMAN_ENET
 #define CONFIG_MII		/* MII PHY management */
 #define CONFIG_ETHPRIME		"FM1@DTSEC3"
-#define CONFIG_PHY_GIGE		/* Include GbE speed/duplex detection */
 #endif
 
 /*
@@ -645,7 +638,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_SATA2		CONFIG_SYS_MPC85xx_SATA2_ADDR
 #define CONFIG_SYS_SATA2_FLAGS		FLAGS_DMA
 #define CONFIG_LBA48
-#define CONFIG_CMD_SATA
 #endif
 
 /*
@@ -673,28 +665,12 @@ unsigned long get_board_ddr_clk(void);
 #ifdef CONFIG_MTD_NOR_FLASH
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#define CONFIG_CMD_MTDPARTS
 #define CONFIG_FLASH_CFI_MTD
-#define MTDIDS_DEFAULT "nor0=fe8000000.nor,nand0=fff800000.flash," \
-			"spi0=spife110000.1"
-#define MTDPARTS_DEFAULT "mtdparts=fe8000000.nor:1m(uboot),5m(kernel)," \
-			"128k(dtb),96m(fs),-(user);fff800000.flash:1m(uboot)," \
-			"5m(kernel),128k(dtb),96m(fs),-(user);spife110000.1:" \
-			"1m(uboot),5m(kernel),128k(dtb),-(user)"
 #endif
 
 /*
  * Environment
  */
-
-/*
- * Command line configuration.
- */
-#define CONFIG_CMD_REGINFO
-
-#ifdef CONFIG_PCI
-#define CONFIG_CMD_PCI
-#endif
 
 /*
  * Miscellaneous configurable options
@@ -703,14 +679,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_CMDLINE_EDITING		/* Command-line editing */
 #define CONFIG_AUTO_COMPLETE		/* add autocompletion support */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000 /* default load address */
-#ifdef CONFIG_CMD_KGDB
-#define CONFIG_SYS_CBSIZE	1024	  /* Console I/O Buffer Size */
-#else
-#define CONFIG_SYS_CBSIZE	256	  /* Console I/O Buffer Size */
-#endif
-#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE+sizeof(CONFIG_SYS_PROMPT)+16)
-#define CONFIG_SYS_MAXARGS	16	/* max number of command args */
-#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE/* Boot Argument Buffer Size */
 
 /*
  * For booting Linux, the board info and command line data

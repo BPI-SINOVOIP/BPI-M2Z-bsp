@@ -52,8 +52,9 @@ static ulong h_spl_load_read(struct spl_load_info *load, ulong sector,
 	return blk_dread(mmc_get_blk_desc(mmc), sector, count, buf);
 }
 
-static int mmc_load_image_raw_sector(struct spl_image_info *spl_image,
-				     struct mmc *mmc, unsigned long sector)
+static __maybe_unused
+int mmc_load_image_raw_sector(struct spl_image_info *spl_image,
+			      struct mmc *mmc, unsigned long sector)
 {
 	unsigned long count;
 	struct image_header *header;
@@ -96,7 +97,7 @@ end:
 	return 0;
 }
 
-int spl_mmc_get_device_index(u32 boot_device)
+static int spl_mmc_get_device_index(u32 boot_device)
 {
 	switch (boot_device) {
 	case BOOT_DEVICE_MMC1:
@@ -115,7 +116,7 @@ int spl_mmc_get_device_index(u32 boot_device)
 
 static int spl_mmc_find_device(struct mmc **mmcp, u32 boot_device)
 {
-#ifdef CONFIG_DM_MMC
+#if CONFIG_IS_ENABLED(DM_MMC)
 	struct udevice *dev;
 #endif
 	int err, mmc_dev;
@@ -132,7 +133,7 @@ static int spl_mmc_find_device(struct mmc **mmcp, u32 boot_device)
 		return err;
 	}
 
-#ifdef CONFIG_DM_MMC
+#if CONFIG_IS_ENABLED(DM_MMC)
 	err = uclass_get_device(UCLASS_MMC, mmc_dev, &dev);
 	if (!err)
 		*mmcp = mmc_get_mmc_dev(dev);
@@ -200,7 +201,7 @@ static int mmc_load_image_raw_os(struct spl_image_info *spl_image,
 		CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTOR,
 		CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTORS,
 		(void *) CONFIG_SYS_SPL_ARGS_ADDR);
-	if (count == 0) {
+	if (count != CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTORS) {
 #ifdef CONFIG_SPL_LIBCOMMON_SUPPORT
 		puts("mmc_load_image_raw_os: mmc block read error\n");
 #endif

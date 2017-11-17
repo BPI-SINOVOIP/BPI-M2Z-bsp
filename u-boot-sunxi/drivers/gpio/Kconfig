@@ -67,6 +67,12 @@ config INTEL_BROADWELL_GPIO
 	  driver from the common Intel ICH6 driver. It supports a total of
 	  95 GPIOs which can be configured from the device tree.
 
+config INTEL_ICH6_GPIO
+	bool "Intel ICH6 compatible legacy GPIO driver"
+	depends on DM_GPIO
+	help
+	  Say yes here to select Intel ICH6 compatible legacy GPIO driver.
+
 config IMX_RGPIO2P
 	bool "i.MX7ULP RGPIO2P driver"
 	depends on DM
@@ -103,6 +109,15 @@ config OMAP_GPIO
 	  Support GPIO controllers on the TI OMAP3/4/5 and related (such as
 	  AM335x/AM43xx/AM57xx/DRA7xx/etc) families of SoCs.
 
+config CMD_PCA953X
+	bool "Enable the pca953x command"
+	help
+	  Deprecated: This should be converted to driver model.
+
+	  This command provides access to a pca953x GPIO device using the
+	  legacy GPIO interface. Several subcommands are provided which mirror
+	  the standard 'gpio' command. It should use that instead.
+
 config PM8916_GPIO
 	bool "Qualcomm PM8916 PMIC GPIO/keypad driver"
 	depends on DM_GPIO && PMIC_PM8916
@@ -119,6 +134,12 @@ config PCF8575_GPIO
 	help
 	 Support for PCF8575 I2C 16-bit GPIO expander. Most of these
 	 chips are from NXP and TI.
+
+config RCAR_GPIO
+	bool "Renesas RCar GPIO driver"
+	depends on DM_GPIO && ARCH_RMOBILE
+	help
+	  This driver supports the GPIO banks on Renesas RCar SoCs.
 
 config ROCKCHIP_GPIO
 	bool "Rockchip GPIO driver"
@@ -149,6 +170,15 @@ config SANDBOX_GPIO_COUNT
 	  are specified using the device tree. But you can also have a number
 	  of 'anonymous' GPIOs that do not belong to any device or bank.
 	  Select a suitable value depending on your needs.
+
+config CMD_TCA642X
+	bool "tca642x - Command to access tca642x state"
+	help
+	  DEPRECATED - This needs conversion to driver model
+
+	  This provides a way to looking at the pin state of this device.
+	  This mirrors the 'gpio' command and that should be used in preference
+	  to custom code.
 
 config TEGRA_GPIO
 	bool "Tegra20..210 GPIO driver"

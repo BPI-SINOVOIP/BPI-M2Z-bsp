@@ -18,6 +18,7 @@ enum uclass_id {
 	UCLASS_TEST,
 	UCLASS_TEST_FDT,
 	UCLASS_TEST_BUS,
+	UCLASS_TEST_PROBE,
 	UCLASS_SPI_EMUL,	/* sandbox SPI device emulator */
 	UCLASS_I2C_EMUL,	/* sandbox I2C device emulator */
 	UCLASS_PCI_EMUL,	/* sandbox PCI device emulator */
@@ -40,6 +41,7 @@ enum uclass_id {
 	UCLASS_I2C_EEPROM,	/* I2C EEPROM device */
 	UCLASS_I2C_GENERIC,	/* Generic I2C device */
 	UCLASS_I2C_MUX,		/* I2C multiplexer */
+	UCLASS_IDE,		/* IDE device */
 	UCLASS_IRQ,		/* Interrupt controller */
 	UCLASS_KEYBOARD,	/* Keyboard input device */
 	UCLASS_LED,		/* Light-emitting diode (LED) */
@@ -51,6 +53,7 @@ enum uclass_id {
 	UCLASS_MOD_EXP,		/* RSA Mod Exp device */
 	UCLASS_MTD,		/* Memory Technology Device (MTD) device */
 	UCLASS_NORTHBRIDGE,	/* Intel Northbridge / SDRAM controller */
+	UCLASS_NVME,		/* NVM Express device */
 	UCLASS_PANEL,		/* Display panel, such as an LCD */
 	UCLASS_PANEL_BACKLIGHT,	/* Backlight controller for panel */
 	UCLASS_PCH,		/* x86 platform controller hub */

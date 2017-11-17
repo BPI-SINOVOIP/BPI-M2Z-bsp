@@ -28,7 +28,7 @@ static void print_eth(int idx)
 		sprintf(name, "eth%iaddr", idx);
 	else
 		strcpy(name, "ethaddr");
-	val = getenv(name);
+	val = env_get(name);
 	if (!val)
 		val = "(not set)";
 	printf("%-12s= %s\n", name, val);
@@ -51,7 +51,7 @@ static void print_eths(void)
 	} while (dev);
 
 	printf("current eth = %s\n", eth_get_name());
-	printf("ip_addr     = %s\n", getenv("ipaddr"));
+	printf("ip_addr     = %s\n", env_get("ipaddr"));
 }
 #endif
 
@@ -141,7 +141,7 @@ static inline void print_eth_ip_addr(void)
 #if defined(CONFIG_HAS_ETH5)
 	print_eth(5);
 #endif
-	printf("IP addr     = %s\n", getenv("ipaddr"));
+	printf("IP addr     = %s\n", env_get("ipaddr"));
 #endif
 }
 
@@ -166,7 +166,7 @@ static inline void __maybe_unused print_std_bdinfo(const bd_t *bd)
 #if defined(CONFIG_PPC)
 void __weak board_detail(void)
 {
-	/* Please define boot_detail() for your platform */
+	/* Please define board_detail() for your platform */
 }
 
 int do_bdinfo(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
@@ -344,9 +344,9 @@ static int do_bdinfo(cmd_tbl_t *cmdtp, int flag, int argc,
 #ifdef CONFIG_BOARD_TYPES
 	printf("Board Type  = %ld\n", gd->board_type);
 #endif
-#ifdef CONFIG_SYS_MALLOC_F
+#if CONFIG_VAL(SYS_MALLOC_F_LEN)
 	printf("Early malloc usage: %lx / %x\n", gd->malloc_ptr,
-	       CONFIG_SYS_MALLOC_F_LEN);
+	       CONFIG_VAL(SYS_MALLOC_F_LEN));
 #endif
 	if (gd->fdt_blob)
 		printf("fdt_blob = %p\n", gd->fdt_blob);

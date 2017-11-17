@@ -39,7 +39,6 @@
 #define CONFIG_FEC_XCV_TYPE		RMII
 #define CONFIG_FEC_MXC_PHYADDR		0
 
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_SMSC
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -54,9 +53,9 @@
 	"ip_dyn=yes\0" \
 	"mmcdev=1\0" \
 	"mmcpart=1\0" \
-	"mmcroot=/dev/mmcblk0p2 rootwait rw\0" \
+	"finduuid=part uuid mmc 1:2 uuid\0" \
 	"mmcargs=setenv bootargs console=${console},${baudrate} " \
-		"root=${mmcroot}\0" \
+		"root=PARTUUID=${uuid} rootwait rw\0" \
 	"loadbootscript=" \
 		"fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
@@ -64,6 +63,7 @@
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
+		"run finduuid; " \
 		"run mmcargs; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if run loadfdt; then " \
@@ -137,7 +137,6 @@
 #define CONFIG_ENV_SIZE			SZ_8K
 
 #if defined CONFIG_SPI_BOOT
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_OFFSET               (768 * 1024)
 #define CONFIG_ENV_SECT_SIZE            (64 * 1024)
 #define CONFIG_ENV_SPI_BUS              CONFIG_SF_DEFAULT_BUS
@@ -146,7 +145,6 @@
 #define CONFIG_ENV_SPI_MAX_HZ           CONFIG_SF_DEFAULT_SPEED
 #else
 #define CONFIG_ENV_OFFSET		(8 * SZ_64K)
-#define CONFIG_ENV_IS_IN_MMC
 #endif
 
 #ifdef CONFIG_CMD_SF
@@ -160,8 +158,6 @@
 /* USB Configs */
 #ifdef CONFIG_CMD_USB
 #define CONFIG_EHCI_HCD_INIT_AFTER_RESET
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_ASIX
 #define CONFIG_MXC_USB_PORTSC		(PORT_PTS_UTMI | PORT_PTS_PTW)
 #define CONFIG_MXC_USB_FLAGS		0
 #define CONFIG_USB_MAX_CONTROLLER_COUNT	2

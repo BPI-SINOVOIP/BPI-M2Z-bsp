@@ -43,10 +43,6 @@
 #define CONFIG_ETHPRIME			"FEC"
 #define CONFIG_FEC_MXC_PHYADDR		3
 
-#define CONFIG_PHYLIB
-#define CONFIG_PHY_MICREL
-#define CONFIG_PHY_KSZ9031
-
 /* SPI Flash */
 #define CONFIG_MXC_SPI
 #define CONFIG_SF_DEFAULT_BUS		0
@@ -61,9 +57,7 @@
 #define CONFIG_SYS_I2C_SPEED		  100000
 
 #ifndef CONFIG_SPL_BUILD
-#define CONFIG_CMD_NAND
 /* Enable NAND support */
-#define CONFIG_CMD_NAND_TRIMFFS
 #define CONFIG_NAND_MXS
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		0x40000000
@@ -77,16 +71,8 @@
 #define CONFIG_APBH_DMA_BURST8
 
 /* Filesystem support */
-#define CONFIG_LZO
-#define CONFIG_CMD_UBIFS
-#define CONFIG_CMD_MTDPARTS
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_MTD_DEVICE
-#define MTDIDS_DEFAULT    "nand0=nand"
-#define MTDPARTS_DEFAULT  "mtdparts=nand:16m(uboot),1m(env),-(rootfs)"
-
-/* Various command support */
-#define CONFIG_RBTREE
 
 /* Physical Memory Map */
 #define CONFIG_NR_DRAM_BANKS           1
@@ -106,7 +92,6 @@
 #define CONFIG_SYS_FSL_USDHC_NUM	1
 
 /* Environment organization */
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SIZE                (16 * 1024)
 #define CONFIG_ENV_OFFSET		(1024 * SZ_1K)
 #define CONFIG_ENV_SECT_SIZE		(64 * SZ_1K)

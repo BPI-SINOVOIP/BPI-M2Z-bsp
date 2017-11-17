@@ -36,15 +36,6 @@
  * Hardware drivers
  */
 
-/* gpio */
-#define CONFIG_AT91_GPIO
-#define CONFIG_AT91_GPIO_PULLUP		1
-
-/* serial console */
-#define CONFIG_ATMEL_USART
-#define CONFIG_USART_BASE		ATMEL_BASE_DBGU
-#define CONFIG_USART_ID			ATMEL_ID_SYS
-
 /* LCD */
 #define LCD_BPP				LCD_COLOR8
 #define CONFIG_LCD_LOGO
@@ -56,13 +47,6 @@
 #define CONFIG_ATMEL_LCD_BGR555
 #endif
 
-/* LED */
-#define CONFIG_AT91_LED
-#define	CONFIG_RED_LED		AT91_PIN_PA23	/* this is the power led */
-#define	CONFIG_GREEN_LED	AT91_PIN_PA13	/* this is the user1 led */
-#define	CONFIG_YELLOW_LED	AT91_PIN_PA14	/* this is the user2 led */
-
-
 /*
  * BOOTP options
  */
@@ -71,27 +55,12 @@
 #define CONFIG_BOOTP_GATEWAY
 #define CONFIG_BOOTP_HOSTNAME
 
-/*
- * Command line configuration.
- */
-#define CONFIG_CMD_NAND
-
 /* SDRAM */
 #define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_SDRAM_BASE		0x20000000
 #define CONFIG_SYS_SDRAM_SIZE		0x04000000
 #define CONFIG_SYS_INIT_SP_ADDR \
-	(ATMEL_BASE_SRAM + 0x1000 - GENERATED_GBL_DATA_SIZE)
-
-/* DataFlash */
-#define CONFIG_ATMEL_DATAFLASH_SPI
-#define CONFIG_HAS_DATAFLASH
-#define CONFIG_SYS_MAX_DATAFLASH_BANKS		2
-#define CONFIG_SYS_DATAFLASH_LOGIC_ADDR_CS0	0xC0000000	/* CS0 */
-#define CONFIG_SYS_DATAFLASH_LOGIC_ADDR_CS3	0xD0000000	/* CS3 */
-#define AT91_SPI_CLK				15000000
-#define DATAFLASH_TCSS				(0x1a << 16)
-#define DATAFLASH_TCHS				(0x1 << 24)
+	(ATMEL_BASE_SRAM + 16 * 1024 - GENERATED_GBL_DATA_SIZE)
 
 /* NAND flash */
 #ifdef CONFIG_CMD_NAND
@@ -139,49 +108,34 @@
 #ifdef CONFIG_SYS_USE_DATAFLASH_CS0
 
 /* bootstrap + u-boot + env + linux in dataflash on CS0 */
-#define CONFIG_ENV_IS_IN_DATAFLASH
-#define CONFIG_SYS_MONITOR_BASE	(CONFIG_SYS_DATAFLASH_LOGIC_ADDR_CS0 + 0x8400)
 #define CONFIG_ENV_OFFSET	0x4200
-#define CONFIG_ENV_ADDR		(CONFIG_SYS_DATAFLASH_LOGIC_ADDR_CS0 + CONFIG_ENV_OFFSET)
 #define CONFIG_ENV_SIZE		0x4200
-#define CONFIG_BOOTCOMMAND	"cp.b 0xC0084000 0x22000000 0x210000; bootm"
-#define CONFIG_BOOTARGS		"console=ttyS0,115200 "			\
-				"root=/dev/mtdblock0 "			\
-				"mtdparts=atmel_nand:-(root) "		\
-				"rw rootfstype=jffs2"
+#define CONFIG_ENV_SECT_SIZE	0x210
+#define CONFIG_ENV_SPI_MAX_HZ	15000000
+#define CONFIG_BOOTCOMMAND	"sf probe 0; " \
+				"sf read 0x22000000 0x84000 0x294000; " \
+				"bootm 0x22000000"
 
 #elif CONFIG_SYS_USE_DATAFLASH_CS3
 
 /* bootstrap + u-boot + env + linux in dataflash on CS3 */
-#define CONFIG_ENV_IS_IN_DATAFLASH
-#define CONFIG_SYS_MONITOR_BASE	(CONFIG_SYS_DATAFLASH_LOGIC_ADDR_CS3 + 0x8400)
 #define CONFIG_ENV_OFFSET	0x4200
-#define CONFIG_ENV_ADDR		(CONFIG_SYS_DATAFLASH_LOGIC_ADDR_CS3 + CONFIG_ENV_OFFSET)
 #define CONFIG_ENV_SIZE		0x4200
-#define CONFIG_BOOTCOMMAND	"cp.b 0xD0084000 0x22000000 0x210000; bootm"
-#define CONFIG_BOOTARGS		"console=ttyS0,115200 "			\
-				"root=/dev/mtdblock0 "			\
-				"mtdparts=atmel_nand:-(root) "		\
-				"rw rootfstype=jffs2"
+#define CONFIG_ENV_SECT_SIZE	0x210
+#define CONFIG_ENV_SPI_MAX_HZ	15000000
+#define CONFIG_BOOTCOMMAND	"sf probe 0:3; " \
+				"sf read 0x22000000 0x84000 0x294000; " \
+				"bootm 0x22000000"
 
 #else /* CONFIG_SYS_USE_NANDFLASH */
 
 /* bootstrap + u-boot + env + linux in nandflash */
-#define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_ENV_OFFSET		0xc0000
+#define CONFIG_ENV_OFFSET		0x120000
 #define CONFIG_ENV_OFFSET_REDUND	0x100000
 #define CONFIG_ENV_SIZE		0x20000		/* 1 sector = 128 kB */
 #define CONFIG_BOOTCOMMAND	"nand read 0x22000000 0x200000 0x300000; bootm"
-#define CONFIG_BOOTARGS							\
-	"console=ttyS0,115200 earlyprintk "				\
-	"mtdparts=atmel_nand:256k(bootstrap)ro,512k(uboot)ro,"		\
-	"256k(env),256k(env_redundant),256k(spare),"			\
-	"512k(dtb),6M(kernel)ro,-(rootfs) "				\
-	"root=/dev/mtdblock7 rw rootfstype=jffs2"
 #endif
 
-#define CONFIG_SYS_CBSIZE		256
-#define CONFIG_SYS_MAXARGS		16
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_AUTO_COMPLETE

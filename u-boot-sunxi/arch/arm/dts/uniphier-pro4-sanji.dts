@@ -8,7 +8,7 @@
  */
 
 /dts-v1/;
-/include/ "uniphier-pro4.dtsi"
+#include "uniphier-pro4.dtsi"
 
 / {
 	model = "UniPhier Pro4 Sanji Board";
@@ -84,25 +84,4 @@
 
 &usb3 {
 	status = "okay";
-};
-
-/* for U-Boot only */
-&serial0 {
-	u-boot,dm-pre-reloc;
-};
-
-&mio_clk {
-	u-boot,dm-pre-reloc;
-};
-
-&emmc {
-	u-boot,dm-pre-reloc;
-};
-
-&pinctrl_uart0 {
-	u-boot,dm-pre-reloc;
-};
-
-&pinctrl_emmc {
-	u-boot,dm-pre-reloc;
 };

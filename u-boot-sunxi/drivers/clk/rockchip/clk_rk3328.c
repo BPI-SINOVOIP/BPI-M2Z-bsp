@@ -5,6 +5,7 @@
  */
 
 #include <common.h>
+#include <bitfield.h>
 #include <clk-uclass.h>
 #include <dm.h>
 #include <errno.h>
@@ -114,7 +115,8 @@ enum {
 
 	/* CLKSEL_CON23 */
 	CLK_SARADC_DIV_CON_SHIFT	= 0,
-	CLK_SARADC_DIV_CON_MASK		= 0x3ff << CLK_SARADC_DIV_CON_SHIFT,
+	CLK_SARADC_DIV_CON_MASK		= GENMASK(9, 0),
+	CLK_SARADC_DIV_CON_WIDTH	= 10,
 
 	/* CLKSEL_CON24 */
 	CLK_PWM_PLL_SEL_CPLL		= 0,
@@ -412,9 +414,9 @@ static ulong rk3328_mmc_get_clk(struct rk3328_cru *cru, uint clk_id)
 
 	if ((con & CLK_EMMC_PLL_MASK) >> CLK_EMMC_PLL_SHIFT
 	    == CLK_EMMC_PLL_SEL_24M)
-		return DIV_TO_RATE(OSC_HZ, div);
+		return DIV_TO_RATE(OSC_HZ, div) / 2;
 	else
-		return DIV_TO_RATE(GPLL_HZ, div);
+		return DIV_TO_RATE(GPLL_HZ, div) / 2;
 }
 
 static ulong rk3328_mmc_set_clk(struct rk3328_cru *cru,
@@ -436,11 +438,12 @@ static ulong rk3328_mmc_set_clk(struct rk3328_cru *cru,
 		return -EINVAL;
 	}
 	/* Select clk_sdmmc/emmc source from GPLL by default */
-	src_clk_div = GPLL_HZ / set_rate;
+	/* mmc clock defaulg div 2 internal, need provide double in cru */
+	src_clk_div = DIV_ROUND_UP(GPLL_HZ / 2, set_rate);
 
 	if (src_clk_div > 127) {
 		/* use 24MHz source for 400KHz clock */
-		src_clk_div = OSC_HZ / set_rate;
+		src_clk_div = DIV_ROUND_UP(OSC_HZ / 2, set_rate);
 		rk_clrsetreg(&cru->clksel_con[con_id],
 			     CLK_EMMC_PLL_MASK | CLK_EMMC_DIV_CON_MASK,
 			     CLK_EMMC_PLL_SEL_24M << CLK_EMMC_PLL_SHIFT |
@@ -477,6 +480,31 @@ static ulong rk3328_pwm_set_clk(struct rk3328_cru *cru, uint hz)
 	return DIV_TO_RATE(GPLL_HZ, div);
 }
 
+static ulong rk3328_saradc_get_clk(struct rk3328_cru *cru)
+{
+	u32 div, val;
+
+	val = readl(&cru->clksel_con[23]);
+	div = bitfield_extract(val, CLK_SARADC_DIV_CON_SHIFT,
+			       CLK_SARADC_DIV_CON_WIDTH);
+
+	return DIV_TO_RATE(OSC_HZ, div);
+}
+
+static ulong rk3328_saradc_set_clk(struct rk3328_cru *cru, uint hz)
+{
+	int src_clk_div;
+
+	src_clk_div = DIV_ROUND_UP(OSC_HZ, hz) - 1;
+	assert(src_clk_div < 128);
+
+	rk_clrsetreg(&cru->clksel_con[23],
+		     CLK_SARADC_DIV_CON_MASK,
+		     src_clk_div << CLK_SARADC_DIV_CON_SHIFT);
+
+	return rk3328_saradc_get_clk(cru);
+}
+
 static ulong rk3328_clk_get_rate(struct clk *clk)
 {
 	struct rk3328_clk_priv *priv = dev_get_priv(clk->dev);
@@ -499,6 +527,9 @@ static ulong rk3328_clk_get_rate(struct clk *clk)
 		break;
 	case SCLK_PWM:
 		rate = rk3328_pwm_get_clk(priv->cru);
+		break;
+	case SCLK_SARADC:
+		rate = rk3328_saradc_get_clk(priv->cru);
 		break;
 	default:
 		return -ENOENT;
@@ -529,6 +560,9 @@ static ulong rk3328_clk_set_rate(struct clk *clk, ulong rate)
 		break;
 	case SCLK_PWM:
 		ret = rk3328_pwm_set_clk(priv->cru, rate);
+		break;
+	case SCLK_SARADC:
+		ret = rk3328_saradc_set_clk(priv->cru, rate);
 		break;
 	default:
 		return -ENOENT;

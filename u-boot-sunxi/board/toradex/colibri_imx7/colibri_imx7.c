@@ -10,8 +10,8 @@
 #include <asm/arch/mx7-pins.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/gpio.h>
-#include <asm/imx-common/boot_mode.h>
-#include <asm/imx-common/iomux-v3.h>
+#include <asm/mach-imx/boot_mode.h>
+#include <asm/mach-imx/iomux-v3.h>
 #include <asm/io.h>
 #include <common.h>
 #include <dm.h>
@@ -280,7 +280,7 @@ static int setup_fec(void)
 			IOMUXC_GPR_GPR1_GPR_ENET1_TX_CLK_SEL_MASK);
 #endif
 
-	return set_clk_enet(ENET_50MHz);
+	return set_clk_enet(ENET_50MHZ);
 }
 
 int board_phy_config(struct phy_device *phydev)

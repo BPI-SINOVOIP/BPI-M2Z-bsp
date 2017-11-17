@@ -205,4 +205,30 @@ void set_board_info_env(char *name);
  */
 void board_ti_set_ethaddr(int index);
 
+/**
+ * board_ti_was_eeprom_read() - Check to see if the eeprom contents have been read
+ *
+ * This function is useful to determine if the eeprom has already been read and
+ * its contents have already been loaded into memory. It utiltzes the magic
+ * number that the header value is set to upon successful eeprom read.
+ */
+bool board_ti_was_eeprom_read(void);
+
+/**
+ * ti_i2c_eeprom_am_set() - Setup the eeprom data with predefined values
+ * @name:	Name of the board
+ * @rev:	Revision of the board
+ *
+ * In some cases such as in RTC-only mode, we are able to skip reading eeprom
+ * and wasting i2c based initialization time by using predefined flags for
+ * detecting what platform we are booting on. For those platforms, provide
+ * a handy function to pre-program information.
+ *
+ * NOTE: many eeprom information such as serial number, mac address etc is not
+ * available.
+ *
+ * Return: 0 if all went fine, else return error.
+ */
+int ti_i2c_eeprom_am_set(const char *name, const char *rev);
+
 #endif	/* __BOARD_DETECT_H */

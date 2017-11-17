@@ -241,8 +241,8 @@ U_BOOT_ENV_CALLBACK(ethaddr, on_ethaddr);
 
 int eth_init(void)
 {
-	char *ethact = getenv("ethact");
-	char *ethrotate = getenv("ethrotate");
+	char *ethact = env_get("ethact");
+	char *ethrotate = env_get("ethrotate");
 	struct udevice *current = NULL;
 	struct udevice *old_current;
 	int ret = -ENODEV;
@@ -401,7 +401,7 @@ int eth_initialize(void)
 		printf("No ethernet found.\n");
 		bootstage_error(BOOTSTAGE_ID_NET_ETH_START);
 	} else {
-		char *ethprime = getenv("ethprime");
+		char *ethprime = env_get("ethprime");
 		struct udevice *prime_dev = NULL;
 
 		if (ethprime)
@@ -495,7 +495,7 @@ static int eth_post_probe(struct udevice *dev)
 	if (eth_get_ops(dev)->read_rom_hwaddr)
 		eth_get_ops(dev)->read_rom_hwaddr(dev);
 
-	eth_getenv_enetaddr_by_index("eth", dev->seq, env_enetaddr);
+	eth_env_get_enetaddr_by_index("eth", dev->seq, env_enetaddr);
 	if (!is_zero_ethaddr(env_enetaddr)) {
 		if (!is_zero_ethaddr(pdata->enetaddr) &&
 		    memcmp(pdata->enetaddr, env_enetaddr, ARP_HLEN)) {
@@ -510,7 +510,7 @@ static int eth_post_probe(struct udevice *dev)
 		/* Override the ROM MAC address */
 		memcpy(pdata->enetaddr, env_enetaddr, ARP_HLEN);
 	} else if (is_valid_ethaddr(pdata->enetaddr)) {
-		eth_setenv_enetaddr_by_index("eth", dev->seq, pdata->enetaddr);
+		eth_env_set_enetaddr_by_index("eth", dev->seq, pdata->enetaddr);
 		printf("\nWarning: %s using MAC address from ROM\n",
 		       dev->name);
 	} else if (is_zero_ethaddr(pdata->enetaddr) ||

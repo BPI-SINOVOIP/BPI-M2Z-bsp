@@ -518,6 +518,64 @@ int pci_auto_config_devices(struct udevice *bus)
 	return sub_bus;
 }
 
+int pci_generic_mmap_write_config(
+	struct udevice *bus,
+	int (*addr_f)(struct udevice *bus, pci_dev_t bdf, uint offset, void **addrp),
+	pci_dev_t bdf,
+	uint offset,
+	ulong value,
+	enum pci_size_t size)
+{
+	void *address;
+
+	if (addr_f(bus, bdf, offset, &address) < 0)
+		return 0;
+
+	switch (size) {
+	case PCI_SIZE_8:
+		writeb(value, address);
+		return 0;
+	case PCI_SIZE_16:
+		writew(value, address);
+		return 0;
+	case PCI_SIZE_32:
+		writel(value, address);
+		return 0;
+	default:
+		return -EINVAL;
+	}
+}
+
+int pci_generic_mmap_read_config(
+	struct udevice *bus,
+	int (*addr_f)(struct udevice *bus, pci_dev_t bdf, uint offset, void **addrp),
+	pci_dev_t bdf,
+	uint offset,
+	ulong *valuep,
+	enum pci_size_t size)
+{
+	void *address;
+
+	if (addr_f(bus, bdf, offset, &address) < 0) {
+		*valuep = pci_get_ff(size);
+		return 0;
+	}
+
+	switch (size) {
+	case PCI_SIZE_8:
+		*valuep = readb(address);
+		return 0;
+	case PCI_SIZE_16:
+		*valuep = readw(address);
+		return 0;
+	case PCI_SIZE_32:
+		*valuep = readl(address);
+		return 0;
+	default:
+		return -EINVAL;
+	}
+}
+
 int dm_pci_hose_probe_bus(struct udevice *bus)
 {
 	int sub_bus;
@@ -763,12 +821,12 @@ static int decode_regions(struct pci_controller *hose, ofnode parent_node,
 	int len;
 	int i;
 
-	prop = ofnode_read_prop(node, "ranges", &len);
+	prop = ofnode_get_property(node, "ranges", &len);
 	if (!prop)
 		return -EINVAL;
-	pci_addr_cells = ofnode_read_addr_cells(node);
-	addr_cells = ofnode_read_addr_cells(parent_node);
-	size_cells = ofnode_read_size_cells(node);
+	pci_addr_cells = ofnode_read_simple_addr_cells(node);
+	addr_cells = ofnode_read_simple_addr_cells(parent_node);
+	size_cells = ofnode_read_simple_size_cells(node);
 
 	/* PCI addresses are always 3-cells */
 	len /= sizeof(u32);

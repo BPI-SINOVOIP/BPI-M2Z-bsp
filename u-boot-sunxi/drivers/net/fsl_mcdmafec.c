@@ -383,15 +383,15 @@ static int fec_init(struct eth_device *dev, bd_t * bd)
 
 	/* Set station address   */
 	if ((u32) fecp == CONFIG_SYS_FEC0_IOBASE)
-		eth_getenv_enetaddr("ethaddr", enetaddr);
+		eth_env_get_enetaddr("ethaddr", enetaddr);
 	else
-		eth_getenv_enetaddr("eth1addr", enetaddr);
+		eth_env_get_enetaddr("eth1addr", enetaddr);
 	fec_set_hwaddr(fecp, enetaddr);
 
 	/* Set Opcode/Pause Duration Register */
 	fecp->opd = 0x00010020;
 
-	/* Setup Buffers and Buffer Desriptors */
+	/* Setup Buffers and Buffer Descriptors */
 	info->rxIdx = 0;
 	info->txIdx = 0;
 

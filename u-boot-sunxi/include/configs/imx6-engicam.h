@@ -160,16 +160,7 @@
 
 /* MTD device */
 # define CONFIG_MTD_DEVICE
-# define CONFIG_CMD_MTDPARTS
 # define CONFIG_MTD_PARTITIONS
-# define MTDIDS_DEFAULT			"nand0=gpmi-nand"
-# define MTDPARTS_DEFAULT		"mtdparts=gpmi-nand:2m(spl),2m(uboot)," \
-					"1m(env),8m(kernel),1m(dtb),-(rootfs)"
-
-/* UBI */
-# define CONFIG_CMD_UBIFS
-# define CONFIG_RBTREE
-# define CONFIG_LZO
 
 # define CONFIG_APBH_DMA
 # define CONFIG_APBH_DMA_BURST
@@ -189,9 +180,22 @@
 # define CONFIG_MII
 #endif
 
+/* Falcon Mode */
+#ifdef CONFIG_SPL_OS_BOOT
+# define CONFIG_SPL_FS_LOAD_ARGS_NAME	"args"
+# define CONFIG_SPL_FS_LOAD_KERNEL_NAME	"uImage"
+# define CONFIG_CMD_SPL
+# define CONFIG_SYS_SPL_ARGS_ADDR	0x18000000
+# define CONFIG_CMD_SPL_WRITE_SIZE	(128 * SZ_1K)
+
+/* MMC support: args@1MB kernel@2MB */
+# define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTOR		0x800   /* 1MB */
+# define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTORS		(CONFIG_CMD_SPL_WRITE_SIZE / 512)
+# define CONFIG_SYS_MMCSD_RAW_MODE_KERNEL_SECTOR	0x1000  /* 2MB */
+#endif
+
 /* Framebuffer */
 #ifdef CONFIG_VIDEO_IPUV3
-# define CONFIG_IPUV3_CLK		260000000
 # define CONFIG_IMX_VIDEO_SKIP
 
 # define CONFIG_SPLASH_SCREEN

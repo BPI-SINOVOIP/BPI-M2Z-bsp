@@ -12,11 +12,6 @@
 
 #include <asm/arch/rmobile.h>
 
-#define CONFIG_CMD_SDRAM
-#define CONFIG_CMD_EXT2
-#define CONFIG_CMD_EXT4
-#define CONFIG_CMD_EXT4_WRITE
-
 #define CONFIG_REMAKE_ELF
 
 /* boot option */
@@ -36,20 +31,16 @@
 
 #define CONFIG_ARCH_CPU_INIT
 
-#define CONFIG_SH_GPIO_PFC
-
 /* console */
-
+#define CONFIG_SYS_CBSIZE		2048
+#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 #define CONFIG_SYS_LONGHELP
-#define CONFIG_SYS_CBSIZE		256
-#define CONFIG_SYS_PBSIZE		256
-#define CONFIG_SYS_MAXARGS		16
-#define CONFIG_SYS_BARGSIZE		512
+#define CONFIG_SYS_MAXARGS		64
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 115200, 38400 }
 
 /* MEMORY */
 #define CONFIG_SYS_TEXT_BASE		0x50000000
-#define CONFIG_SYS_INIT_SP_ADDR		(CONFIG_SYS_TEXT_BASE + 0x7fff0)
+#define CONFIG_SYS_INIT_SP_ADDR		CONFIG_SYS_TEXT_BASE
 
 #define DRAM_RSV_SIZE			0x08000000
 #if defined(CONFIG_R8A7795)
@@ -91,10 +82,6 @@
 #define CONFIG_EXTRA_ENV_SETTINGS	\
 	"fdt_high=0xffffffffffffffff\0"	\
 	"initrd_high=0xffffffffffffffff\0"
-
-#define CONFIG_BOOTARGS	\
-	"console=ttySC0,115200 rw root=/dev/nfs "	\
-	"nfsroot=192.168.0.1:/export/rfs ip=192.168.0.20"
 
 #define CONFIG_BOOTCOMMAND	\
 	"tftp 0x48080000 Image; " \

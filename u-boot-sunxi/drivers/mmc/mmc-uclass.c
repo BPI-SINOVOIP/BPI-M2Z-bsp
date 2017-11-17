@@ -15,7 +15,6 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#ifdef CONFIG_DM_MMC_OPS
 int dm_mmc_send_cmd(struct udevice *dev, struct mmc_cmd *cmd,
 		    struct mmc_data *data)
 {
@@ -79,7 +78,6 @@ int mmc_getcd(struct mmc *mmc)
 {
 	return dm_mmc_get_cd(mmc->dev);
 }
-#endif
 
 struct mmc *mmc_get_mmc_dev(struct udevice *dev)
 {
@@ -91,7 +89,7 @@ struct mmc *mmc_get_mmc_dev(struct udevice *dev)
 	return upriv->mmc;
 }
 
-#ifdef CONFIG_BLK
+#if CONFIG_IS_ENABLED(BLK)
 struct mmc *find_mmc_device(int dev_num)
 {
 	struct udevice *dev, *mmc_dev;
@@ -198,10 +196,8 @@ int mmc_bind(struct udevice *dev, struct mmc *mmc, const struct mmc_config *cfg)
 	struct udevice *bdev;
 	int ret, devnum = -1;
 
-#ifdef CONFIG_DM_MMC_OPS
 	if (!mmc_get_ops(dev))
 		return -ENOSYS;
-#endif
 #ifndef CONFIG_SPL_BUILD
 	/* Use the fixed index with aliase node's index */
 	ret = dev_read_alias_seq(dev, &devnum);

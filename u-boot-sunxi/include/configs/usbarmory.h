@@ -21,14 +21,10 @@
 /* U-Boot environment */
 #define CONFIG_ENV_OFFSET	(6 * 64 * 1024)
 #define CONFIG_ENV_SIZE		(8 * 1024)
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV	0
 
 /* U-Boot general configurations */
 #define CONFIG_SYS_CBSIZE	512
-#define CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE+sizeof(CONFIG_SYS_PROMPT)+16)
-#define CONFIG_SYS_MAXARGS	16
-#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
 
 /* UART */
 #define CONFIG_MXC_UART
@@ -88,7 +84,6 @@
 	BOOTENV
 
 #ifndef CONFIG_CMDLINE
-#define CONFIG_BOOTARGS "console=ttymxc0,115200 root=/dev/mmcblk0p1 rootwait rw"
 #define USBARMORY_FIT_PATH	"/boot/usbarmory.itb"
 #define USBARMORY_FIT_ADDR	"0x70800000"
 #endif

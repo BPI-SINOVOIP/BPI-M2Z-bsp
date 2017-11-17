@@ -18,7 +18,7 @@
 #include <asm/arch/iomux.h>
 #include <asm/arch/mx6-pins.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/imx-common/iomux-v3.h>
+#include <asm/mach-imx/iomux-v3.h>
 
 #include "../common/board.h"
 
@@ -102,9 +102,9 @@ void setenv_fdt_file(void)
 {
 	if (is_mx6ul()) {
 #ifdef CONFIG_ENV_IS_IN_MMC
-		setenv("fdt_file", "imx6ul-isiot-emmc.dtb");
+		env_set("fdt_file", "imx6ul-isiot-emmc.dtb");
 #else
-		setenv("fdt_file", "imx6ul-isiot-nand.dtb");
+		env_set("fdt_file", "imx6ul-isiot-nand.dtb");
 #endif
 	}
 }

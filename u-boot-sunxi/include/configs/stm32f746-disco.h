@@ -1,6 +1,6 @@
 /*
- * (C) Copyright 2016
- * Vikas Manocha, <vikas.manocha@st.com>
+ * Copyright (C) 2016, STMicroelectronics - All Rights Reserved
+ * Author(s): Vikas Manocha, <vikas.manocha@st.com> for STMicroelectronics.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -28,11 +28,9 @@
 #define CONFIG_SYS_MAX_FLASH_SECT	8
 #define CONFIG_SYS_MAX_FLASH_BANKS	1
 
-#define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_ENV_SIZE			(8 << 10)
 
 #define CONFIG_STM32_FLASH
-#define CONFIG_STM32X7_SERIAL
 
 #define CONFIG_DW_GMAC_DEFAULT_DMA_PBL	(8)
 #define CONFIG_DW_ALTDESCRIPTOR
@@ -49,14 +47,9 @@
 #define CONFIG_REVISION_TAG
 
 #define CONFIG_SYS_CBSIZE		1024
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE \
-					+ sizeof(CONFIG_SYS_PROMPT) + 16)
 
-#define CONFIG_SYS_MAXARGS		16
 #define CONFIG_SYS_MALLOC_LEN		(1 * 1024 * 1024)
 
-#define CONFIG_BOOTARGS							\
-	"console=ttyS0,115200 earlyprintk consoleblank=0 ignore_loglevel"
 #define CONFIG_BOOTCOMMAND						\
 	"run bootcmd_romfs"
 

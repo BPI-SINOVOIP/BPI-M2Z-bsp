@@ -26,7 +26,6 @@
 #define CONFIG_ETHPRIME                 "FEC"
 #define CONFIG_FEC_MXC_PHYADDR          0
 
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_BROADCOM
 /* ENET1 */
 #define IMX_FEC_BASE			ENET_IPS_BASE_ADDR
@@ -185,16 +184,12 @@
 
 /* environment organization */
 #define CONFIG_ENV_SIZE			SZ_8K
-#define CONFIG_ENV_IS_IN_MMC
 
 /*
  * If want to use nand, define CONFIG_NAND_MXS and rework board
  * to support nand, since emmc has pin conflicts with nand
  */
 #ifdef CONFIG_NAND_MXS
-#define CONFIG_CMD_NAND
-#define CONFIG_CMD_NAND_TRIMFFS
-
 /* NAND stuff */
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		0x40000000
@@ -219,8 +214,6 @@
 #define CONFIG_MMCROOT			"/dev/mmcblk0p2"  /* USDHC1 */
 
 /* USB Configs */
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_ASIX
 #define CONFIG_MXC_USB_PORTSC  (PORT_PTS_UTMI | PORT_PTS_PTW)
 
 #define CONFIG_IMX_THERMAL

@@ -174,7 +174,7 @@ void socfpga_emac_manage_reset(ulong emacbase, u32 state)
 		emacmask = ALT_RSTMGR_PER0MODRST_EMAC2_SET_MSK;
 		break;
 	default:
-		error("emac base address unexpected! %lx", emacbase);
+		pr_err("emac base address unexpected! %lx", emacbase);
 		hang();
 		break;
 	}
@@ -318,13 +318,13 @@ void socfpga_per_reset_all(void)
 }
 
 #if defined(CONFIG_SOCFPGA_VIRTUAL_TARGET)
-int socfpga_bridges_reset(int enable)
+int socfpga_bridges_reset(void)
 {
 	/* For SoCFPGA-VT, this is NOP. */
 	return 0;
 }
 #else
-int socfpga_bridges_reset(int enable)
+int socfpga_bridges_reset(void)
 {
 	int ret;
 

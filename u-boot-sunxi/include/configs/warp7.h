@@ -112,7 +112,6 @@
 
 /* environment organization */
 #define CONFIG_ENV_SIZE			SZ_8K
-#define CONFIG_ENV_IS_IN_MMC
 
 #define CONFIG_ENV_OFFSET		(8 * SZ_64K)
 #define CONFIG_SYS_FSL_USDHC_NUM	1
@@ -137,10 +136,6 @@
 #define CONFIG_SYS_DFU_DATA_BUF_SIZE	SZ_16M
 #define DFU_DEFAULT_POLL_TIMEOUT	300
 
-#define CONFIG_USB_ETHER
-#define CONFIG_USB_ETH_CDC
-#define CONFIG_USB_ETH_RNDIS
-#define CONFIG_USBNET_HOST_ADDR		"de:ad:be:af:00:00"
 #define CONFIG_USBNET_DEV_ADDR		"de:ad:be:af:00:01"
 
 #endif

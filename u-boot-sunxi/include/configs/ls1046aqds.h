@@ -70,7 +70,6 @@ unsigned long get_board_ddr_clk(void);
 
 #ifdef CONFIG_SYS_DPAA_FMAN
 #define CONFIG_FMAN_ENET
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_VITESSE
 #define CONFIG_PHY_REALTEK
 #define CONFIG_PHYLIB_10G
@@ -137,23 +136,10 @@ unsigned long get_board_ddr_clk(void);
 #define CFG_LPUART_EN		0x2
 #endif
 
-/* USB */
-#define CONFIG_HAS_FSL_XHCI_USB
-#ifdef CONFIG_HAS_FSL_XHCI_USB
-#define CONFIG_USB_XHCI_HCD
-#define CONFIG_USB_XHCI_FSL
-#define CONFIG_USB_XHCI_DWC3
-#define CONFIG_USB_MAX_CONTROLLER_COUNT         3
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS      2
-#define CONFIG_CMD_USB
-#define CONFIG_USB_STORAGE
-#endif
-
 /* SATA */
 #define CONFIG_LIBATA
 #define CONFIG_SCSI_AHCI
 #define CONFIG_SCSI_AHCI_PLAT
-#define CONFIG_SCSI
 
 /* EEPROM */
 #define CONFIG_ID_EEPROM
@@ -255,7 +241,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_NAND_BASE_LIST	{ CONFIG_SYS_NAND_BASE }
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_MTD_NAND_VERIFY_WRITE
-#define CONFIG_CMD_NAND
 
 #define CONFIG_SYS_NAND_BLOCK_SIZE	(256 * 1024)
 #endif
@@ -425,9 +410,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_MISC_INIT_R
 #define CONFIG_SYS_LONGHELP		/* undef to save memory */
 #define CONFIG_AUTO_COMPLETE
-#define CONFIG_SYS_PBSIZE		\
-		(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 
 #define CONFIG_SYS_MEMTEST_START	0x80000000
 #define CONFIG_SYS_MEMTEST_END		0x9fffffff
@@ -445,21 +427,17 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_ENV_OVERWRITE
 
 #ifdef CONFIG_NAND_BOOT
-#define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_SIZE			0x2000
-#define CONFIG_ENV_OFFSET		(24 * CONFIG_SYS_NAND_BLOCK_SIZE)
+#define CONFIG_ENV_OFFSET		(12 * CONFIG_SYS_NAND_BLOCK_SIZE)
 #elif defined(CONFIG_SD_BOOT)
 #define CONFIG_ENV_OFFSET		(3 * 1024 * 1024)
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV		0
 #define CONFIG_ENV_SIZE			0x2000
 #elif defined(CONFIG_QSPI_BOOT)
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SIZE			0x2000          /* 8KB */
 #define CONFIG_ENV_OFFSET		0x300000        /* 3MB */
 #define CONFIG_ENV_SECT_SIZE		0x10000
 #else
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + 0x300000)
 #define CONFIG_ENV_SECT_SIZE		0x20000
 #define CONFIG_ENV_SIZE			0x20000
@@ -467,29 +445,13 @@ unsigned long get_board_ddr_clk(void);
 
 #define CONFIG_CMDLINE_TAG
 
+#undef CONFIG_BOOTCOMMAND
 #if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT_QSPI)
 #define CONFIG_BOOTCOMMAND		"sf probe && sf read $kernel_load "    \
 					"e0000 f00000 && bootm $kernel_load"
 #else
 #define CONFIG_BOOTCOMMAND		"cp.b $kernel_start $kernel_load "     \
 					"$kernel_size && bootm $kernel_load"
-#endif
-
-#if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT_QSPI)
-#define MTDPARTS_DEFAULT "mtdparts=1550000.quadspi:2m(uboot)," \
-			"14m(free)"
-#else
-#define MTDPARTS_DEFAULT "mtdparts=60000000.nor:" \
-			"2m@0x100000(nor_bank0_uboot),"\
-			"40m@0x1100000(nor_bank0_fit)," \
-			"7m(nor_bank0_user)," \
-			"2m@0x4100000(nor_bank4_uboot)," \
-			"40m@0x5100000(nor_bank4_fit),"\
-			"-(nor_bank4_user);" \
-			"7e800000.flash:" \
-			"4m(nand_uboot),36m(nand_kernel)," \
-			"472m(nand_free);spi0.0:2m(uboot)," \
-			"14m(free)"
 #endif
 
 #include <asm/fsl_secure_boot.h>

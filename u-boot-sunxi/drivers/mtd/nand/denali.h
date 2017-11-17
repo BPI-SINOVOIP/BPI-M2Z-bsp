@@ -166,8 +166,6 @@
 
 #define REVISION				0x370
 #define     REVISION__VALUE				0xffff
-#define MAKE_COMPARABLE_REVISION(x)		swab16((x) & REVISION__VALUE)
-#define REVISION_5_1				0x00000501
 
 #define ONFI_DEVICE_FEATURES			0x380
 #define     ONFI_DEVICE_FEATURES__VALUE			0x003f
@@ -437,6 +435,7 @@ struct nand_buf {
 
 struct denali_nand_info {
 	struct nand_chip nand;
+	unsigned long clk_x_rate;	/* bus interface clock rate */
 	int flash_bank; /* currently selected chip */
 	int status;
 	int platform;
@@ -462,6 +461,13 @@ struct denali_nand_info {
 	uint32_t blksperchip;
 	uint32_t bbtskipbytes;
 	uint32_t max_banks;
+	unsigned int revision;
+	unsigned int caps;
 };
+
+#define DENALI_CAP_HW_ECC_FIXUP			BIT(0)
+#define DENALI_CAP_DMA_64BIT			BIT(1)
+
+int denali_init(struct denali_nand_info *denali);
 
 #endif /* __DENALI_H__ */

@@ -22,10 +22,11 @@ static const char *if_typename_str[IF_TYPE_COUNT] = {
 	[IF_TYPE_SATA]		= "sata",
 	[IF_TYPE_HOST]		= "host",
 	[IF_TYPE_SYSTEMACE]	= "ace",
+	[IF_TYPE_NVME]		= "nvme",
 };
 
 static enum uclass_id if_type_uclass_id[IF_TYPE_COUNT] = {
-	[IF_TYPE_IDE]		= UCLASS_INVALID,
+	[IF_TYPE_IDE]		= UCLASS_IDE,
 	[IF_TYPE_SCSI]		= UCLASS_SCSI,
 	[IF_TYPE_ATAPI]		= UCLASS_INVALID,
 	[IF_TYPE_USB]		= UCLASS_MASS_STORAGE,
@@ -34,6 +35,7 @@ static enum uclass_id if_type_uclass_id[IF_TYPE_COUNT] = {
 	[IF_TYPE_SD]		= UCLASS_INVALID,
 	[IF_TYPE_SATA]		= UCLASS_AHCI,
 	[IF_TYPE_HOST]		= UCLASS_ROOT,
+	[IF_TYPE_NVME]		= UCLASS_NVME,
 	[IF_TYPE_SYSTEMACE]	= UCLASS_INVALID,
 };
 
@@ -53,6 +55,11 @@ static enum if_type if_typename_to_iftype(const char *if_typename)
 static enum uclass_id if_type_to_uclass_id(enum if_type if_type)
 {
 	return if_type_uclass_id[if_type];
+}
+
+const char *blk_get_if_type_name(enum if_type if_type)
+{
+	return if_typename_str[if_type];
 }
 
 struct blk_desc *blk_get_devnum_by_type(enum if_type if_type, int devnum)
@@ -286,9 +293,6 @@ ulong blk_read_devnum(enum if_type if_type, int devnum, lbaint_t start,
 	n = blk_dread(desc, start, blkcnt, buffer);
 	if (IS_ERR_VALUE(n))
 		return n;
-
-	/* flush cache after read */
-	flush_cache((ulong)buffer, blkcnt * desc->blksz);
 
 	return n;
 }
@@ -539,7 +543,7 @@ static int blk_claim_devnum(enum if_type if_type, int devnum)
 
 int blk_create_device(struct udevice *parent, const char *drv_name,
 		      const char *name, int if_type, int devnum, int blksz,
-		      lbaint_t size, struct udevice **devp)
+		      lbaint_t lba, struct udevice **devp)
 {
 	struct blk_desc *desc;
 	struct udevice *dev;
@@ -560,7 +564,7 @@ int blk_create_device(struct udevice *parent, const char *drv_name,
 	desc = dev_get_uclass_platdata(dev);
 	desc->if_type = if_type;
 	desc->blksz = blksz;
-	desc->lba = size / blksz;
+	desc->lba = lba;
 	desc->part_type = PART_TYPE_UNKNOWN;
 	desc->bdev = dev;
 	desc->devnum = devnum;
@@ -571,7 +575,7 @@ int blk_create_device(struct udevice *parent, const char *drv_name,
 
 int blk_create_devicef(struct udevice *parent, const char *drv_name,
 		       const char *name, int if_type, int devnum, int blksz,
-		       lbaint_t size, struct udevice **devp)
+		       lbaint_t lba, struct udevice **devp)
 {
 	char dev_name[30], *str;
 	int ret;
@@ -582,14 +586,14 @@ int blk_create_devicef(struct udevice *parent, const char *drv_name,
 		return -ENOMEM;
 
 	ret = blk_create_device(parent, drv_name, str, if_type, devnum,
-				blksz, size, devp);
+				blksz, lba, devp);
 	if (ret) {
 		free(str);
 		return ret;
 	}
 	device_set_name_alloced(*devp);
 
-	return ret;
+	return 0;
 }
 
 int blk_unbind_all(int if_type)

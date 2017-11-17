@@ -21,7 +21,6 @@ subdir-$(HOST_TOOLS_ALL) += gdb
 
 # Merge all the different vars for envcrc into one
 ENVCRC-$(CONFIG_ENV_IS_EMBEDDED) = y
-ENVCRC-$(CONFIG_ENV_IS_IN_DATAFLASH) = y
 ENVCRC-$(CONFIG_ENV_IS_IN_EEPROM) = y
 ENVCRC-$(CONFIG_ENV_IS_IN_FLASH) = y
 ENVCRC-$(CONFIG_ENV_IS_IN_ONENAND) = y
@@ -37,7 +36,7 @@ hostprogs-$(CONFIG_VIDEO_LOGO) += bmp_logo
 HOSTCFLAGS_bmp_logo.o := -pedantic
 
 hostprogs-$(CONFIG_BUILD_ENVCRC) += envcrc
-envcrc-objs := envcrc.o lib/crc32.o common/env_embedded.o lib/sha1.o
+envcrc-objs := envcrc.o lib/crc32.o env/embedded.o lib/sha1.o
 
 hostprogs-$(CONFIG_CMD_NET) += gen_eth_addr
 HOSTCFLAGS_gen_eth_addr.o := -pedantic
@@ -131,14 +130,14 @@ fit_check_sign-objs   := $(dumpimage-mkimage-objs) fit_check_sign.o
 # all three files in $(obj)/tools: _libfdt.so, libfdt.py and libfdt_wrap.c
 # The latter is a temporary file which we could actually remove.
 tools/_libfdt.so: $(LIBFDT_SRCS) $(LIBFDT_SWIG)
-	cp $(LIBFDT_SWIG) tools/.
-	unset CC; \
+	$(Q)cp $(LIBFDT_SWIG) tools/.
+	$(Q)unset CC; \
 	unset CROSS_COMPILE; \
 	LDFLAGS="$(HOSTLDFLAGS)" CFLAGS= VERSION="u-boot-$(UBOOTVERSION)" \
 		CPPFLAGS="$(_hostc_flags)" OBJDIR=tools \
 		SOURCES="$(LIBFDT_SRCS) tools/libfdt.i" \
 		SWIG_OPTS="-I$(srctree)/lib/libfdt -I$(srctree)/lib" \
-		$(libfdt_tree)/pylibfdt/setup.py --quiet build_ext \
+		$(PYTHON) $(libfdt_tree)/pylibfdt/setup.py --quiet build_ext \
 			--build-lib tools
 
 ifneq ($(CONFIG_MX23)$(CONFIG_MX28),)
@@ -175,6 +174,8 @@ HOSTCFLAGS_rsa-sign.o += -Wno-deprecated-declarations
 endif
 endif
 
+HOSTCFLAGS_fit_image.o += -DMKIMAGE_DTC=\"$(CONFIG_MKIMAGE_DTC_PATH)\"
+
 HOSTLOADLIBES_dumpimage := $(HOSTLOADLIBES_mkimage)
 HOSTLOADLIBES_fit_info := $(HOSTLOADLIBES_mkimage)
 HOSTLOADLIBES_fit_check_sign := $(HOSTLOADLIBES_mkimage)
@@ -209,6 +210,8 @@ hostprogs-$(CONFIG_STATIC_RELA) += relocate-rela
 hostprogs-y += fdtgrep
 fdtgrep-objs += $(LIBFDT_OBJS) fdtgrep.o
 
+hostprogs-$(CONFIG_MIPS) += mips-relocs
+
 # We build some files with extra pedantic flags to try to minimize things
 # that won't build on some weird host compiler -- though there are lots of
 # exceptions for files that aren't complaint.
@@ -221,7 +224,7 @@ HOSTCFLAGS_sha256.o := -pedantic
 quiet_cmd_wrap = WRAP    $@
 cmd_wrap = echo "\#include <../$(patsubst $(obj)/%,%,$@)>" >$@
 
-$(obj)/lib/%.c $(obj)/common/%.c:
+$(obj)/lib/%.c $(obj)/common/%.c $(obj)/env/%.c:
 	$(call cmd,wrap)
 
 clean-dirs := lib common

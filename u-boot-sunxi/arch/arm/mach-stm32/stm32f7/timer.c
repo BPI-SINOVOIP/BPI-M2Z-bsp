@@ -1,6 +1,6 @@
 /*
- * (C) Copyright 2016
- * Vikas Manocha, ST Micoelectronics, vikas.manocha@st.com.
+ * Copyright (C) 2016, STMicroelectronics - All Rights Reserved
+ * Author(s): Vikas Manocha, <vikas.manocha@st.com> for STMicroelectronics.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -26,7 +26,7 @@ int timer_init(void)
 	/* Stop the timer */
 	writel(readl(&gpt1_regs_ptr->cr1) & ~GPT_CR1_CEN, &gpt1_regs_ptr->cr1);
 
-	writel((CONFIG_SYS_CLK_FREQ/CONFIG_SYS_HZ_CLOCK) - 1,
+	writel((CONFIG_SYS_CLK_FREQ / 2 / CONFIG_SYS_HZ_CLOCK) - 1,
 						&gpt1_regs_ptr->psc);
 
 	/* Configure timer for auto-reload */

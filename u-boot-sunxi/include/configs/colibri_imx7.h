@@ -32,8 +32,6 @@
 #define CONFIG_ETHPRIME                 "FEC"
 #define CONFIG_FEC_MXC_PHYADDR          0
 
-#define CONFIG_PHYLIB
-#define CONFIG_PHY_MICREL
 #define CONFIG_IP_DEFRAG
 #define CONFIG_TFTP_BLOCKSIZE		16352
 #define CONFIG_TFTP_TSIZE
@@ -107,7 +105,7 @@
 	"m4boot=;\0" \
 	"ip_dyn=yes\0" \
 	"kernel_file=zImage\0" \
-	"mtdparts=" MTDPARTS_DEFAULT "\0" \
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
 	"setethupdate=if env exists ethaddr; then; else setenv ethaddr " \
 		"00:14:2d:00:00:00; fi; tftpboot ${loadaddr} " \
 		"${board}/flash_eth.img && source ${loadaddr}\0" \
@@ -148,7 +146,6 @@
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
 /* environment organization */
-#define CONFIG_ENV_IS_IN_NAND
 
 #if defined(CONFIG_ENV_IS_IN_MMC)
 #define CONFIG_SYS_MMC_ENV_DEV		0   /* USDHC1 */
@@ -162,7 +159,6 @@
 #endif
 
 #define CONFIG_NAND_MXS
-#define CONFIG_CMD_NAND_TRIMFFS
 
 /* NAND stuff */
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
@@ -170,24 +166,10 @@
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
 #define CONFIG_SYS_NAND_ONFI_DETECTION
 #define CONFIG_SYS_NAND_MX7_GPMI_62_ECC_BYTES
-#define CONFIG_CMD_NAND_TORTURE
-
-/* UBI stuff */
-#define CONFIG_RBTREE
-#define CONFIG_LZO
-#define CONFIG_CMD_UBIFS	/* increases size by almost 60 KB */
 
 /* Dynamic MTD partition support */
-#define CONFIG_CMD_MTDPARTS	/* Enable 'mtdparts' command line support */
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_MTD_DEVICE	/* needed for mtdparts commands */
-#define MTDIDS_DEFAULT		"nand0=gpmi-nand"
-#define MTDPARTS_DEFAULT	"mtdparts=gpmi-nand:"		\
-				"512k(mx7-bcb),"		\
-				"1536k(u-boot1)ro,"		\
-				"1536k(u-boot2)ro,"		\
-				"512k(u-boot-env),"		\
-				"-(ubi)"
 
 /* DMA stuff, needed for GPMI/MXS NAND support */
 #define CONFIG_APBH_DMA

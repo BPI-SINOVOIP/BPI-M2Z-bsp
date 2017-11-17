@@ -31,8 +31,6 @@
 #define CONFIG_PCA953X
 #define CONFIG_SYS_I2C_PCA953X_ADDR	0x20
 #define CONFIG_SYS_I2C_PCA953X_WIDTH	{ {0x20, 16} }
-#define CONFIG_CMD_PCA953X
-#define CONFIG_CMD_PCA953X_INFO
 
 /* I2C Configs */
 #define CONFIG_SYS_I2C
@@ -56,10 +54,6 @@
 /* USB Configs */
 #define CONFIG_MXC_USB_PORTSC   (PORT_PTS_UTMI | PORT_PTS_PTW)
 #define CONFIG_USB_MAX_CONTROLLER_COUNT 2
-
-#ifdef CONFIG_MX6Q
-#define CONFIG_CMD_SATA
-#endif
 
 /*
  * SATA Configs
@@ -86,7 +80,6 @@
 #define CONFIG_FEC_XCV_TYPE             MII100
 #define CONFIG_ETHPRIME                 "FEC"
 #define CONFIG_FEC_MXC_PHYADDR          0x5
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_SMSC
 
 #ifndef CONFIG_SPL
@@ -99,8 +92,8 @@
 
 #define CONFIG_PREBOOT                 ""
 
-/* Print Buffer Size */
-#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
+/* Thermal support */
+#define CONFIG_IMX_THERMAL
 
 /* Physical Memory Map */
 #define CONFIG_NR_DRAM_BANKS           1
@@ -116,7 +109,6 @@
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
 /* Environment organization */
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SIZE                 (64 * 1024)	/* 64 kb */
 #define CONFIG_ENV_OFFSET               (1024 * 1024)
 /* M25P16 has an erase size of 64 KiB */

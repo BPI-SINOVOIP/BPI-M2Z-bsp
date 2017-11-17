@@ -7,22 +7,6 @@
 #ifndef __CONFIG_FSL_CHAIN_TRUST_H
 #define __CONFIG_FSL_CHAIN_TRUST_H
 
-/* For secure boot, since ENVIRONMENT in flash/external memories is
- * not verified, undef CONFIG_ENV_xxx and set default env
- * (CONFIG_ENV_IS_NOWHERE)
- */
-#ifdef CONFIG_SECURE_BOOT
-
-#undef CONFIG_ENV_IS_IN_EEPROM
-#undef CONFIG_ENV_IS_IN_NAND
-#undef CONFIG_ENV_IS_IN_MMC
-#undef CONFIG_ENV_IS_IN_SPI_FLASH
-#undef CONFIG_ENV_IS_IN_FLASH
-
-#define CONFIG_ENV_IS_NOWHERE
-
-#endif
-
 #ifdef CONFIG_CHAIN_OF_TRUST
 
 #ifndef CONFIG_EXTRA_ENV
@@ -44,7 +28,7 @@
  *	 "41066b564c6ffcef40ccbc1e0a5d0d519604000c785d97bbefd25e4d288d1c8b"
  */
 
-#ifdef CONFIG_BOOTARGS
+#ifdef CONFIG_USE_BOOTARGS
 #define CONFIG_SET_BOOTARGS	"setenv bootargs \'" CONFIG_BOOTARGS" \';"
 #else
 #define CONFIG_SET_BOOTARGS	"setenv bootargs \'root=/dev/ram "	\

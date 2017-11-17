@@ -33,10 +33,7 @@
 
 /* environment variables configuration */
 #ifdef CONFIG_CMD_NAND
-#define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_SECT_SIZE	0x20000
-#else
-#define CONFIG_ENV_IS_NOWHERE
 #endif
 #define CONFIG_ENV_SIZE		0x20000
 #define CONFIG_ENV_OFFSET	0xe0000
@@ -52,17 +49,10 @@
 	"fdt addr 0x700000; fdt resize; fdt chosen; " \
 	"bootz 0x800000 - 0x700000"
 
-#define CONFIG_MTDPARTS \
-	"mtdparts=orion_nand:" \
-	"0xe0000@0x0(uboot)," \
-	"0x20000@0xe0000(uboot_env)," \
-	"0x100000@0x100000(second_stage_uboot)," \
-	"-@0x200000(root)\0"
-
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"console=console=ttyS0,115200\0" \
 	"mtdids=nand0=orion_nand\0" \
-	"mtdparts="CONFIG_MTDPARTS \
+	"mtdparts="CONFIG_MTDPARTS_DEFAULT \
 	"kernel=/boot/zImage\0" \
 	"fdt=/boot/nsa310s.dtb\0" \
 	"bootargs_root=ubi.mtd=3 root=ubi0:rootfs rootfstype=ubifs rw\0"
@@ -70,10 +60,8 @@
 /* Ethernet driver configuration */
 #ifdef CONFIG_CMD_NET
 #define CONFIG_NETCONSOLE
-#define CONFIG_NET_MULTI
 #define CONFIG_MVGBE_PORTS	{1, 0}	/* enable port 0 only */
 #define CONFIG_PHY_BASE_ADR	1
-#define CONFIG_PHY_GIGE
 #define CONFIG_RESET_PHY_R
 #endif /* CONFIG_CMD_NET */
 

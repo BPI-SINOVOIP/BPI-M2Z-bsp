@@ -245,7 +245,6 @@
  * Networking options
  */
 #define CONFIG_TSEC_ENET		/* tsec ethernet support */
-#define CONFIG_PHY_GIGE		1	/* Include GbE speed/duplex detection */
 #define CONFIG_MII		1	/* MII PHY management */
 #define CONFIG_ETHPRIME		"eTSEC1"
 
@@ -285,24 +284,10 @@
 #define CONFIG_BOOTP_GATEWAY
 
 /*
- * Command configuration.
- */
-#define CONFIG_CMD_NAND
-#define CONFIG_CMD_PCA953X
-#define CONFIG_CMD_PCA953X_INFO
-#define CONFIG_CMD_PCI
-#define CONFIG_CMD_PCI_ENUM
-#define CONFIG_CMD_REGINFO
-
-/*
  * Miscellaneous configurable options
  */
 #define CONFIG_SYS_LONGHELP			/* undef to save memory	*/
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
-#define CONFIG_SYS_CBSIZE	256		/* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE+sizeof(CONFIG_SYS_PROMPT)+16) /* Print Buffer Size */
-#define CONFIG_SYS_MAXARGS	16		/* max number of command args */
-#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE	/* Boot Argument Buffer Size */
 #define CONFIG_CMDLINE_EDITING	1		/* add command line history	*/
 #define CONFIG_AUTO_COMPLETE	1		/* add autocompletion support */
 #define CONFIG_LOADADDR		0x1000000	/* default location for tftp and bootm */
@@ -322,7 +307,6 @@
 /*
  * Environment Configuration
  */
-#define CONFIG_ENV_IS_IN_FLASH	1
 #define CONFIG_ENV_SECT_SIZE	0x20000		/* 128k (one sector) for env */
 #define CONFIG_ENV_SIZE		0x8000
 #define CONFIG_ENV_ADDR		(CONFIG_SYS_MONITOR_BASE - (256 * 1024))

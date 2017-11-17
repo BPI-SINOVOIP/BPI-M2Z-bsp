@@ -3,82 +3,61 @@
  *
  * SPDX-License-Identifier:     GPL-2.0+
  */
+
 #include <common.h>
 #include <dm.h>
 #include <misc.h>
-#include <ram.h>
 #include <dm/pinctrl.h>
 #include <dm/uclass-internal.h>
-#include <misc.h>
 #include <asm/setup.h>
 #include <asm/arch/periph.h>
 #include <power/regulator.h>
+#include <spl.h>
 #include <u-boot/sha256.h>
-
-#define RK3399_CPUID_OFF  0x7
-#define RK3399_CPUID_LEN  0x10
-
-DECLARE_GLOBAL_DATA_PTR;
-
-#define RK3399_CPUID_OFF  0x7
-#define RK3399_CPUID_LEN  0x10
 
 DECLARE_GLOBAL_DATA_PTR;
 
 int board_init(void)
 {
-	struct udevice *pinctrl, *regulator;
 	int ret;
 
 	/*
-	 * The PWM does not have decicated interrupt number in dts and can
-	 * not get periph_id by pinctrl framework, so let's init them here.
-	 * The PWM2 and PWM3 are for pwm regulators.
+	 * We need to call into regulators_enable_boot_on() again, as the call
+	 * during SPL may have not included all regulators.
 	 */
-	ret = uclass_get_device(UCLASS_PINCTRL, 0, &pinctrl);
-	if (ret) {
-		debug("%s: Cannot find pinctrl device\n", __func__);
-		goto out;
-	}
-
-	ret = pinctrl_request_noflags(pinctrl, PERIPH_ID_PWM2);
-	if (ret) {
-		debug("%s PWM2 pinctrl init fail!\n", __func__);
-		goto out;
-	}
-
-	/* rk3399 need to init vdd_center to get the correct output voltage */
-	ret = regulator_get_by_platname("vdd_center", &regulator);
+	ret = regulators_enable_boot_on(false);
 	if (ret)
-		debug("%s: Cannot get vdd_center regulator\n", __func__);
+		debug("%s: Cannot enable boot on regulator\n", __func__);
 
-	ret = regulator_get_by_platname("vcc5v0_host", &regulator);
-	if (ret) {
-		debug("%s vcc5v0_host init fail! ret %d\n", __func__, ret);
-		goto out;
-	}
-
-	ret = regulator_set_enable(regulator, true);
-	if (ret) {
-		debug("%s vcc5v0-host-en set fail!\n", __func__);
-		goto out;
-	}
-
-out:
 	return 0;
+}
+
+void spl_board_init(void)
+{
+	int  ret;
+
+	/*
+	 * Turning the eMMC and SPI back on (if disabled via the Qseven
+	 * BIOS_ENABLE) signal is done through a always-on regulator).
+	 */
+	ret = regulators_enable_boot_on(false);
+	if (ret)
+		debug("%s: Cannot enable boot on regulator\n", __func__);
+
+	preloader_console_init();
 }
 
 static void setup_macaddr(void)
 {
 #if CONFIG_IS_ENABLED(CMD_NET)
 	int ret;
-	const char *cpuid = getenv("cpuid#");
+	const char *cpuid = env_get("cpuid#");
 	u8 hash[SHA256_SUM_LEN];
 	int size = sizeof(hash);
 	u8 mac_addr[6];
 
 	/* Only generate a MAC address, if none is set in the environment */
-	if (getenv("ethaddr"))
+	if (env_get("ethaddr"))
 		return;
 
 	if (!cpuid) {
@@ -98,22 +77,23 @@ static void setup_macaddr(void)
 	/* Make this a valid MAC address and set it */
 	mac_addr[0] &= 0xfe;  /* clear multicast bit */
 	mac_addr[0] |= 0x02;  /* set local assignment bit (IEEE802) */
-	eth_setenv_enetaddr("ethaddr", mac_addr);
+	eth_env_set_enetaddr("ethaddr", mac_addr);
 #endif
-
-	return;
 }
 
 static void setup_serial(void)
 {
 #if CONFIG_IS_ENABLED(ROCKCHIP_EFUSE)
+	const u32 cpuid_offset = 0x7;
+	const u32 cpuid_length = 0x10;
+
 	struct udevice *dev;
 	int ret, i;
-	u8 cpuid[RK3399_CPUID_LEN];
-	u8 low[RK3399_CPUID_LEN/2], high[RK3399_CPUID_LEN/2];
-	char cpuid_str[RK3399_CPUID_LEN * 2 + 1];
+	u8 cpuid[cpuid_length];
+	u8 low[cpuid_length/2], high[cpuid_length/2];
+	char cpuid_str[cpuid_length * 2 + 1];
 	u64 serialno;
-	char serialno_str[16];
+	char serialno_str[17];
 
 	/* retrieve the device */
 	ret = uclass_get_device_by_driver(UCLASS_MISC,
@@ -124,7 +104,7 @@ static void setup_serial(void)
 	}
 
 	/* read the cpu_id range from the efuses */
-	ret = misc_read(dev, RK3399_CPUID_OFF, &cpuid, sizeof(cpuid));
+	ret = misc_read(dev, cpuid_offset, &cpuid, sizeof(cpuid));
 	if (ret) {
 		debug("%s: reading cpuid from the efuses failed\n",
 		      __func__);
@@ -150,11 +130,9 @@ static void setup_serial(void)
 	serialno |= (u64)crc32_no_comp(serialno, high, 8) << 32;
 	snprintf(serialno_str, sizeof(serialno_str), "%llx", serialno);
 
-	setenv("cpuid#", cpuid_str);
-	setenv("serial#", serialno_str);
+	env_set("cpuid#", cpuid_str);
+	env_set("serial#", serialno_str);
 #endif
-
-	return;
 }
 
 int misc_init_r(void)
@@ -171,7 +149,7 @@ void get_board_serial(struct tag_serialnr *serialnr)
 	char *serial_string;
 	u64 serial = 0;
 
-	serial_string = getenv("serial#");
+	serial_string = env_get("serial#");
 
 	if (serial_string)
 		serial = simple_strtoull(serial_string, NULL, 16);
@@ -180,34 +158,3 @@ void get_board_serial(struct tag_serialnr *serialnr)
 	serialnr->low = (u32)(serial & 0xffffffff);
 }
 #endif
-
-int dram_init(void)
-{
-	struct ram_info ram;
-	struct udevice *dev;
-	int ret;
-
-	ret = uclass_get_device(UCLASS_RAM, 0, &dev);
-	if (ret) {
-		debug("DRAM init failed: %d\n", ret);
-		return ret;
-	}
-	ret = ram_get_info(dev, &ram);
-	if (ret) {
-		debug("Cannot get DRAM size: %d\n", ret);
-		return ret;
-	}
-	debug("SDRAM base=%llx, size=%x\n", ram.base, (unsigned int)ram.size);
-	gd->ram_size = ram.size;
-
-	return 0;
-}
-
-int dram_init_banksize(void)
-{
-	/* Reserve 0x200000 for ATF bl31 */
-	gd->bd->bi_dram[0].start = 0x200000;
-	gd->bd->bi_dram[0].size = 0x7e000000;
-
-	return 0;
-}

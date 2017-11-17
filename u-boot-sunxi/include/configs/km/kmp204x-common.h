@@ -44,7 +44,6 @@
 
 /* Environment in SPI Flash */
 #define CONFIG_SYS_EXTRA_ENV_RELOC
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SPI_BUS              0
 #define CONFIG_ENV_SPI_CS               0
 #define CONFIG_ENV_SPI_MAX_HZ           20000000
@@ -153,10 +152,7 @@ unsigned long get_board_sys_clk(unsigned long dummy);
 
 #define CONFIG_SYS_NAND_BASE_LIST     {CONFIG_SYS_NAND_BASE}
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_CMD_NAND
 #define CONFIG_SYS_NAND_BLOCK_SIZE    (128 * 1024)
-
-#define CONFIG_BCH
 
 /* NAND flash config */
 #define CONFIG_SYS_NAND_BR_PRELIM  (BR_PHYS_ADDR(CONFIG_SYS_NAND_BASE_PHYS) \
@@ -348,9 +344,7 @@ int get_scl(void);
 /* RGMII (FM1@DTESC5) is used as debug itf, it's the only one configured */
 #define CONFIG_SYS_FM1_DTSEC5_PHY_ADDR	0x11
 #define CONFIG_SYS_TBIPA_VALUE	8
-#define CONFIG_PHYLIB		/* recommended PHY management */
 #define CONFIG_ETHPRIME		"FM1@DTSEC5"
-#define CONFIG_PHY_GIGE		/* Include GbE speed/duplex detection */
 
 /*
  * Environment
@@ -369,7 +363,6 @@ int get_scl(void);
 /*
  * additionnal command line configuration.
  */
-#define CONFIG_CMD_PCI
 
 /* we don't need flash support */
 #undef CONFIG_FLASH_CFI_MTD
@@ -397,16 +390,6 @@ int get_scl(void);
 #ifndef CONFIG_KM_DEF_ENV		/* if not set by keymile-common.h */
 #define CONFIG_KM_DEF_ENV "km-common=empty\0"
 #endif
-
-#ifndef MTDIDS_DEFAULT
-# define MTDIDS_DEFAULT		"nand0=fsl_elbc_nand"
-#endif /* MTDIDS_DEFAULT */
-
-#ifndef MTDPARTS_DEFAULT
-# define MTDPARTS_DEFAULT	"mtdparts="			\
-	"fsl_elbc_nand:"						\
-		"-(" CONFIG_KM_UBI_PARTITION_NAME_BOOT ");"
-#endif /* MTDPARTS_DEFAULT */
 
 /* architecture specific default bootargs */
 #define CONFIG_KM_DEF_BOOT_ARGS_CPU		""

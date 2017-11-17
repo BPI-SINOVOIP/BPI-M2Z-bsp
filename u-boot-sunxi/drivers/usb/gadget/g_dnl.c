@@ -19,14 +19,16 @@
 #include <dfu.h>
 #include <thor.h>
 
+#include <env_callback.h>
+
 #include "gadget_chips.h"
 #include "composite.c"
 
 /*
  * One needs to define the following:
- * CONFIG_G_DNL_VENDOR_NUM
- * CONFIG_G_DNL_PRODUCT_NUM
- * CONFIG_G_DNL_MANUFACTURER
+ * CONFIG_USB_GADGET_VENDOR_NUM
+ * CONFIG_USB_GADGET_PRODUCT_NUM
+ * CONFIG_USB_GADGET_MANUFACTURER
  * at e.g. ./configs/<board>_defconfig
  */
 
@@ -44,7 +46,7 @@
 
 static const char product[] = "USB download gadget";
 static char g_dnl_serial[MAX_STRING_SERIAL];
-static const char manufacturer[] = CONFIG_G_DNL_MANUFACTURER;
+static const char manufacturer[] = CONFIG_USB_GADGET_MANUFACTURER;
 
 void g_dnl_set_serialnumber(char *s)
 {
@@ -60,8 +62,8 @@ static struct usb_device_descriptor device_desc = {
 	.bDeviceClass = USB_CLASS_PER_INTERFACE,
 	.bDeviceSubClass = 0, /*0x02:CDC-modem , 0x00:CDC-serial*/
 
-	.idVendor = __constant_cpu_to_le16(CONFIG_G_DNL_VENDOR_NUM),
-	.idProduct = __constant_cpu_to_le16(CONFIG_G_DNL_PRODUCT_NUM),
+	.idVendor = __constant_cpu_to_le16(CONFIG_USB_GADGET_VENDOR_NUM),
+	.idProduct = __constant_cpu_to_le16(CONFIG_USB_GADGET_PRODUCT_NUM),
 	/* .iProduct = DYNAMIC */
 	/* .iSerialNumber = DYNAMIC */
 	.bNumConfigurations = 1,
@@ -201,6 +203,19 @@ static int g_dnl_get_bcd_device_number(struct usb_composite_dev *cdev)
 
 	return g_dnl_get_board_bcd_device_number(gcnum);
 }
+
+/**
+ * Update internal serial number variable when the "serial#" env var changes.
+ *
+ * Handle all cases, even when flags == H_PROGRAMMATIC or op == env_op_delete.
+ */
+static int on_serialno(const char *name, const char *value, enum env_op op,
+		int flags)
+{
+	g_dnl_set_serialnumber((char *)value);
+	return 0;
+}
+U_BOOT_ENV_CALLBACK(serialno, on_serialno);
 
 static int g_dnl_bind(struct usb_composite_dev *cdev)
 {

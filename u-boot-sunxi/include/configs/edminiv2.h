@@ -24,7 +24,6 @@
 #define CONFIG_SPL_BSS_MAX_SIZE		0x0001ffff
 #define CONFIG_SYS_SPL_MALLOC_START	0x00040000
 #define CONFIG_SYS_SPL_MALLOC_SIZE	0x0001ffff
-#define CONFIG_SPL_LDSCRIPT            "$(CPUDIR)/orion5x/u-boot-spl.lds"
 #define CONFIG_SYS_UBOOT_BASE		0xfff90000
 #define CONFIG_SYS_UBOOT_START		0x00800000
 #define CONFIG_SYS_TEXT_BASE 		0x00800000
@@ -114,8 +113,6 @@
 #define CONFIG_SETUP_MEMORY_TAGS 1	/* enable memory tag */
 
 #define	CONFIG_SYS_CBSIZE	1024	/* Console I/O Buff Size */
-#define	CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE \
-		+sizeof(CONFIG_SYS_PROMPT) + 16)	/* Print Buff */
 /*
  * Commands configuration
  */
@@ -187,7 +184,6 @@
 /*
  *  Environment variables configurations
  */
-#define CONFIG_ENV_IS_IN_FLASH		1
 #define CONFIG_ENV_SECT_SIZE		0x2000	/* 16K */
 #define CONFIG_ENV_SIZE			0x2000
 #define CONFIG_ENV_OFFSET		0x4000	/* env starts here */
@@ -207,7 +203,6 @@
 #define CONFIG_SYS_MEMTEST_START	0x00400000
 #define CONFIG_SYS_MEMTEST_END		0x007fffff
 #define CONFIG_SYS_RESET_ADDRESS	0xffff0000
-#define CONFIG_SYS_MAXARGS		16
 
 /* Enable command line editing */
 #define CONFIG_CMDLINE_EDITING

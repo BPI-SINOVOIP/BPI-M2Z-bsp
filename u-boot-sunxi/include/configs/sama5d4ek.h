@@ -14,7 +14,7 @@
 
 /* SDRAM */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_SDRAM_BASE           ATMEL_BASE_DDRCS
+#define CONFIG_SYS_SDRAM_BASE           0x20000000
 #define CONFIG_SYS_SDRAM_SIZE		0x20000000
 
 #ifdef CONFIG_SPL_BUILD
@@ -31,12 +31,10 @@
 #endif
 
 /* NAND flash */
-#define CONFIG_CMD_NAND
-
 #ifdef CONFIG_CMD_NAND
 #define CONFIG_NAND_ATMEL
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_SYS_NAND_BASE		ATMEL_BASE_CS3
+#define CONFIG_SYS_NAND_BASE		0x80000000
 /* our ALE is AD21 */
 #define CONFIG_SYS_NAND_MASK_ALE	(1 << 21)
 /* our CLE is AD22 */
@@ -45,23 +43,6 @@
 /* PMECC & PMERRLOC */
 #define CONFIG_ATMEL_NAND_HWECC
 #define CONFIG_ATMEL_NAND_HW_PMECC
-#endif
-
-/* LCD */
-#define LCD_BPP				LCD_COLOR16
-#define LCD_OUTPUT_BPP                  18
-#define CONFIG_LCD_LOGO
-#define CONFIG_LCD_INFO
-#define CONFIG_LCD_INFO_BELOW_LOGO
-#define CONFIG_ATMEL_HLCD
-#define CONFIG_ATMEL_LCD_RGB565
-
-#ifdef CONFIG_SYS_USE_SERIALFLASH
-/* override the bootcmd, bootargs and other configuration for spi flash env*/
-#elif CONFIG_SYS_USE_NANDFLASH
-/* override the bootcmd, bootargs and other configuration for nandflash env*/
-#elif CONFIG_SYS_USE_MMC
-/* override the bootcmd, bootargs and other configuration for sd/mmc env */
 #endif
 
 /* SPL */
@@ -75,14 +56,18 @@
 
 #define CONFIG_SYS_MONITOR_LEN		(512 << 10)
 
-#ifdef CONFIG_SYS_USE_MMC
-#define CONFIG_SPL_LDSCRIPT		arch/arm/mach-at91/armv7/u-boot-spl.lds
+#ifdef CONFIG_SD_BOOT
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME		"u-boot.img"
 
-#elif CONFIG_SYS_USE_NANDFLASH
+#elif CONFIG_SPI_BOOT
+#define CONFIG_SPL_SPI_LOAD
+#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x10000
+
+#elif CONFIG_NAND_BOOT
 #define CONFIG_SPL_NAND_DRIVERS
 #define CONFIG_SPL_NAND_BASE
+#endif
 #define CONFIG_PMECC_CAP		8
 #define CONFIG_PMECC_SECTOR_SIZE	512
 #define CONFIG_SYS_NAND_U_BOOT_OFFS	0x40000
@@ -94,9 +79,4 @@
 #define CONFIG_SYS_NAND_BAD_BLOCK_POS	0x0
 #define CONFIG_SPL_GENERATE_ATMEL_PMECC_HEADER
 
-#elif CONFIG_SYS_USE_SERIALFLASH
-#define CONFIG_SPL_SPI_LOAD
-#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x10000
-
-#endif
 #endif

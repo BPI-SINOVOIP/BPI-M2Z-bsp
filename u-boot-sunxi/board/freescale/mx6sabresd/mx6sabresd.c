@@ -10,12 +10,13 @@
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/iomux.h>
 #include <asm/arch/mx6-pins.h>
+#include <asm/mach-imx/spi.h>
 #include <linux/errno.h>
 #include <asm/gpio.h>
-#include <asm/imx-common/mxc_i2c.h>
-#include <asm/imx-common/iomux-v3.h>
-#include <asm/imx-common/boot_mode.h>
-#include <asm/imx-common/video.h>
+#include <asm/mach-imx/mxc_i2c.h>
+#include <asm/mach-imx/iomux-v3.h>
+#include <asm/mach-imx/boot_mode.h>
+#include <asm/mach-imx/video.h>
 #include <mmc.h>
 #include <fsl_esdhc.h>
 #include <miiphy.h>
@@ -25,10 +26,12 @@
 #include <asm/io.h>
 #include <asm/arch/sys_proto.h>
 #include <i2c.h>
+#include <input.h>
 #include <power/pmic.h>
 #include <power/pfuze100_pmic.h>
 #include "../common/pfuze.h"
 #include <usb.h>
+#include <usb/ehci-ci.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -620,9 +623,6 @@ int board_ehci_power(int port, int on)
 int board_early_init_f(void)
 {
 	setup_iomux_uart();
-#if defined(CONFIG_VIDEO_IPUV3)
-	setup_display();
-#endif
 
 	return 0;
 }
@@ -639,6 +639,9 @@ int board_init(void)
 		setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &mx6q_i2c_pad_info1);
 	else
 		setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &mx6dl_i2c_pad_info1);
+#if defined(CONFIG_VIDEO_IPUV3)
+	setup_display();
+#endif
 #ifdef CONFIG_USB_EHCI_MX6
 	setup_usb();
 #endif
@@ -700,14 +703,14 @@ int board_late_init(void)
 #endif
 
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	setenv("board_name", "SABRESD");
+	env_set("board_name", "SABRESD");
 
 	if (is_mx6dqp())
-		setenv("board_rev", "MX6QP");
+		env_set("board_rev", "MX6QP");
 	else if (is_mx6dq())
-		setenv("board_rev", "MX6Q");
+		env_set("board_rev", "MX6Q");
 	else if (is_mx6sdl())
-		setenv("board_rev", "MX6DL");
+		env_set("board_rev", "MX6DL");
 #endif
 
 	return 0;
@@ -745,23 +748,6 @@ static void ccgr_init(void)
 	writel(0x00FFF300, &ccm->CCGR4);
 	writel(0x0F0000C3, &ccm->CCGR5);
 	writel(0x000003FF, &ccm->CCGR6);
-}
-
-static void gpr_init(void)
-{
-	struct iomuxc *iomux = (struct iomuxc *)IOMUXC_BASE_ADDR;
-
-	/* enable AXI cache for VDOA/VPU/IPU */
-	writel(0xF00000CF, &iomux->gpr[4]);
-	if (is_mx6dqp()) {
-		/* set IPU AXI-id1 Qos=0x1 AXI-id0/2/3 Qos=0x7 */
-		writel(0x007F007F, &iomux->gpr[6]);
-		writel(0x007F007F, &iomux->gpr[7]);
-	} else {
-		/* set IPU AXI-id0 Qos=0xf(bypass) AXI-id1 Qos=0x7 */
-		writel(0x007F007F, &iomux->gpr[6]);
-		writel(0x007F007F, &iomux->gpr[7]);
-	}
 }
 
 static int mx6q_dcd_table[] = {

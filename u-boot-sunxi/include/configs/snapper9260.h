@@ -119,27 +119,16 @@
 #define CONFIG_BOOTP_HOSTNAME
 
 /* Environment settings */
-#define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_OFFSET		(512 << 10)
 #define CONFIG_ENV_SIZE			(256 << 10)
 #define CONFIG_ENV_OVERWRITE
-#define CONFIG_BOOTARGS			"console=ttyS0,115200 ip=any"
 
 /* Console settings */
-#define CONFIG_SYS_CBSIZE		256
-#define CONFIG_SYS_MAXARGS		16
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE +		\
-					 sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_AUTO_COMPLETE
 
 /* U-Boot memory settings */
 #define CONFIG_SYS_MALLOC_LEN		(1 << 20)
-
-/* Command line configuration */
-#define CONFIG_CMD_NAND
-#define CONFIG_CMD_PCA953X
-#define CONFIG_CMD_PCA953X_INFO
 
 #endif /* __CONFIG_H */

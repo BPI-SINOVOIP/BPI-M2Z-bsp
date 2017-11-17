@@ -10,13 +10,13 @@
 #include <fdt_support.h>
 #include <fdtdec.h>
 #include <linux/errno.h>
+#include <linux/kernel.h>
+#include <linux/printk.h>
 #include <linux/sizes.h>
+#include <asm/global_data.h>
 
 #include "sg-regs.h"
 #include "soc-info.h"
-
-#define pr_warn(fmt, args...)	printf(fmt, ##args)
-#define pr_err(fmt, args...)	printf(fmt, ##args)
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -27,15 +27,6 @@ struct uniphier_memif_data {
 };
 
 static const struct uniphier_memif_data uniphier_memif_data[] = {
-	{
-		.soc_id = UNIPHIER_SLD3_ID,
-		.sparse_ch1_base = 0xc0000000,
-		/*
-		 * In fact, SLD3 has DRAM ch2, but the memory regions for ch1
-		 * and ch2 overlap, and host cannot get access to them at the
-		 * same time.  Hide the ch2 from U-Boot.
-		 */
-	},
 	{
 		.soc_id = UNIPHIER_LD4_ID,
 		.sparse_ch1_base = 0xc0000000,
@@ -276,8 +267,8 @@ int ft_board_setup(void *fdt, bd_t *bd)
 		if (ret)
 			return -ENOSPC;
 
-		printf("   Reserved memory region for DRAM PHY training: addr=%lx size=%lx\n",
-		       rsv_addr, rsv_size);
+		pr_notice("   Reserved memory region for DRAM PHY training: addr=%lx size=%lx\n",
+			  rsv_addr, rsv_size);
 	}
 
 	return 0;

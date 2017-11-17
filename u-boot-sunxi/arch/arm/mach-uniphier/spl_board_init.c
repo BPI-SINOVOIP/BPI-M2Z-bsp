@@ -24,35 +24,24 @@ struct uniphier_spl_initdata {
 };
 
 static const struct uniphier_spl_initdata uniphier_spl_initdata[] = {
-#if defined(CONFIG_ARCH_UNIPHIER_SLD3)
-	{
-		.soc_id = UNIPHIER_SLD3_ID,
-		.bcu_init = uniphier_sld3_bcu_init,
-		.early_clk_init = uniphier_sld3_early_clk_init,
-		.dpll_init = uniphier_sld3_dpll_init,
-		.memconf_init = uniphier_memconf_3ch_no_disbit_init,
-		.dram_clk_init = uniphier_sld3_dram_clk_init,
-		.umc_init = uniphier_sld3_umc_init,
-	},
-#endif
 #if defined(CONFIG_ARCH_UNIPHIER_LD4)
 	{
 		.soc_id = UNIPHIER_LD4_ID,
 		.bcu_init = uniphier_ld4_bcu_init,
-		.early_clk_init = uniphier_sld3_early_clk_init,
+		.early_clk_init = uniphier_ld4_early_clk_init,
 		.dpll_init = uniphier_ld4_dpll_init,
 		.memconf_init = uniphier_memconf_2ch_init,
-		.dram_clk_init = uniphier_sld3_dram_clk_init,
+		.dram_clk_init = uniphier_ld4_dram_clk_init,
 		.umc_init = uniphier_ld4_umc_init,
 	},
 #endif
 #if defined(CONFIG_ARCH_UNIPHIER_PRO4)
 	{
 		.soc_id = UNIPHIER_PRO4_ID,
-		.early_clk_init = uniphier_sld3_early_clk_init,
+		.early_clk_init = uniphier_ld4_early_clk_init,
 		.dpll_init = uniphier_pro4_dpll_init,
 		.memconf_init = uniphier_memconf_2ch_init,
-		.dram_clk_init = uniphier_sld3_dram_clk_init,
+		.dram_clk_init = uniphier_ld4_dram_clk_init,
 		.umc_init = uniphier_pro4_umc_init,
 	},
 #endif
@@ -60,17 +49,17 @@ static const struct uniphier_spl_initdata uniphier_spl_initdata[] = {
 	{
 		.soc_id = UNIPHIER_SLD8_ID,
 		.bcu_init = uniphier_ld4_bcu_init,
-		.early_clk_init = uniphier_sld3_early_clk_init,
+		.early_clk_init = uniphier_ld4_early_clk_init,
 		.dpll_init = uniphier_sld8_dpll_init,
 		.memconf_init = uniphier_memconf_2ch_init,
-		.dram_clk_init = uniphier_sld3_dram_clk_init,
+		.dram_clk_init = uniphier_ld4_dram_clk_init,
 		.umc_init = uniphier_sld8_umc_init,
 	},
 #endif
 #if defined(CONFIG_ARCH_UNIPHIER_PRO5)
 	{
 		.soc_id = UNIPHIER_PRO5_ID,
-		.early_clk_init = uniphier_sld3_early_clk_init,
+		.early_clk_init = uniphier_ld4_early_clk_init,
 		.dpll_init = uniphier_pro5_dpll_init,
 		.memconf_init = uniphier_memconf_2ch_init,
 		.dram_clk_init = uniphier_pro5_dram_clk_init,
@@ -80,7 +69,7 @@ static const struct uniphier_spl_initdata uniphier_spl_initdata[] = {
 #if defined(CONFIG_ARCH_UNIPHIER_PXS2)
 	{
 		.soc_id = UNIPHIER_PXS2_ID,
-		.early_clk_init = uniphier_sld3_early_clk_init,
+		.early_clk_init = uniphier_ld4_early_clk_init,
 		.dpll_init = uniphier_pxs2_dpll_init,
 		.memconf_init = uniphier_memconf_3ch_init,
 		.dram_clk_init = uniphier_pxs2_dram_clk_init,
@@ -90,31 +79,11 @@ static const struct uniphier_spl_initdata uniphier_spl_initdata[] = {
 #if defined(CONFIG_ARCH_UNIPHIER_LD6B)
 	{
 		.soc_id = UNIPHIER_LD6B_ID,
-		.early_clk_init = uniphier_sld3_early_clk_init,
+		.early_clk_init = uniphier_ld4_early_clk_init,
 		.dpll_init = uniphier_pxs2_dpll_init,
 		.memconf_init = uniphier_memconf_3ch_init,
 		.dram_clk_init = uniphier_pxs2_dram_clk_init,
 		.umc_init = uniphier_pxs2_umc_init,
-	},
-#endif
-#if defined(CONFIG_ARCH_UNIPHIER_LD11)
-	{
-		.soc_id = UNIPHIER_LD11_ID,
-		.early_clk_init = uniphier_ld11_early_clk_init,
-		.dpll_init = uniphier_ld11_dpll_init,
-		.memconf_init = uniphier_memconf_2ch_init,
-		.dram_clk_init = uniphier_ld11_dram_clk_init,
-		.umc_init = uniphier_ld11_umc_init,
-	},
-#endif
-#if defined(CONFIG_ARCH_UNIPHIER_LD20)
-	{
-		.soc_id = UNIPHIER_LD20_ID,
-		.early_clk_init = uniphier_ld11_early_clk_init,
-		.dpll_init = uniphier_ld20_dpll_init,
-		.memconf_init = uniphier_memconf_3ch_init,
-		.dram_clk_init = uniphier_ld20_dram_clk_init,
-		.umc_init = uniphier_ld20_umc_init,
 	},
 #endif
 };
@@ -141,9 +110,7 @@ void spl_board_init(void)
 	if (initdata->bcu_init)
 		initdata->bcu_init(bd);
 
-
 	initdata->early_clk_init();
-
 
 #ifdef CONFIG_SPL_SERIAL_SUPPORT
 	preloader_console_init();
@@ -168,8 +135,4 @@ void spl_board_init(void)
 		pr_err("failed to init DRAM\n");
 		hang();
 	}
-
-#ifdef CONFIG_ARM64
-	dcache_disable();
-#endif
 }

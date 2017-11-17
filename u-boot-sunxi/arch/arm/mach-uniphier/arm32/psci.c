@@ -7,8 +7,10 @@
 
 #include <common.h>
 #include <linux/bitops.h>
+#include <linux/delay.h>
 #include <linux/io.h>
 #include <linux/kernel.h>
+#include <linux/printk.h>
 #include <linux/psci.h>
 #include <linux/sizes.h>
 #include <asm/processor.h>
@@ -29,7 +31,6 @@ u32 uniphier_smp_booted[CONFIG_ARMV7_PSCI_NR_CPUS];
 static int uniphier_get_nr_cpus(void)
 {
 	switch (uniphier_get_soc_id()) {
-	case UNIPHIER_SLD3_ID:
 	case UNIPHIER_PRO4_ID:
 	case UNIPHIER_PRO5_ID:
 		return 2;
@@ -92,7 +93,7 @@ static void uniphier_smp_kick_all_cpus(void)
 	}
 
 	if (!timeout)
-		printf("warning: some of secondary CPUs may not boot\n");
+		pr_warn("warning: some of secondary CPUs may not boot\n");
 
 	uniphier_cache_disable();
 }

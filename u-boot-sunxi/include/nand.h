@@ -44,7 +44,6 @@ extern int board_nand_init(struct nand_chip *nand);
 #endif
 
 extern int nand_curr_device;
-extern struct mtd_info *nand_info[];
 
 static inline int nand_read(struct mtd_info *info, loff_t ofs, size_t *len,
 			    u_char *buf)
@@ -144,5 +143,14 @@ int spl_nand_erase_one(int block, int page);
 
 /* platform specific init functions */
 void sunxi_nand_init(void);
+
+/*
+ * get_nand_dev_by_index - Get the nand info based in index.
+ *
+ * @dev - index to the nand device.
+ *
+ * returns pointer to the nand device info structure or NULL on failure.
+ */
+struct mtd_info *get_nand_dev_by_index(int dev);
 
 #endif /* _NAND_H_ */

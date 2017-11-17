@@ -19,7 +19,6 @@
 #define CONFIG_MACH_TYPE		MACH_TYPE_PEPPER
 
 #define CONFIG_ENV_SIZE			(128 << 10)	/* 128 KiB */
-#define CONFIG_ENV_IS_NOWHERE
 
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -78,14 +77,9 @@
 #define CONFIG_SYS_NS16550_COM1		0x44e09000
 
 /* Ethernet support */
-#define CONFIG_PHY_GIGE
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_ADDR			0
-#define CONFIG_PHY_MICREL
-#define CONFIG_PHY_MICREL_KSZ9021
 #define CONFIG_PHY_RESET_DELAY 1000
 
 /* SPL */
-#define CONFIG_SPL_LDSCRIPT		"arch/arm/mach-omap2/u-boot-spl.lds"
 
 #endif /* __CONFIG_PEPPER_H */

@@ -34,11 +34,11 @@ static void setup_boot_mode(void)
 	switch (boot_mode) {
 	case BOOT_FASTBOOT:
 		printf("enter fastboot!\n");
-		setenv("preboot", "setenv preboot; fastboot usb0");
+		env_set("preboot", "setenv preboot; fastboot usb0");
 		break;
 	case BOOT_UMS:
 		printf("enter UMS!\n");
-		setenv("preboot", "setenv preboot; ums mmc 0");
+		env_set("preboot", "setenv preboot; ums mmc 0");
 		break;
 	}
 }
@@ -60,12 +60,18 @@ int board_init(void)
 	return 0;
 }
 
+#if !CONFIG_IS_ENABLED(RAM)
+/*
+ * When CONFIG_RAM is enabled, the dram_init() function is implemented
+ * in sdram_common.c.
+ */
 int dram_init(void)
 {
 	gd->ram_size = sdram_size();
 
 	return 0;
 }
+#endif
 
 #ifndef CONFIG_SYS_DCACHE_OFF
 void enable_caches(void)

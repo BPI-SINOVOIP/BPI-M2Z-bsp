@@ -239,11 +239,11 @@ void eth_set_current(void);		/* set nterface to ethcur var */
 
 int eth_get_dev_index(void);		/* get the device index */
 void eth_parse_enetaddr(const char *addr, uchar *enetaddr);
-int eth_getenv_enetaddr(const char *name, uchar *enetaddr);
-int eth_setenv_enetaddr(const char *name, const uchar *enetaddr);
+int eth_env_get_enetaddr(const char *name, uchar *enetaddr);
+int eth_env_set_enetaddr(const char *name, const uchar *enetaddr);
 
 /**
- * eth_setenv_enetaddr_by_index() - set the MAC address environment variable
+ * eth_env_set_enetaddr_by_index() - set the MAC address environment variable
  *
  * This sets up an environment variable with the given MAC address (@enetaddr).
  * The environment variable to be set is defined by <@base_name><@index>addr.
@@ -255,7 +255,7 @@ int eth_setenv_enetaddr(const char *name, const uchar *enetaddr);
  * @enetaddr:   Pointer to MAC address to put into the variable
  * @return 0 if OK, other value on error
  */
-int eth_setenv_enetaddr_by_index(const char *base_name, int index,
+int eth_env_set_enetaddr_by_index(const char *base_name, int index,
 				 uchar *enetaddr);
 
 
@@ -275,7 +275,7 @@ int usb_ether_init(void);
  * Returns:
  *	Return true if the address is valid.
  */
-int eth_getenv_enetaddr_by_index(const char *base_name, int index,
+int eth_env_get_enetaddr_by_index(const char *base_name, int index,
 				 uchar *enetaddr);
 
 int eth_init(void);			/* Initialize the device */
@@ -308,7 +308,7 @@ struct ethernet_hdr {
 	u8		et_dest[ARP_HLEN];	/* Destination node	*/
 	u8		et_src[ARP_HLEN];	/* Source node		*/
 	u16		et_protlen;		/* Protocol or length	*/
-};
+} __attribute__((packed));
 
 /* Ethernet header size */
 #define ETHER_HDR_SIZE	(sizeof(struct ethernet_hdr))
@@ -326,7 +326,7 @@ struct e802_hdr {
 	u8		et_snap2;
 	u8		et_snap3;
 	u16		et_prot;		/* 802 protocol		*/
-};
+} __attribute__((packed));
 
 /* 802 + SNAP + ethernet header size */
 #define E802_HDR_SIZE	(sizeof(struct e802_hdr))
@@ -340,7 +340,7 @@ struct vlan_ethernet_hdr {
 	u16		vet_vlan_type;		/* PROT_VLAN		*/
 	u16		vet_tag;		/* TAG of VLAN		*/
 	u16		vet_type;		/* protocol type	*/
-};
+} __attribute__((packed));
 
 /* VLAN Ethernet header size */
 #define VLAN_ETHER_HDR_SIZE	(sizeof(struct vlan_ethernet_hdr))
@@ -369,7 +369,7 @@ struct ip_hdr {
 	u16		ip_sum;		/* checksum			*/
 	struct in_addr	ip_src;		/* Source IP address		*/
 	struct in_addr	ip_dst;		/* Destination IP address	*/
-};
+} __attribute__((packed));
 
 #define IP_OFFS		0x1fff /* ip offset *= 8 */
 #define IP_FLAGS	0xe000 /* first 3 bits */
@@ -397,7 +397,7 @@ struct ip_udp_hdr {
 	u16		udp_dst;	/* UDP destination port		*/
 	u16		udp_len;	/* Length of UDP packet		*/
 	u16		udp_xsum;	/* Checksum			*/
-};
+} __attribute__((packed));
 
 #define IP_UDP_HDR_SIZE		(sizeof(struct ip_udp_hdr))
 #define UDP_HDR_SIZE		(IP_UDP_HDR_SIZE - IP_HDR_SIZE)
@@ -435,7 +435,7 @@ struct arp_hdr {
 	u8		ar_tha[];	/* Target hardware address	*/
 	u8		ar_tpa[];	/* Target protocol address	*/
 #endif /* 0 */
-};
+} __attribute__((packed));
 
 #define ARP_HDR_SIZE	(8+20)		/* Size assuming ethernet	*/
 
@@ -470,7 +470,7 @@ struct icmp_hdr {
 		} frag;
 		u8 data[0];
 	} un;
-};
+} __attribute__((packed));
 
 #define ICMP_HDR_SIZE		(sizeof(struct icmp_hdr))
 #define IP_ICMP_HDR_SIZE	(IP_HDR_SIZE + ICMP_HDR_SIZE)
@@ -834,7 +834,7 @@ void vlan_to_string(ushort x, char *s);
 ushort string_to_vlan(const char *s);
 
 /* read a VLAN id from an environment variable */
-ushort getenv_vlan(char *);
+ushort env_get_vlan(char *);
 
 /* copy a filename (allow for "..." notation, limit length) */
 void copy_filename(char *dst, const char *src, int size);

@@ -128,7 +128,6 @@
 #define CONFIG_SYS_SCSI_MAX_LUN		1
 #define CONFIG_SYS_SCSI_MAX_DEVICE	(CONFIG_SYS_SCSI_MAX_SCSI_ID * \
 					 CONFIG_SYS_SCSI_MAX_LUN)
-#define CONFIG_SCSI
 #endif
 
 #define CONFIG_SETUP_MEMORY_TAGS
@@ -155,7 +154,13 @@
 #endif
 
 #if defined(CONFIG_ENV_IS_IN_MMC)
-#define CONFIG_SYS_MMC_ENV_DEV		0	/* first detected MMC controller */
+#if CONFIG_MMC_SUNXI_SLOT_EXTRA != -1
+/* If we have two devices (most likely eMMC + MMC), favour the eMMC */
+#define CONFIG_SYS_MMC_ENV_DEV		1
+#else
+/* Otherwise, use the only device we have */
+#define CONFIG_SYS_MMC_ENV_DEV		0
+#endif
 #define CONFIG_SYS_MMC_MAX_DEVICE	4
 #elif defined(CONFIG_ENV_IS_NOWHERE)
 #define CONFIG_ENV_SIZE			(128 << 10)
@@ -174,10 +179,6 @@
  */
 #define CONFIG_SYS_CBSIZE	1024	/* Console I/O Buffer Size */
 #define CONFIG_SYS_PBSIZE	1024	/* Print Buffer Size */
-#define CONFIG_SYS_MAXARGS	16	/* max number of command args */
-
-/* Boot Argument Buffer Size */
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 
 /* standalone support */
 #define CONFIG_STANDALONE_LOAD_ADDR	CONFIG_SYS_LOAD_ADDR
@@ -208,10 +209,6 @@
 #endif
 
 #define CONFIG_SPL_STACK		LOW_LEVEL_SRAM_STACK
-
-#ifndef CONFIG_ARM64
-#define CONFIG_SPL_LDSCRIPT "arch/arm/cpu/armv7/sunxi/u-boot-spl.lds"
-#endif
 
 #define CONFIG_SPL_PAD_TO		32768		/* decimal for 'dd' */
 
@@ -277,17 +274,12 @@ extern int soft_i2c_gpio_scl;
 /* GPIO */
 #define CONFIG_SUNXI_GPIO
 
-#ifdef CONFIG_VIDEO
+#ifdef CONFIG_VIDEO_SUNXI
 /*
  * The amount of RAM to keep free at the top of RAM when relocating u-boot,
  * to use as framebuffer. This must be a multiple of 4096.
  */
 #define CONFIG_SUNXI_MAX_FB_SIZE (16 << 20)
-
-/* Do we want to initialize a simple FB? */
-#define CONFIG_VIDEO_DT_SIMPLEFB
-
-#define CONFIG_VIDEO_SUNXI
 
 #define CONFIG_VIDEO_LOGO
 #ifdef BPI
@@ -301,17 +293,15 @@ extern int soft_i2c_gpio_scl;
 /* allow both serial and cfb console. */
 /* stop x86 thinking in cfbconsole from trying to init a pc keyboard */
 
-#endif /* CONFIG_VIDEO */
+#endif /* CONFIG_VIDEO_SUNXI */
 
 /* Ethernet support */
-#ifdef CONFIG_SUNXI_EMAC
+#ifdef CONFIG_SUN4I_EMAC
 #define CONFIG_PHY_ADDR		1
 #define CONFIG_MII			/* MII PHY management		*/
-#define CONFIG_PHYLIB
 #endif
 
-#ifdef CONFIG_SUNXI_GMAC
-#define CONFIG_PHY_GIGE			/* GMAC can use gigabit PHY	*/
+#ifdef CONFIG_SUN7I_GMAC
 #define CONFIG_PHY_ADDR		1
 #define CONFIG_MII			/* MII PHY management		*/
 #define CONFIG_PHY_REALTEK
@@ -321,7 +311,6 @@ extern int soft_i2c_gpio_scl;
 #define CONFIG_USB_OHCI_NEW
 #define CONFIG_USB_OHCI_SUNXI
 #define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS 1
-#define CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS 1
 #endif
 
 #ifdef CONFIG_USB_MUSB_SUNXI
@@ -329,21 +318,7 @@ extern int soft_i2c_gpio_scl;
 #endif
 
 #ifdef CONFIG_USB_MUSB_GADGET
-#define CONFIG_USB_FUNCTION_FASTBOOT
 #define CONFIG_USB_FUNCTION_MASS_STORAGE
-#endif
-
-#ifdef CONFIG_USB_FUNCTION_FASTBOOT
-#define CONFIG_CMD_FASTBOOT
-#define CONFIG_FASTBOOT_BUF_ADDR	CONFIG_SYS_LOAD_ADDR
-#define CONFIG_FASTBOOT_BUF_SIZE	0x2000000
-#define CONFIG_ANDROID_BOOT_IMAGE
-
-#define CONFIG_FASTBOOT_FLASH
-
-#ifdef CONFIG_MMC
-#define CONFIG_FASTBOOT_FLASH_MMC_DEV	0
-#endif
 #endif
 
 #ifdef CONFIG_USB_FUNCTION_MASS_STORAGE
@@ -351,7 +326,6 @@ extern int soft_i2c_gpio_scl;
 
 #ifdef CONFIG_USB_KEYBOARD
 #define CONFIG_PREBOOT
-#define CONFIG_SYS_USB_EVENT_POLL_VIA_INT_QUEUE
 #endif
 
 #define CONFIG_MISC_INIT_R
@@ -419,15 +393,28 @@ extern int soft_i2c_gpio_scl;
 	"ramdisk ram " RAMDISK_ADDR_R " 0x4000000\0"
 
 #ifdef CONFIG_MMC
-#define BOOT_TARGET_DEVICES_MMC(func) func(MMC, mmc, 0)
 #if CONFIG_MMC_SUNXI_SLOT_EXTRA != -1
-#define BOOT_TARGET_DEVICES_MMC_EXTRA(func) func(MMC, mmc, 1)
+#define BOOTENV_DEV_MMC_AUTO(devtypeu, devtypel, instance)		\
+	BOOTENV_DEV_MMC(MMC, mmc, 0)					\
+	BOOTENV_DEV_MMC(MMC, mmc, 1)					\
+	"bootcmd_mmc_auto="						\
+		"if test ${mmc_bootdev} -eq 1; then "			\
+			"run bootcmd_mmc1; "				\
+			"run bootcmd_mmc0; "				\
+		"elif test ${mmc_bootdev} -eq 0; then "			\
+			"run bootcmd_mmc0; "				\
+			"run bootcmd_mmc1; "				\
+		"fi\0"
+
+#define BOOTENV_DEV_NAME_MMC_AUTO(devtypeu, devtypel, instance) \
+	"mmc_auto "
+
+#define BOOT_TARGET_DEVICES_MMC(func) func(MMC_AUTO, mmc_auto, na)
 #else
-#define BOOT_TARGET_DEVICES_MMC_EXTRA(func)
+#define BOOT_TARGET_DEVICES_MMC(func) func(MMC, mmc, 0)
 #endif
 #else
 #define BOOT_TARGET_DEVICES_MMC(func)
-#define BOOT_TARGET_DEVICES_MMC_EXTRA(func)
 #endif
 
 #ifdef CONFIG_AHCI
@@ -455,7 +442,6 @@ extern int soft_i2c_gpio_scl;
 #define BOOT_TARGET_DEVICES(func) \
 	func(FEL, fel, na) \
 	BOOT_TARGET_DEVICES_MMC(func) \
-	BOOT_TARGET_DEVICES_MMC_EXTRA(func) \
 	BOOT_TARGET_DEVICES_SCSI(func) \
 	BOOT_TARGET_DEVICES_USB(func) \
 	func(PXE, pxe, na) \

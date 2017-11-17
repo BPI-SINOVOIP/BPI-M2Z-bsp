@@ -52,7 +52,7 @@ static void print_backtrace(unsigned long *sp)
 	printf("\n");
 }
 
-void show_regs(struct pt_regs *regs)
+static void show_regs(struct pt_regs *regs)
 {
 	int i;
 
@@ -154,12 +154,4 @@ void DebugException(struct pt_regs *regs)
 {
 	printf("Debugger trap at @ %lx\n", regs->nip);
 	show_regs(regs);
-}
-
-/* Probe an address by reading.  If not present, return -1, otherwise
- * return 0.
- */
-int addr_probe(uint *addr)
-{
-	return 0;
 }

@@ -1,6 +1,6 @@
 /*
- * (C) Copyright 2016
- * Vikas Manocha, <vikas.manocha@st.com>
+ * Copyright (C) 2016, STMicroelectronics - All Rights Reserved
+ * Author(s): Vikas Manocha, <vikas.manocha@st.com> for STMicroelectronics.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -13,8 +13,6 @@
 #include <asm/armv7m.h>
 #include <asm/arch/stm32.h>
 #include <asm/arch/gpio.h>
-#include <asm/arch/fmc.h>
-#include <dm/platform_data/serial_stm32x7.h>
 #include <asm/arch/stm32_periph.h>
 #include <asm/arch/stm32_defs.h>
 #include <asm/arch/syscfg.h>

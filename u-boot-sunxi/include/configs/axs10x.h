@@ -55,7 +55,6 @@
  * Ethernet PHY configuration
  */
 #define CONFIG_MII
-#define CONFIG_PHY_GIGE
 
 /*
  * USB 1.1 configuration
@@ -63,40 +62,24 @@
 #define CONFIG_USB_OHCI_NEW
 #define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS 1
 
-/*
- * Commands still not supported in Kconfig
- */
-#define CONFIG_CMD_NAND
-
 #define CONFIG_AUTO_COMPLETE
-#define CONFIG_SYS_MAXARGS		16
 #define CONFIG_CMDLINE_EDITING
 
 /*
  * Environment settings
  */
-#define CONFIG_ENV_IS_IN_FAT
 #define CONFIG_ENV_SIZE			SZ_16K
-#define FAT_ENV_INTERFACE		"mmc"
-#define FAT_ENV_DEVICE_AND_PART		"0:1"
-#define FAT_ENV_FILE			"uboot.env"
-#define CONFIG_FAT_WRITE
 
 /*
  * Environment configuration
  */
 #define CONFIG_BOOTFILE			"uImage"
-#define CONFIG_BOOTARGS			"console=ttyS3,115200n8"
 #define CONFIG_LOADADDR			CONFIG_SYS_LOAD_ADDR
 
 /*
  * Console configuration
  */
 #define CONFIG_SYS_LONGHELP
-#define CONFIG_SYS_CBSIZE		SZ_256
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-						sizeof(CONFIG_SYS_PROMPT) + 16)
 
 /*
  * Misc utility configuration

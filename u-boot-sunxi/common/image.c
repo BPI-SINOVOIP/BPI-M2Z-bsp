@@ -15,10 +15,6 @@
 #include <status_led.h>
 #endif
 
-#ifdef CONFIG_HAS_DATAFLASH
-#include <dataflash.h>
-#endif
-
 #ifdef CONFIG_LOGBUFFER
 #include <logbuff.h>
 #endif
@@ -167,6 +163,7 @@ static const table_entry_t uimage_type[] = {
 	{	IH_TYPE_FPGA,       "fpga",       "FPGA Image" },
 	{       IH_TYPE_TEE,        "tee",        "Trusted Execution Environment Image",},
 	{	IH_TYPE_FIRMWARE_IVT, "firmware_ivt", "Firmware with HABv4 IVT" },
+	{       IH_TYPE_PMMC,        "pmmc",        "TI Power Management Micro-Controller Firmware",},
 	{	-1,		    "",		  "",			},
 };
 
@@ -388,9 +385,6 @@ void image_print_contents(const void *ptr)
  * flag. Verification done covers data and header integrity and os/type/arch
  * fields checking.
  *
- * If dataflash support is enabled routine checks for dataflash addresses
- * and handles required dataflash reads.
- *
  * returns:
  *     pointer to a ramdisk image header, if image was found and valid
  *     otherwise, return NULL
@@ -465,9 +459,9 @@ static int on_loadaddr(const char *name, const char *value, enum env_op op,
 }
 U_BOOT_ENV_CALLBACK(loadaddr, on_loadaddr);
 
-ulong getenv_bootm_low(void)
+ulong env_get_bootm_low(void)
 {
-	char *s = getenv("bootm_low");
+	char *s = env_get("bootm_low");
 	if (s) {
 		ulong tmp = simple_strtoul(s, NULL, 16);
 		return tmp;
@@ -482,11 +476,11 @@ ulong getenv_bootm_low(void)
 #endif
 }
 
-phys_size_t getenv_bootm_size(void)
+phys_size_t env_get_bootm_size(void)
 {
 	phys_size_t tmp, size;
 	phys_addr_t start;
-	char *s = getenv("bootm_size");
+	char *s = env_get("bootm_size");
 	if (s) {
 		tmp = (phys_size_t)simple_strtoull(s, NULL, 16);
 		return tmp;
@@ -500,7 +494,7 @@ phys_size_t getenv_bootm_size(void)
 	size = gd->bd->bi_memsize;
 #endif
 
-	s = getenv("bootm_low");
+	s = env_get("bootm_low");
 	if (s)
 		tmp = (phys_size_t)simple_strtoull(s, NULL, 16);
 	else
@@ -509,10 +503,10 @@ phys_size_t getenv_bootm_size(void)
 	return size - (tmp - start);
 }
 
-phys_size_t getenv_bootm_mapsize(void)
+phys_size_t env_get_bootm_mapsize(void)
 {
 	phys_size_t tmp;
-	char *s = getenv("bootm_mapsize");
+	char *s = env_get("bootm_mapsize");
 	if (s) {
 		tmp = (phys_size_t)simple_strtoull(s, NULL, 16);
 		return tmp;
@@ -521,7 +515,7 @@ phys_size_t getenv_bootm_mapsize(void)
 #if defined(CONFIG_SYS_BOOTMAPSZ)
 	return CONFIG_SYS_BOOTMAPSZ;
 #else
-	return getenv_bootm_size();
+	return env_get_bootm_size();
 #endif
 }
 
@@ -889,81 +883,6 @@ int genimg_get_format(const void *img_addr)
 }
 
 /**
- * genimg_get_image - get image from special storage (if necessary)
- * @img_addr: image start address
- *
- * genimg_get_image() checks if provided image start address is located
- * in a dataflash storage. If so, image is moved to a system RAM memory.
- *
- * returns:
- *     image start address after possible relocation from special storage
- */
-ulong genimg_get_image(ulong img_addr)
-{
-	ulong ram_addr = img_addr;
-
-#ifdef CONFIG_HAS_DATAFLASH
-	ulong h_size, d_size;
-
-	if (addr_dataflash(img_addr)) {
-		void *buf;
-
-		/* ger RAM address */
-		ram_addr = CONFIG_SYS_LOAD_ADDR;
-
-		/* get header size */
-		h_size = image_get_header_size();
-#if IMAGE_ENABLE_FIT
-		if (sizeof(struct fdt_header) > h_size)
-			h_size = sizeof(struct fdt_header);
-#endif
-
-		/* read in header */
-		debug("   Reading image header from dataflash address "
-			"%08lx to RAM address %08lx\n", img_addr, ram_addr);
-
-		buf = map_sysmem(ram_addr, 0);
-		read_dataflash(img_addr, h_size, buf);
-
-		/* get data size */
-		switch (genimg_get_format(buf)) {
-#if defined(CONFIG_IMAGE_FORMAT_LEGACY)
-		case IMAGE_FORMAT_LEGACY:
-			d_size = image_get_data_size(buf);
-			debug("   Legacy format image found at 0x%08lx, "
-					"size 0x%08lx\n",
-					ram_addr, d_size);
-			break;
-#endif
-#if IMAGE_ENABLE_FIT
-		case IMAGE_FORMAT_FIT:
-			d_size = fit_get_size(buf) - h_size;
-			debug("   FIT/FDT format image found at 0x%08lx, "
-					"size 0x%08lx\n",
-					ram_addr, d_size);
-			break;
-#endif
-		default:
-			printf("   No valid image found at 0x%08lx\n",
-				img_addr);
-			return ram_addr;
-		}
-
-		/* read in image data */
-		debug("   Reading image remaining data from dataflash address "
-			"%08lx to RAM address %08lx\n", img_addr + h_size,
-			ram_addr + h_size);
-
-		read_dataflash(img_addr + h_size, d_size,
-				(char *)(buf + h_size));
-
-	}
-#endif /* CONFIG_HAS_DATAFLASH */
-
-	return ram_addr;
-}
-
-/**
  * fit_has_config - check if there is a valid FIT configuration
  * @images: pointer to the bootm command headers structure
  *
@@ -1095,9 +1014,6 @@ int boot_get_ramdisk(int argc, char * const argv[], bootm_headers_t *images,
 		}
 #endif
 
-		/* copy from dataflash if needed */
-		rd_addr = genimg_get_image(rd_addr);
-
 		/*
 		 * Check if there is an initrd image at the
 		 * address provided in the second bootm argument
@@ -1224,7 +1140,8 @@ int boot_ramdisk_high(struct lmb *lmb, ulong rd_data, ulong rd_len,
 	ulong	initrd_high;
 	int	initrd_copy_to_ram = 1;
 
-	if ((s = getenv("initrd_high")) != NULL) {
+	s = env_get("initrd_high");
+	if (s) {
 		/* a value of "no" or a similar string will act like 0,
 		 * turning the "load high" feature off. This is intentional.
 		 */
@@ -1232,7 +1149,7 @@ int boot_ramdisk_high(struct lmb *lmb, ulong rd_data, ulong rd_len,
 		if (initrd_high == ~0)
 			initrd_copy_to_ram = 0;
 	} else {
-		initrd_high = getenv_bootm_mapsize() + getenv_bootm_low();
+		initrd_high = env_get_bootm_mapsize() + env_get_bootm_low();
 	}
 
 
@@ -1328,10 +1245,8 @@ int boot_get_fpga(int argc, char * const argv[], bootm_headers_t *images,
 
 	/*
 	 * Obtain the os FIT header from the images struct
-	 * copy from dataflash if needed
 	 */
 	tmp_img_addr = map_to_sysmem(images->fit_hdr_os);
-	tmp_img_addr = genimg_get_image(tmp_img_addr);
 	buf = map_sysmem(tmp_img_addr, 0);
 	/*
 	 * Check image type. For FIT images get FIT node
@@ -1440,10 +1355,8 @@ int boot_get_loadable(int argc, char * const argv[], bootm_headers_t *images,
 
 	/*
 	 * Obtain the os FIT header from the images struct
-	 * copy from dataflash if needed
 	 */
 	tmp_img_addr = map_to_sysmem(images->fit_hdr_os);
-	tmp_img_addr = genimg_get_image(tmp_img_addr);
 	buf = map_sysmem(tmp_img_addr, 0);
 	/*
 	 * Check image type. For FIT images get FIT node
@@ -1505,7 +1418,7 @@ int boot_get_loadable(int argc, char * const argv[], bootm_headers_t *images,
  * @cmd_end: pointer to a ulong variable, will hold cmdline end
  *
  * boot_get_cmdline() allocates space for kernel command line below
- * BOOTMAPSZ + getenv_bootm_low() address. If "bootargs" U-Boot environemnt
+ * BOOTMAPSZ + env_get_bootm_low() address. If "bootargs" U-Boot environemnt
  * variable is present its contents is copied to allocated kernel
  * command line.
  *
@@ -1519,12 +1432,13 @@ int boot_get_cmdline(struct lmb *lmb, ulong *cmd_start, ulong *cmd_end)
 	char *s;
 
 	cmdline = (char *)(ulong)lmb_alloc_base(lmb, CONFIG_SYS_BARGSIZE, 0xf,
-				getenv_bootm_mapsize() + getenv_bootm_low());
+				env_get_bootm_mapsize() + env_get_bootm_low());
 
 	if (cmdline == NULL)
 		return -1;
 
-	if ((s = getenv("bootargs")) == NULL)
+	s = env_get("bootargs");
+	if (!s)
 		s = "";
 
 	strcpy(cmdline, s);
@@ -1545,7 +1459,7 @@ int boot_get_cmdline(struct lmb *lmb, ulong *cmd_start, ulong *cmd_end)
  * @kbd: double pointer to board info data
  *
  * boot_get_kbd() allocates space for kernel copy of board info data below
- * BOOTMAPSZ + getenv_bootm_low() address and kernel board info is initialized
+ * BOOTMAPSZ + env_get_bootm_low() address and kernel board info is initialized
  * with the current u-boot board info data.
  *
  * returns:
@@ -1555,7 +1469,7 @@ int boot_get_cmdline(struct lmb *lmb, ulong *cmd_start, ulong *cmd_end)
 int boot_get_kbd(struct lmb *lmb, bd_t **kbd)
 {
 	*kbd = (bd_t *)(ulong)lmb_alloc_base(lmb, sizeof(bd_t), 0xf,
-				getenv_bootm_mapsize() + getenv_bootm_low());
+				env_get_bootm_mapsize() + env_get_bootm_low());
 	if (*kbd == NULL)
 		return -1;
 

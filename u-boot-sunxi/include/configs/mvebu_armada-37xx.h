@@ -35,8 +35,6 @@
 #define CONFIG_SETUP_MEMORY_TAGS	/* enable memory tag */
 
 #define	CONFIG_SYS_CBSIZE	1024	/* Console I/O Buff Size */
-#define	CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE \
-		+sizeof(CONFIG_SYS_PROMPT) + 16)	/* Print Buff */
 
 /*
  * Size of malloc() pool
@@ -79,7 +77,6 @@
 #define CONFIG_ENV_SPI_MODE		CONFIG_SF_DEFAULT_MODE
 
 /* Environment in SPI NOR flash */
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_OFFSET		0x180000 /* as Marvell U-Boot version */
 #define CONFIG_ENV_SIZE			(64 << 10) /* 64KiB */
 #define CONFIG_ENV_SECT_SIZE		(64 << 10) /* 64KiB sectors */
@@ -87,33 +84,18 @@
 /*
  * Ethernet Driver configuration
  */
-#define CONFIG_MVNETA		/* Enable Marvell Gbe Controller Driver */
 #define CONFIG_ENV_OVERWRITE	/* ethaddr can be reprogrammed */
-#define CONFIG_PHY_GIGE		/* GbE speed/duplex detect */
 #define CONFIG_ARP_TIMEOUT	200
 #define CONFIG_NET_RETRY_COUNT	50
 #define CONFIG_PHY_MARVELL
 
-/* USB 2.0 */
-#define CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS 3
-
-/* USB 3.0 */
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS 3
-
-#define CONFIG_USB_MAX_CONTROLLER_COUNT (CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS + \
-					 CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS)
+#define CONFIG_USB_MAX_CONTROLLER_COUNT (3 + 3)
 
 /* USB ethernet */
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_ASIX
-#define CONFIG_USB_ETHER_MCS7830
-#define CONFIG_USB_ETHER_RTL8152
-#define CONFIG_USB_ETHER_SMSC95XX
 
 /*
  * SATA/SCSI/AHCI configuration
  */
-#define CONFIG_SCSI
 #define CONFIG_SCSI_AHCI
 #define CONFIG_SCSI_AHCI_PLAT
 #define CONFIG_LIBATA

@@ -9,7 +9,7 @@
 #define __XPRESS_CONFIG_H
 
 #include "mx6_common.h"
-#include <asm/imx-common/gpio.h>
+#include <asm/mach-imx/gpio.h>
 
 /* SPL options */
 #include "imx6_spl.h"
@@ -18,7 +18,7 @@
 #define CONFIG_SYS_MALLOC_LEN		(16 << 20)
 
 #define CONFIG_MXC_UART
-#define CONFIG_MXC_UART_BASE		UART1_BASE
+#define CONFIG_MXC_UART_BASE		MX6UL_UART7_BASE_ADDR
 
 /* MMC Configs */
 #define CONFIG_SYS_FSL_ESDHC_ADDR	USDHC2_BASE_ADDR
@@ -57,7 +57,6 @@
 
 /* Environment is in stored in the eMMC boot partition */
 #define CONFIG_ENV_SIZE			(16 << 10)
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_ENV_OFFSET		(512 << 10)
 #define CONFIG_SYS_MMC_ENV_DEV		0	/* USDHC2 */
 #define CONFIG_SYS_MMC_ENV_PART		1	/* boot parition */
@@ -76,7 +75,6 @@
 #define CONFIG_FEC_MXC_PHYADDR          0x0
 #define CONFIG_FEC_XCV_TYPE             RMII
 #define CONFIG_ETHPRIME			"FEC"
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_SMSC
 
 #define CONFIG_IMX_THERMAL
@@ -89,7 +87,7 @@
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"script=boot.scr\0" \
 	"image=zImage\0" \
-	"console=ttymxc0\0" \
+	"console=ttymxc6\0" \
 	"fdt_high=0xffffffff\0" \
 	"initrd_high=0xffffffff\0" \
 	"fdt_file=undefined\0" \

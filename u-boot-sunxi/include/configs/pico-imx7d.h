@@ -25,7 +25,6 @@
 #define CONFIG_ETHPRIME			"FEC"
 #define CONFIG_FEC_MXC_PHYADDR		1
 
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_ATHEROS
 
 /* ENET1 */
@@ -122,7 +121,6 @@
 
 /* FLASH and environment organization */
 #define CONFIG_ENV_SIZE			SZ_8K
-#define CONFIG_ENV_IS_IN_MMC
 
 #define CONFIG_ENV_OFFSET			(8 * SZ_64K)
 #define CONFIG_SYS_FSL_USDHC_NUM		2

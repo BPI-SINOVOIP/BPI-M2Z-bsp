@@ -31,7 +31,6 @@
 /* Network defines */
 #define CONFIG_DRIVER_TI_CPSW		/* Driver for IP block */
 #define CONFIG_MII			/* Required in net/eth.c */
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_NATSEMI
 
 /*
@@ -73,7 +72,6 @@
 #define CONFIG_SYS_I2C
 #define CONFIG_SYS_OMAP24_I2C_SPEED	100000
 #define CONFIG_SYS_OMAP24_I2C_SLAVE	1
-#define CONFIG_SYS_I2C_OMAP24XX
 
 /*
  * Our platforms make use of SPL to initalize the hardware (primarily
@@ -104,6 +102,5 @@
 #define CONFIG_SYS_SPL_MALLOC_SIZE	CONFIG_SYS_MALLOC_LEN
 
 /* General parts of the framework, required. */
-#define CONFIG_SPL_LDSCRIPT		"arch/arm/mach-omap2/u-boot-spl.lds"
 
 #endif	/* ! __BUR_AM335X_COMMON_H__ */

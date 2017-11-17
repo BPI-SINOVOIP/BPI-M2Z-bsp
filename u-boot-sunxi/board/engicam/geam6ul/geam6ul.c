@@ -18,7 +18,7 @@
 #include <asm/arch/iomux.h>
 #include <asm/arch/mx6-pins.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/imx-common/iomux-v3.h>
+#include <asm/mach-imx/iomux-v3.h>
 
 #include "../common/board.h"
 
@@ -93,7 +93,7 @@ void setup_gpmi_nand(void)
 void setenv_fdt_file(void)
 {
 	if (is_mx6ul())
-		setenv("fdt_file", "imx6ul-geam-kit.dtb");
+		env_set("fdt_file", "imx6ul-geam-kit.dtb");
 }
 
 #ifdef CONFIG_SPL_BUILD

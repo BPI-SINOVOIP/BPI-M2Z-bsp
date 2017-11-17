@@ -98,7 +98,6 @@
 #define EEPROM_ADDR_CHIP 0x120
 
 #undef CONFIG_MII
-#undef CONFIG_PHY_GIGE
 #define CONFIG_PHY_SMSC
 
 #define CONFIG_FACTORYSET
@@ -121,7 +120,6 @@
 
 
 
-#define CONFIG_DFU_MTD
 #undef COMMON_ENV_DFU_ARGS
 #define COMMON_ENV_DFU_ARGS	"dfu_args=run bootargs_defaults;" \
 				"setenv bootargs ${bootargs};" \
@@ -140,26 +138,6 @@
 	"u-boot.env0 mtddev;" \
 	"u-boot.env1 mtddev;" \
 	"rootfs mtddevubi" \
-
-#undef MTDIDS_NAME_STR
-#define MTDIDS_NAME_STR		"omap2-nand_concat"
-#undef MTDIDS_DEFAULT
-#define MTDIDS_DEFAULT		"nand2=" MTDIDS_NAME_STR
-
-#undef MTDPARTS_DEFAULT_V2
-#define MTDPARTS_DEFAULT_V2     "mtdparts=" MTDIDS_NAME_STR ":" \
-				"512k(spl)," \
-				"512k(spl.backup1)," \
-				"512k(spl.backup2)," \
-				"512k(spl.backup3)," \
-				"7680k(u-boot)," \
-				"2048k(u-boot.env0)," \
-				"2048k(u-boot.env1)," \
-				"2048k(mtdoops)," \
-				"-(rootfs)"
-
-#undef MTDPARTS_DEFAULT
-#define MTDPARTS_DEFAULT	MTDPARTS_DEFAULT_V2
 
 #undef CONFIG_ENV_SETTINGS_NAND_V2
 #define CONFIG_ENV_SETTINGS_NAND_V2 \

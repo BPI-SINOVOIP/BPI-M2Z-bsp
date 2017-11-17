@@ -20,7 +20,7 @@ generate_board_config() {
 
 export BOARD=${BPIBOARD}
 export ARCH=arm
-BPICONF=Bananapi_M1_Plus_defconfig
+BPICONF=bananapi_m1_plus_defconfig
 NEWBPICONF=$BPICONF
 
 if [ -z "$MODE" ]; then

@@ -64,11 +64,6 @@
 #define CONFIG_BOOTP_GATEWAY		1
 #define CONFIG_BOOTP_HOSTNAME		1
 
-/*
- * Command line configuration.
- */
-#define CONFIG_CMD_NAND		1
-
 #define CONFIG_JFFS2_CMDLINE		1
 #define CONFIG_JFFS2_NAND		1
 #define CONFIG_JFFS2_DEV		"nand0" /* NAND dev jffs2 lives on */
@@ -119,23 +114,11 @@
 #define CONFIG_SYS_MEMTEST_END		CONFIG_AT91SAM9G45_LCD_BASE
 
 /* bootstrap + u-boot + env + linux in nandflash */
-#define CONFIG_ENV_IS_IN_NAND		1
 #define CONFIG_ENV_OFFSET		0x60000
 #define CONFIG_ENV_OFFSET_REDUND	0x80000
 #define CONFIG_ENV_SIZE			0x20000		/* 1 sector = 128 kB */
 #define CONFIG_BOOTCOMMAND	"nand read 0x72000000 0x200000 0x200000; bootm"
-#define CONFIG_BOOTARGS		"fbcon=rotate:3 console=tty0 " \
-				"console=ttyS0,115200 " \
-				"root=/dev/mtdblock4 " \
-				"mtdparts=atmel_nand:128k(bootstrap)ro," \
-				"256k(uboot)ro,1664k(env)," \
-				"2M(linux)ro,-(root) rw " \
-				"rootfstype=jffs2"
 
-#define CONFIG_SYS_CBSIZE		256
-#define CONFIG_SYS_MAXARGS		16
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_SYS_LONGHELP		1
 #define CONFIG_CMDLINE_EDITING		1
 #define CONFIG_AUTO_COMPLETE

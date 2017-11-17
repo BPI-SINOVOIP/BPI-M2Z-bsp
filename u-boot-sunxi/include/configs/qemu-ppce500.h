@@ -10,8 +10,6 @@
 #ifndef __QEMU_PPCE500_H
 #define __QEMU_PPCE500_H
 
-#define CONFIG_CMD_REGINFO
-
 #undef CONFIG_SYS_TEXT_BASE
 #define CONFIG_SYS_TEXT_BASE	0xf01000 /* 15 MB */
 
@@ -71,8 +69,6 @@ extern unsigned long long get_phys_ccsrbar_addr_early(void);
 
 #define CONFIG_SYS_MONITOR_BASE		CONFIG_SYS_TEXT_BASE
 
-#define CONFIG_ENV_IS_NOWHERE
-
 #define CONFIG_HWCONFIG
 
 #define CONFIG_SYS_INIT_RAM_ADDR		0x00100000
@@ -128,10 +124,6 @@ extern unsigned long long get_phys_ccsrbar_addr_early(void);
  * Command line configuration.
  */
 
-#ifdef CONFIG_PCI
-#define CONFIG_CMD_PCI
-#endif
-
 /*
  * Miscellaneous configurable options
  */
@@ -139,10 +131,6 @@ extern unsigned long long get_phys_ccsrbar_addr_early(void);
 #define CONFIG_CMDLINE_EDITING			/* Command-line editing */
 #define CONFIG_AUTO_COMPLETE			/* add autocompletion support */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
-#define CONFIG_SYS_CBSIZE	256		/* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE+sizeof(CONFIG_SYS_PROMPT)+16)
-#define CONFIG_SYS_MAXARGS	16		/* max number of command args */
-#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE/* Boot Argument Buffer Size */
 
 /*
  * For booting Linux, the board info and command line data

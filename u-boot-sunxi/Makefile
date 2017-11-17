@@ -3,7 +3,7 @@
 #
 
 VERSION = 2017
-PATCHLEVEL = 07
+PATCHLEVEL = 11
 SUBLEVEL =
 EXTRAVERSION =
 NAME =
@@ -349,7 +349,7 @@ OBJDUMP		= $(CROSS_COMPILE)objdump
 AWK		= awk
 PERL		= perl
 PYTHON		?= python
-DTC		= dtc
+DTC		?= $(objtree)/scripts/dtc/dtc
 CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
@@ -360,6 +360,7 @@ KBUILD_CPPFLAGS := -D__KERNEL__ -D__UBOOT__
 KBUILD_CFLAGS   := -Wall -Wstrict-prototypes \
 		   -Wno-format-security \
 		   -fno-builtin -ffreestanding
+KBUILD_CFLAGS	+= -fshort-wchar
 KBUILD_AFLAGS   := -D__ASSEMBLY__
 
 # Read UBOOTRELEASE from include/config/uboot.release (if it exists)
@@ -515,6 +516,9 @@ include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
 	@# than include/config.h.
 	@# Otherwise, 'make silentoldconfig' would be invoked twice.
 	$(Q)touch include/config/auto.conf
+
+u-boot.cfg spl/u-boot.cfg tpl/u-boot.cfg: include/config.h FORCE
+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.autoconf $(@)
 
 -include include/autoconf.mk
 -include include/autoconf.mk.dep
@@ -687,6 +691,7 @@ libs-y += drivers/usb/phy/
 libs-y += drivers/usb/ulpi/
 libs-y += cmd/
 libs-y += common/
+libs-y += env/
 libs-$(CONFIG_API) += api/
 libs-$(CONFIG_HAS_POST) += post/
 libs-y += test/
@@ -791,7 +796,7 @@ ALL-$(CONFIG_REMAKE_ELF) += u-boot.elf
 ALL-$(CONFIG_EFI_APP) += u-boot-app.efi
 ALL-$(CONFIG_EFI_STUB) += u-boot-payload.efi
 
-ifneq ($(BUILD_ROM),)
+ifneq ($(BUILD_ROM)$(CONFIG_BUILD_ROM),)
 ALL-$(CONFIG_X86_RESET_VECTOR) += u-boot.rom
 endif
 
@@ -851,7 +856,7 @@ quiet_cmd_cfgcheck = CFGCHK  $2
 cmd_cfgcheck = $(srctree)/scripts/check-config.sh $2 \
 		$(srctree)/scripts/config_whitelist.txt $(srctree)
 
-all:		$(ALL-y)
+all:		$(ALL-y) cfg
 ifeq ($(CONFIG_DM_I2C_COMPAT)$(CONFIG_SANDBOX),y)
 	@echo "===================== WARNING ======================"
 	@echo "This board uses CONFIG_DM_I2C_COMPAT. Please remove"
@@ -867,13 +872,27 @@ endif
 PHONY += dtbs
 dtbs: dts/dt.dtb
 	@:
-dts/dt.dtb: checkdtc u-boot
+dts/dt.dtb: u-boot
 	$(Q)$(MAKE) $(build)=dts dtbs
 
 quiet_cmd_copy = COPY    $@
       cmd_copy = cp $< $@
 
-ifeq ($(CONFIG_OF_SEPARATE),y)
+ifeq ($(CONFIG_MULTI_DTB_FIT),y)
+
+fit-dtb.blob: dts/dt.dtb FORCE
+	$(call if_changed,mkimage)
+
+MKIMAGEFLAGS_fit-dtb.blob = -f auto -A $(ARCH) -T firmware -C none -O u-boot \
+	-a 0 -e 0 -E \
+	$(patsubst %,-b arch/$(ARCH)/dts/%.dtb,$(subst ",,$(CONFIG_OF_LIST))) -d /dev/null
+
+u-boot-fit-dtb.bin: u-boot-nodtb.bin fit-dtb.blob
+	$(call if_changed,cat)
+
+u-boot.bin: u-boot-fit-dtb.bin FORCE
+	$(call if_changed,copy)
+else ifeq ($(CONFIG_OF_SEPARATE),y)
 u-boot-dtb.bin: u-boot-nodtb.bin dts/dt.dtb FORCE
 	$(call if_changed,cat)
 
@@ -885,7 +904,7 @@ u-boot.bin: u-boot-nodtb.bin FORCE
 endif
 
 %.imx: %.bin
-	$(Q)$(MAKE) $(build)=arch/arm/imx-common $@
+	$(Q)$(MAKE) $(build)=arch/arm/mach-imx $@
 
 %.vyb: %.imx
 	$(Q)$(MAKE) $(build)=arch/arm/cpu/armv7/vf610 $@
@@ -1050,10 +1069,10 @@ tpl/u-boot-with-tpl.bin: tpl/u-boot-tpl.bin u-boot.bin FORCE
 	$(call if_changed,pad_cat)
 
 SPL: spl/u-boot-spl.bin FORCE
-	$(Q)$(MAKE) $(build)=arch/arm/imx-common $@
+	$(Q)$(MAKE) $(build)=arch/arm/mach-imx $@
 
 u-boot-with-spl.imx u-boot-with-nand-spl.imx: SPL u-boot.bin FORCE
-	$(Q)$(MAKE) $(build)=arch/arm/imx-common $@
+	$(Q)$(MAKE) $(build)=arch/arm/mach-imx $@
 
 MKIMAGEFLAGS_u-boot.ubl = -n $(UBL_CONFIG) -T ublimage -e $(CONFIG_SYS_TEXT_BASE)
 
@@ -1215,13 +1234,16 @@ u-boot.elf: u-boot.bin
 	$(Q)$(OBJCOPY) -I binary $(PLATFORM_ELFFLAGS) $< u-boot-elf.o
 	$(call if_changed,u-boot-elf)
 
+ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(ARCH)/Makefile.postlink)
+
 # Rule to link u-boot
 # May be overridden by arch/$(ARCH)/config.mk
 quiet_cmd_u-boot__ ?= LD      $@
       cmd_u-boot__ ?= $(LD) $(LDFLAGS) $(LDFLAGS_u-boot) -o $@ \
       -T u-boot.lds $(u-boot-init)                             \
       --start-group $(u-boot-main) --end-group                 \
-      $(PLATFORM_LIBS) -Map u-boot.map
+      $(PLATFORM_LIBS) -Map u-boot.map;                        \
+      $(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
 
 quiet_cmd_smap = GEN     common/system_map.o
 cmd_smap = \
@@ -1231,7 +1253,7 @@ cmd_smap = \
 		-c $(srctree)/common/system_map.c -o common/system_map.o
 
 u-boot:	$(u-boot-init) $(u-boot-main) u-boot.lds FORCE
-	$(call if_changed,u-boot__)
+	+$(call if_changed,u-boot__)
 ifeq ($(CONFIG_KALLSYMS),y)
 	$(call cmd,smap)
 	$(call cmd,u-boot__) common/system_map.o
@@ -1338,6 +1360,7 @@ define filechk_timestamp.h
 			LC_ALL=C $${DATE} -u -d "$${SOURCE_DATE}" +'#define U_BOOT_TIME "%T"'; \
 			LC_ALL=C $${DATE} -u -d "$${SOURCE_DATE}" +'#define U_BOOT_TZ "%z"'; \
 			LC_ALL=C $${DATE} -u -d "$${SOURCE_DATE}" +'#define U_BOOT_DMI_DATE "%m/%d/%Y"'; \
+			LC_ALL=C $${DATE} -u -d "$${SOURCE_DATE}" +'#define U_BOOT_BUILD_DATE 0x%Y%m%d'; \
 		else \
 			return 42; \
 		fi; \
@@ -1346,6 +1369,7 @@ define filechk_timestamp.h
 		LC_ALL=C date +'#define U_BOOT_TIME "%T"'; \
 		LC_ALL=C date +'#define U_BOOT_TZ "%z"'; \
 		LC_ALL=C date +'#define U_BOOT_DMI_DATE "%m/%d/%Y"'; \
+		LC_ALL=C date +'#define U_BOOT_BUILD_DATE 0x%Y%m%d'; \
 	fi)
 endef
 
@@ -1356,7 +1380,7 @@ $(timestamp_h): $(srctree)/Makefile FORCE
 	$(call filechk,timestamp.h)
 
 checkbinman: tools
-	@if ! ( echo 'import libfdt' | ( PYTHONPATH=tools python )); then \
+	@if ! ( echo 'import libfdt' | ( PYTHONPATH=tools $(PYTHON) )); then \
 		echo >&2; \
 		echo >&2 '*** binman needs the Python libfdt library.'; \
 		echo >&2 '*** Either install it on your system, or try:'; \
@@ -1378,7 +1402,8 @@ u-boot.lds: $(LDSCRIPT) prepare FORCE
 spl/u-boot-spl.bin: spl/u-boot-spl
 	@:
 spl/u-boot-spl: tools prepare \
-		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_SPL_OF_PLATDATA),dts/dt.dtb)
+		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_SPL_OF_PLATDATA),dts/dt.dtb) \
+		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_TPL_OF_PLATDATA),dts/dt.dtb)
 	$(Q)$(MAKE) obj=spl -f $(srctree)/scripts/Makefile.spl all
 
 spl/sunxi-spl.bin: spl/u-boot-spl
@@ -1422,12 +1447,6 @@ SYSTEM_MAP = \
 System.map:	u-boot
 		@$(call SYSTEM_MAP,$<) > $@
 
-checkdtc:
-	@if test $(call dtc-version) -lt 0104; then \
-		echo '*** Your dtc is too old, please upgrade to dtc 1.4 or newer'; \
-		false; \
-	fi
-
 #########################################################################
 
 # ARM relocations should all be R_ARM_RELATIVE (32-bit) or
@@ -1441,14 +1460,14 @@ checkarmreloc: u-boot
 		false; \
 	fi
 
-env: scripts_basic
-	$(Q)$(MAKE) $(build)=tools/$@
+envtools: scripts_basic
+	$(Q)$(MAKE) $(build)=tools/env
 
 tools-only: scripts_basic $(version_h) $(timestamp_h)
 	$(Q)$(MAKE) $(build)=tools
 
 tools-all: export HOST_TOOLS_ALL=y
-tools-all: env tools ;
+tools-all: envtools tools ;
 
 cross_tools: export CROSS_BUILD_TOOLS=y
 cross_tools: tools ;
@@ -1473,7 +1492,7 @@ CLEAN_DIRS  += $(MODVERDIR) \
 			$(filter-out include, $(shell ls -1 $d 2>/dev/null))))
 
 CLEAN_FILES += include/bmp_logo.h include/bmp_logo_data.h \
-	       boot* u-boot* MLO* SPL System.map
+	       boot* u-boot* MLO* SPL System.map fit-dtb.blob
 
 # Directories & files removed with 'make mrproper'
 MRPROPER_DIRS  += include/config include/generated spl tpl \
@@ -1562,6 +1581,7 @@ help:
 	@echo  '  ubootrelease	  - Output the release version string (use with make -s)'
 	@echo  '  ubootversion	  - Output the version stored in Makefile (use with make -s)'
 	@echo  "  cfg		  - Don't build, just create the .cfg files"
+	@echo  "  envtools	  - Build only the target-side environment tools"
 	@echo  ''
 	@echo  'Static analysers'
 	@echo  '  checkstack      - Generate a list of stack hogs'

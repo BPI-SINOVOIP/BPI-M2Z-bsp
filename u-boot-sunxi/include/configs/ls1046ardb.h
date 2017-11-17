@@ -95,7 +95,6 @@
 #define CONFIG_SYS_NAND_BASE_LIST	{ CONFIG_SYS_NAND_BASE }
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_MTD_NAND_VERIFY_WRITE
-#define CONFIG_CMD_NAND
 
 #define CONFIG_SYS_NAND_BLOCK_SIZE	(128 * 1024)
 
@@ -167,12 +166,10 @@
 #endif
 
 #if defined(CONFIG_SD_BOOT)
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV		0
 #define CONFIG_ENV_OFFSET		(3 * 1024 * 1024)
 #define CONFIG_ENV_SIZE			0x2000
 #else
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SIZE			0x2000		/* 8KB */
 #define CONFIG_ENV_OFFSET		0x300000	/* 3MB */
 #define CONFIG_ENV_SECT_SIZE		0x40000		/* 256KB */
@@ -183,8 +180,6 @@
 #ifndef SPL_NO_FMAN
 
 #ifdef CONFIG_NET
-#define CONFIG_PHYLIB
-#define CONFIG_PHY_GIGE		/* Include GbE speed/duplex detection */
 #define CONFIG_PHY_REALTEK
 #endif
 
@@ -214,26 +209,11 @@
 #endif
 #endif
 
-/* USB */
-#ifndef SPL_NO_USB
-#define CONFIG_HAS_FSL_XHCI_USB
-#ifdef CONFIG_HAS_FSL_XHCI_USB
-#define CONFIG_USB_XHCI_HCD
-#define CONFIG_USB_XHCI_FSL
-#define CONFIG_USB_XHCI_DWC3
-#define CONFIG_USB_MAX_CONTROLLER_COUNT         3
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS      2
-#define CONFIG_CMD_USB
-#define CONFIG_USB_STORAGE
-#endif
-#endif
-
 /* SATA */
 #ifndef SPL_NO_SATA
 #define CONFIG_LIBATA
 #define CONFIG_SCSI_AHCI
 #define CONFIG_SCSI_AHCI_PLAT
-#define CONFIG_SCSI
 
 #define CONFIG_SYS_SATA				AHCI_BASE_ADDR
 
@@ -244,14 +224,9 @@
 #endif
 
 #ifndef SPL_NO_MISC
-#define CONFIG_BOOTCOMMAND		"sf probe 0:0;sf read $kernel_load" \
-					"$kernel_start $kernel_size;" \
-					"bootm $kernel_load"
-
-#define MTDPARTS_DEFAULT "mtdparts=1550000.quadspi:1m(rcw)," \
-			"15m(u-boot),48m(kernel.itb);" \
-			"7e800000.flash:16m(nand_uboot)," \
-			"48m(nand_kernel),448m(nand_free)"
+#undef CONFIG_BOOTCOMMAND
+#define CONFIG_BOOTCOMMAND "run distro_bootcmd; env exists secureboot"	\
+			   "&& esbc_halt; run qspi_bootcmd;"
 #endif
 
 #include <asm/fsl_secure_boot.h>

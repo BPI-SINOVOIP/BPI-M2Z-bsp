@@ -60,7 +60,7 @@ static int get_mac_addr(u8 *addr)
 		return -1;
 	}
 
-	ret = spi_flash_read(flash, CFG_MAC_ADDR_OFFSET, 6, addr);
+	ret = spi_flash_read(flash, (CFG_MAC_ADDR_OFFSET) + 1, 7, addr);
 	if (ret) {
 		printf("Error - unable to read MAC address from SPI flash.\n");
 		return -1;
@@ -131,13 +131,16 @@ int misc_init_r(void)
 	uchar env_enetaddr[6];
 	int enetaddr_found;
 
-	enetaddr_found = eth_getenv_enetaddr("ethaddr", env_enetaddr);
+	enetaddr_found = eth_env_get_enetaddr("ethaddr", env_enetaddr);
+
+#endif
 
 #ifdef CONFIG_MAC_ADDR_IN_SPIFLASH
 	int spi_mac_read;
 	uchar buff[6];
 
 	spi_mac_read = get_mac_addr(buff);
+	buff[0] = 0;
 
 	/*
 	 * MAC address not present in the environment
@@ -147,7 +150,7 @@ int misc_init_r(void)
 	if (!enetaddr_found) {
 		if (!spi_mac_read) {
 			if (is_valid_ethaddr(buff)) {
-				if (eth_setenv_enetaddr("ethaddr", buff)) {
+				if (eth_env_set_enetaddr("ethaddr", buff)) {
 					printf("Warning: Failed to "
 					"set MAC address from SPI flash\n");
 				}
@@ -167,7 +170,8 @@ int misc_init_r(void)
 					"with the MAC address in the environment\n");
 		printf("Default using MAC address from environment\n");
 	}
-#endif
+
+#elif defined(CONFIG_MAC_ADDR_IN_EEPROM)
 	uint8_t enetaddr[8];
 	int eeprom_mac_read;
 
@@ -292,7 +296,7 @@ u32 get_board_rev(void)
 	u32 maxcpuclk = CONFIG_DA850_EVM_MAX_CPU_CLK;
 	u32 rev = 0;
 
-	s = getenv("maxcpuclk");
+	s = env_get("maxcpuclk");
 	if (s)
 		maxcpuclk = simple_strtoul(s, NULL, 10);
 

@@ -1,6 +1,6 @@
 /*
- * (C) Copyright 2016
- * Vikas Manocha, STMicroelectronics, <vikas.manocha@st.com>
+ * Copyright (C) 2016, STMicroelectronics - All Rights Reserved
+ * Author(s): Vikas Manocha, <vikas.manocha@st.com> for STMicroelectronics.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -57,12 +57,6 @@ static const u32 sect_sz_kb[CONFIG_SYS_MAX_FLASH_SECT] = {
 	[5 ... 7] =	256 * 1024
 };
 
-enum clock {
-	CLOCK_CORE,
-	CLOCK_AHB,
-	CLOCK_APB1,
-	CLOCK_APB2
-};
 #define STM32_BUS_MASK		GENMASK(31, 16)
 
 struct stm32_rcc_regs {
@@ -101,11 +95,6 @@ struct stm32_rcc_regs {
 };
 #define STM32_RCC		((struct stm32_rcc_regs *)RCC_BASE)
 
-struct stm32_rcc_ext_f7_regs {
-	u32 dckcfgr2;	/* dedicated clocks configuration register */
-};
-#define STM32_RCC_EXT_F7	((struct stm32_rcc_ext_f7_regs *) (RCC_BASE + sizeof(struct stm32_rcc_regs)))
-
 struct stm32_pwr_regs {
 	u32 cr1;   /* power control register 1 */
 	u32 csr1;  /* power control/status register 2 */
@@ -114,8 +103,6 @@ struct stm32_pwr_regs {
 };
 #define STM32_PWR		((struct stm32_pwr_regs *)PWR_BASE)
 
-int configure_clocks(void);
-unsigned long clock_get(enum clock clck);
 void stm32_flash_latency_cfg(int latency);
 
 #endif /* _ASM_ARCH_HARDWARE_H */

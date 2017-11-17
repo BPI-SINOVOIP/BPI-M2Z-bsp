@@ -22,8 +22,7 @@
 
 #define CONFIG_CMDLINE_EDITING
 
-#define CONFIG_SYS_ICACHE_OFF
-#define CONFIG_SYS_DCACHE_OFF
+#define CONFIG_ARCH_MAP_SYSMEM
 
 #define CONFIG_BOOTP_SEND_HOSTNAME
 #define CONFIG_BOOTP_SERVERIP
@@ -106,17 +105,6 @@
  * Miscellaneous configurable options
  */
 #define CONFIG_SYS_LONGHELP			/* undef to save memory */
-#define CONFIG_SYS_CBSIZE	256		/* Console I/O Buffer Size */
-
-/* Print Buffer Size */
-#define CONFIG_SYS_PBSIZE	\
-	(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-
-/* max number of command args */
-#define CONFIG_SYS_MAXARGS	16
-
-/* Boot Argument Buffer Size */
-#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
 
 /*
  * Size of malloc() pool
@@ -358,7 +346,6 @@
 #define CONFIG_SYS_MAX_FLASH_SECT	512
 
 /* environments */
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_ADDR			(CONFIG_SYS_MONITOR_BASE + 0x140000)
 #define CONFIG_ENV_SIZE			8192
 #define CONFIG_ENV_OVERWRITE

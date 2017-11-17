@@ -75,7 +75,6 @@
 #endif
 
 #ifdef CONFIG_NAND_ZYNQ
-#define CONFIG_CMD_NAND_LOCK_UNLOCK
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_ONFI_DETECTION
 #define CONFIG_MTD_DEVICE
@@ -92,7 +91,6 @@
 # define CONFIG_SYS_DFU_DATA_BUF_SIZE	0x600000
 # define DFU_DEFAULT_POLL_TIMEOUT	300
 # define CONFIG_USB_CABLE_CHECK
-# define CONFIG_CMD_THOR_DOWNLOAD
 # define CONFIG_THOR_RESET_OFF
 # define CONFIG_USB_FUNCTION_THOR
 # define DFU_ALT_INFO_RAM \
@@ -161,12 +159,8 @@
 #ifndef CONFIG_ENV_IS_NOWHERE
 # ifdef CONFIG_MTD_NOR_FLASH
 /* Environment in NOR flash */
-#  define CONFIG_ENV_IS_IN_FLASH
 # elif defined(CONFIG_ZYNQ_QSPI)
 /* Environment in Serial Flash */
-#  define CONFIG_ENV_IS_IN_SPI_FLASH
-# elif !defined(CONFIG_MTD_NOR_FLASH)
-#  define CONFIG_ENV_IS_NOWHERE
 # endif
 
 # define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
@@ -175,6 +169,50 @@
 
 /* enable preboot to be loaded before CONFIG_BOOTDELAY */
 #define CONFIG_PREBOOT
+
+/* Boot configuration */
+#define CONFIG_BOOTCOMMAND		"run $modeboot || run distro_bootcmd"
+#define CONFIG_SYS_LOAD_ADDR		0 /* default? */
+
+/* Distro boot enablement */
+
+#ifdef CONFIG_SPL_BUILD
+#define BOOTENV
+#else
+#include <config_distro_defaults.h>
+
+#ifdef CONFIG_CMD_MMC
+#define BOOT_TARGET_DEVICES_MMC(func) func(MMC, mmc, 0)
+#else
+#define BOOT_TARGET_DEVICES_MMC(func)
+#endif
+
+#ifdef CONFIG_CMD_USB
+#define BOOT_TARGET_DEVICES_USB(func) func(USB, usb, 0)
+#else
+#define BOOT_TARGET_DEVICES_USB(func)
+#endif
+
+#if defined(CONFIG_CMD_PXE)
+#define BOOT_TARGET_DEVICES_PXE(func) func(PXE, pxe, na)
+#else
+#define BOOT_TARGET_DEVICES_PXE(func)
+#endif
+
+#if defined(CONFIG_CMD_DHCP)
+#define BOOT_TARGET_DEVICES_DHCP(func) func(DHCP, dhcp, na)
+#else
+#define BOOT_TARGET_DEVICES_DHCP(func)
+#endif
+
+#define BOOT_TARGET_DEVICES(func) \
+	BOOT_TARGET_DEVICES_MMC(func) \
+	BOOT_TARGET_DEVICES_USB(func) \
+	BOOT_TARGET_DEVICES_PXE(func) \
+	BOOT_TARGET_DEVICES_DHCP(func)
+
+#include <config_distro_bootcmd.h>
+#endif /* CONFIG_SPL_BUILD */
 
 /* Default environment */
 #ifndef CONFIG_EXTRA_ENV_SETTINGS
@@ -187,6 +225,11 @@
 	"fdt_high=0x20000000\0"		\
 	"initrd_high=0x20000000\0"	\
 	"loadbootenv_addr=0x2000000\0" \
+	"fdt_addr_r=0x1f00000\0"        \
+	"pxefile_addr_r=0x2000000\0"    \
+	"kernel_addr_r=0x2000000\0"     \
+	"scriptaddr=0x3000000\0"        \
+	"ramdisk_addr_r=0x3100000\0"    \
 	"bootenv=uEnv.txt\0" \
 	"bootenv_dev=mmc\0" \
 	"loadbootenv=load ${bootenv_dev} 0 ${loadbootenv_addr} ${bootenv}\0" \
@@ -222,11 +265,9 @@
 			"echo Copying FIT from USB to RAM... && " \
 			"load usb 0 ${load_addr} ${fit_image} && " \
 			"bootm ${load_addr}; fi\0" \
-		DFU_ALT_INFO
+		DFU_ALT_INFO \
+		BOOTENV
 #endif
-
-#define CONFIG_BOOTCOMMAND		"run $modeboot"
-#define CONFIG_SYS_LOAD_ADDR		0 /* default? */
 
 /* Miscellaneous configurable options */
 
@@ -235,9 +276,6 @@
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_CLOCKS
 #define CONFIG_SYS_MAXARGS		32 /* max number of command args */
-#define CONFIG_SYS_CBSIZE		256 /* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					sizeof(CONFIG_SYS_PROMPT) + 16)
 
 #ifndef CONFIG_NR_DRAM_BANKS
 # define CONFIG_NR_DRAM_BANKS		1
@@ -276,10 +314,7 @@
 /* Commands */
 
 /* SPL part */
-#define CONFIG_CMD_SPL
 #define CONFIG_SPL_FRAMEWORK
-
-#define CONFIG_SPL_LDSCRIPT	"arch/arm/mach-zynq/u-boot-spl.lds"
 
 /* MMC support */
 #ifdef CONFIG_MMC_SDHCI_ZYNQ

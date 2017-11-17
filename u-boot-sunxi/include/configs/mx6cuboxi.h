@@ -21,18 +21,26 @@
 /* MMC Configs */
 #define CONFIG_SYS_FSL_ESDHC_ADDR	USDHC2_BASE_ADDR
 
+/* SATA Configuration */
+#ifdef CONFIG_CMD_SATA
+#define CONFIG_DWC_AHSATA
+#define CONFIG_SYS_SATA_MAX_DEVICE      1
+#define CONFIG_DWC_AHSATA_PORT_ID       0
+#define CONFIG_DWC_AHSATA_BASE_ADDR     SATA_ARB_BASE_ADDR
+#define CONFIG_LBA48
+#define CONFIG_LIBATA
+#endif
+
 /* Ethernet Configuration */
 #define CONFIG_FEC_MXC
 #define CONFIG_MII
 #define IMX_FEC_BASE			ENET_BASE_ADDR
 #define CONFIG_FEC_XCV_TYPE		RGMII
 #define CONFIG_FEC_MXC_PHYADDR		0
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_ATHEROS
 
 /* Framebuffer */
 #define CONFIG_VIDEO_IPUV3
-#define CONFIG_IPUV3_CLK		260000000
 #define CONFIG_VIDEO_BMP_RLE8
 #define CONFIG_SPLASH_SCREEN
 #define CONFIG_SPLASH_SCREEN_ALIGN
@@ -47,7 +55,6 @@
 #define CONFIG_MXC_USB_PORTSC		(PORT_PTS_UTMI | PORT_PTS_PTW)
 #define CONFIG_MXC_USB_FLAGS		0
 #define CONFIG_USB_MAX_CONTROLLER_COUNT	2
-#define CONFIG_SYS_USB_EVENT_POLL
 #define CONFIG_PREBOOT \
 	"if hdmidet; then " \
 		"usb start; "		       \
@@ -84,6 +91,7 @@
 	"console=" CONSOLE_DEV ",115200\0" \
 	"bootm_size=0x10000000\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
+	"finduuid=part uuid mmc 0:1 uuid\0" \
 	"update_sd_firmware=" \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv get_cmd dhcp; " \
@@ -98,6 +106,10 @@
 			"fi; "	\
 		"fi\0" \
 	"findfdt="\
+		"if test $board_name = HUMMINGBOARD2 && test $board_rev = MX6Q ; then " \
+			"setenv fdtfile imx6q-hummingboard2.dtb; fi; " \
+		"if test $board_name = HUMMINGBOARD2 && test $board_rev = MX6DL ; then " \
+			"setenv fdtfile imx6dl-hummingboard2.dtb; fi; " \
 		"if test $board_name = HUMMINGBOARD && test $board_rev = MX6Q ; then " \
 			"setenv fdtfile imx6q-hummingboard.dtb; fi; " \
 		"if test $board_name = HUMMINGBOARD && test $board_rev = MX6DL ; then " \
@@ -112,10 +124,12 @@
 
 #define CONFIG_BOOTCOMMAND \
 	"run findfdt; " \
+	"run finduuid; " \
 	"run distro_bootcmd"
 
 #define BOOT_TARGET_DEVICES(func) \
 	func(MMC, mmc, 0) \
+	func(SATA, sata, 0) \
 	func(USB, usb, 0) \
 	func(PXE, pxe, na) \
 	func(DHCP, dhcp, na)
@@ -139,7 +153,6 @@
 
 /* Environment organization */
 #define CONFIG_ENV_SIZE			(8 * 1024)
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_ENV_OFFSET		(8 * 64 * 1024)
 
 #endif                         /* __MX6CUBOXI_CONFIG_H */

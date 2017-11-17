@@ -35,7 +35,6 @@
 #define CONFIG_SYS_MAX_FLASH_SECT	12
 #define CONFIG_SYS_MAX_FLASH_BANKS	2
 
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_OFFSET		(256 << 10)
 #define CONFIG_ENV_SECT_SIZE		(128 << 10)
 #define CONFIG_ENV_SIZE			(8 << 10)
@@ -59,15 +58,9 @@
 #define CONFIG_REVISION_TAG
 
 #define CONFIG_SYS_CBSIZE		1024
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE \
-					+ sizeof(CONFIG_SYS_PROMPT) + 16)
-
-#define CONFIG_SYS_MAXARGS		16
 
 #define CONFIG_SYS_MALLOC_LEN		(2 << 20)
 
-#define CONFIG_BOOTARGS							\
-	"console=ttyS0,115200 earlyprintk consoleblank=0 ignore_loglevel"
 #define CONFIG_BOOTCOMMAND						\
 	"run bootcmd_romfs"
 
@@ -82,7 +75,5 @@
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_AUTO_COMPLETE
 #define CONFIG_CMDLINE_EDITING
-
-#define CONFIG_CMD_MEM
 
 #endif /* __CONFIG_H */

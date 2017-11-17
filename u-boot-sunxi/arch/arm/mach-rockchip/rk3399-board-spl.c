@@ -1,134 +1,63 @@
 /*
  * (C) Copyright 2016 Rockchip Electronics Co., Ltd
+ * (C) Copyright 2017 Theobroma Systems Design und Consulting GmbH
  *
  * SPDX-License-Identifier:     GPL-2.0+
  */
 
 #include <common.h>
-#include <debug_uart.h>
-#include <dm.h>
-#include <fdtdec.h>
-#include <led.h>
-#include <malloc.h>
-#include <mmc.h>
-#include <ram.h>
-#include <spl.h>
-#include <asm/gpio.h>
-#include <asm/io.h>
+#include <asm/arch/bootrom.h>
 #include <asm/arch/clock.h>
+#include <asm/arch/grf_rk3399.h>
 #include <asm/arch/hardware.h>
 #include <asm/arch/periph.h>
-#include <asm/arch/sdram.h>
-#include <asm/arch/timer.h>
+#include <asm/io.h>
+#include <debug_uart.h>
+#include <dm.h>
 #include <dm/pinctrl.h>
-#include <dm/root.h>
-#include <dm/test.h>
-#include <dm/util.h>
-#include <power/regulator.h>
+#include <ram.h>
+#include <spl.h>
+#include <syscon.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#if defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_OF_CONTROL)
-static int spl_node_to_boot_device(int node)
+void board_return_to_bootrom(void)
 {
-	struct udevice *parent;
-
-	/*
-	 * This should eventually move into the SPL code, once SPL becomes
-	 * aware of the block-device layer.  Until then (and to avoid unneeded
-	 * delays in getting this feature out, it lives at the board-level).
-	 */
-	if (!uclass_get_device_by_of_offset(UCLASS_MMC, node, &parent)) {
-		struct udevice *dev;
-		struct blk_desc *desc = NULL;
-
-		for (device_find_first_child(parent, &dev);
-		     dev;
-		     device_find_next_child(&dev)) {
-			if (device_get_uclass_id(dev) == UCLASS_BLK) {
-				desc = dev_get_uclass_platdata(dev);
-				break;
-			}
-		}
-
-		if (!desc)
-			return -ENOENT;
-
-		switch (desc->devnum) {
-		case 0:
-			return BOOT_DEVICE_MMC1;
-		case 1:
-			return BOOT_DEVICE_MMC2;
-		default:
-			return -ENOSYS;
-		}
-	}
-
-	/*
-	 * SPL doesn't differentiate SPI flashes, so we keep the detection
-	 * brief and inaccurate... hopefully, the common SPL layer can be
-	 * extended with awareness of the BLK layer (and matching OF_CONTROL)
-	 * soon.
-	 */
-	if (!uclass_get_device_by_of_offset(UCLASS_SPI_FLASH, node, &parent))
-		return BOOT_DEVICE_SPI;
-
-	return -1;
+	back_to_bootrom();
 }
 
-void board_boot_order(u32 *spl_boot_list)
+static const char * const boot_devices[BROM_LAST_BOOTSOURCE + 1] = {
+	[BROM_BOOTSOURCE_EMMC] = "/sdhci@fe330000",
+	[BROM_BOOTSOURCE_SPINOR] = "/spi@ff1d0000",
+	[BROM_BOOTSOURCE_SD] = "/dwmmc@fe320000",
+};
+
+const char *board_spl_was_booted_from(void)
 {
-	const void *blob = gd->fdt_blob;
-	int chosen_node = fdt_path_offset(blob, "/chosen");
-	int idx = 0;
-	int elem;
-	int boot_device;
-	int node;
-	const char *conf;
+	u32  bootdevice_brom_id = readl(RK3399_BROM_BOOTSOURCE_ID_ADDR);
+	const char *bootdevice_ofpath = NULL;
 
-	if (chosen_node < 0) {
-		debug("%s: /chosen not found, using spl_boot_device()\n",
-		      __func__);
-		spl_boot_list[0] = spl_boot_device();
-		return;
-	}
+	if (bootdevice_brom_id < ARRAY_SIZE(boot_devices))
+		bootdevice_ofpath = boot_devices[bootdevice_brom_id];
 
-	for (elem = 0;
-	     (conf = fdt_stringlist_get(blob, chosen_node,
-					"u-boot,spl-boot-order", elem, NULL));
-	     elem++) {
-		/* First check if the list element is an alias */
-		const char *alias = fdt_get_alias(blob, conf);
-		if (alias)
-			conf = alias;
+	if (bootdevice_ofpath)
+		debug("%s: brom_bootdevice_id %x maps to '%s'\n",
+		      __func__, bootdevice_brom_id, bootdevice_ofpath);
+	else
+		debug("%s: failed to resolve brom_bootdevice_id %x\n",
+		      __func__, bootdevice_brom_id);
 
-		/* Try to resolve the config item (or alias) as a path */
-		node = fdt_path_offset(blob, conf);
-		if (node < 0) {
-			debug("%s: could not find %s in FDT", __func__, conf);
-			continue;
-		}
-
-		/* Try to map this back onto SPL boot devices */
-		boot_device = spl_node_to_boot_device(node);
-		if (boot_device < 0) {
-			debug("%s: could not map node @%x to a boot-device\n",
-			      __func__, node);
-			continue;
-		}
-
-		spl_boot_list[idx++] = boot_device;
-	}
-
-	/* If we had no matches, fall back to spl_boot_device */
-	if (idx == 0)
-		spl_boot_list[0] = spl_boot_device();
+	return bootdevice_ofpath;
 }
-#endif
 
 u32 spl_boot_device(void)
 {
-	return BOOT_DEVICE_MMC1;
+	u32 boot_device = BOOT_DEVICE_MMC1;
+
+	if (CONFIG_IS_ENABLED(ROCKCHIP_BACK_TO_BROM))
+		return BOOT_DEVICE_BOOTROM;
+
+	return boot_device;
 }
 
 u32 spl_boot_mode(const u32 boot_device)
@@ -158,7 +87,6 @@ void secure_timer_init(void)
 
 void board_debug_uart_init(void)
 {
-#include <asm/arch/grf_rk3399.h>
 #define GRF_BASE	0xff770000
 	struct rk3399_grf_regs * const grf = (void *)GRF_BASE;
 
@@ -185,13 +113,12 @@ void board_debug_uart_init(void)
 #endif
 }
 
-#define GRF_EMMCCORE_CON11 0xff77f02c
-#define SGRF_DDR_RGN_CON16 0xff330040
-#define SGRF_SLV_SECURE_CON4 0xff33e3d0
 void board_init_f(ulong dummy)
 {
 	struct udevice *pinctrl;
 	struct udevice *dev;
+	struct rk3399_pmusgrf_regs *sgrf;
+	struct rk3399_grf_regs *grf;
 	int ret;
 
 #define EARLY_UART
@@ -208,9 +135,6 @@ void board_init_f(ulong dummy)
 	printascii("U-Boot SPL board init");
 #endif
 
-	/*  Emmc clock generator: disable the clock multipilier */
-	rk_clrreg(GRF_EMMCCORE_CON11, 0x0ff);
-
 	ret = spl_early_init();
 	if (ret) {
 		debug("spl_early_init() failed: %d\n", ret);
@@ -226,8 +150,13 @@ void board_init_f(ulong dummy)
 	 * driver, which tries to DMA from/to the stack (likely)
 	 * located in this range.
 	 */
-	rk_clrsetreg(SGRF_DDR_RGN_CON16, 0x1FF, 0);
-	rk_clrreg(SGRF_SLV_SECURE_CON4, 0x2000);
+	sgrf = syscon_get_first_range(ROCKCHIP_SYSCON_PMUSGRF);
+	rk_clrsetreg(&sgrf->ddr_rgn_con[16], 0x1ff, 0);
+	rk_clrreg(&sgrf->slv_secure_con4, 0x2000);
+
+	/*  eMMC clock generator: disable the clock multipilier */
+	grf = syscon_get_first_range(ROCKCHIP_SYSCON_GRF);
+	rk_clrreg(&grf->emmccore_con[11], 0x0ff);
 
 	secure_timer_init();
 
@@ -242,37 +171,6 @@ void board_init_f(ulong dummy)
 		debug("DRAM init failed: %d\n", ret);
 		return;
 	}
-}
-
-void spl_board_init(void)
-{
-	struct udevice *pinctrl;
-	int ret;
-
-	ret = uclass_get_device(UCLASS_PINCTRL, 0, &pinctrl);
-	if (ret) {
-		debug("%s: Cannot find pinctrl device\n", __func__);
-		goto err;
-	}
-
-	/* Enable debug UART */
-	ret = pinctrl_request_noflags(pinctrl, PERIPH_ID_UART_DBG);
-	if (ret) {
-		debug("%s: Failed to set up console UART\n", __func__);
-		goto err;
-	}
-
-	preloader_console_init();
-#ifdef CONFIG_ROCKCHIP_SPL_BACK_TO_BROM
-	back_to_bootrom();
-#endif
-
-	return;
-err:
-	printf("spl_board_init: Error %d\n", ret);
-
-	/* No way to report error here */
-	hang();
 }
 
 #ifdef CONFIG_SPL_LOAD_FIT

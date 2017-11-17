@@ -29,7 +29,6 @@
 
 /* Console configuration */
 
-#define CONFIG_BOOTARGS			"Please use defined boot"
 #define CONFIG_BOOTCOMMAND		"run mmcboot"
 #define CONFIG_DEFAULT_CONSOLE		"console=ttySAC1,115200n8\0"
 
@@ -51,21 +50,8 @@
 #define CONFIG_MTD_PARTITIONS
 
 /* Actual modem binary size is 16MiB. Add 2MiB for bad block handling */
-#define MTDIDS_DEFAULT		"onenand0=samsung-onenand"
 
-#define MTDPARTS_DEFAULT	"mtdparts=samsung-onenand:"\
-				"128k(s-boot)"\
-				",896k(bootloader)"\
-				",256k(params)"\
-				",2816k(config)"\
-				",8m(csa)"\
-				",7m(kernel)"\
-				",1m(log)"\
-				",12m(modem)"\
-				",60m(qboot)"\
-				",-(UBI)\0"
-
-#define NORMAL_MTDPARTS_DEFAULT MTDPARTS_DEFAULT
+#define NORMAL_MTDPARTS_DEFAULT CONFIG_MTDPARTS_DEFAULT
 
 #define MBRPARTS_DEFAULT	"20M(permanent)"\
 				",20M(boot)"\
@@ -77,7 +63,6 @@
 #define CONFIG_BOOTBLOCK	"10"
 #define CONFIG_UBIBLOCK		"9"
 
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV		CONFIG_MMC_DEFAULT_DEV
 #define CONFIG_ENV_SIZE			4096
 #define CONFIG_ENV_OFFSET		((32 - 4) << 10) /* 32KiB - 4KiB */
@@ -135,7 +120,7 @@
 	"verify=n\0" \
 	"rootfstype=ext4\0" \
 	"console=" CONFIG_DEFAULT_CONSOLE \
-	"mtdparts=" MTDPARTS_DEFAULT \
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT \
 	"mbrparts=" MBRPARTS_DEFAULT \
 	"meminfo=crashkernel=32M@0x50000000\0" \
 	"nfsroot=/nfsroot/arm\0" \
@@ -172,7 +157,6 @@ int universal_spi_read(void);
 
 /* Download menu - Samsung common */
 #define CONFIG_LCD_MENU
-#define CONFIG_LCD_MENU_BOARD
 
 /* Download menu - definitions for check keys */
 #ifndef __ASSEMBLY__

@@ -102,7 +102,7 @@ int misc_init_r(void)
 			CONFIG_DM9000_BASE, GPMC_SIZE_16M);
 
 	/* Use OMAP DIE_ID as MAC address */
-	if (!eth_getenv_enetaddr("ethaddr", enetaddr)) {
+	if (!eth_env_get_enetaddr("ethaddr", enetaddr)) {
 		printf("ethaddr not set, using Die ID\n");
 		die_id_0 = readl(&id_base->die_id_0);
 		enetaddr[0] = 0x02; /* locally administered */
@@ -111,7 +111,7 @@ int misc_init_r(void)
 		enetaddr[3] = (die_id_0 & 0x00ff0000) >> 16;
 		enetaddr[4] = (die_id_0 & 0x0000ff00) >> 8;
 		enetaddr[5] = (die_id_0 & 0x000000ff);
-		eth_setenv_enetaddr("ethaddr", enetaddr);
+		eth_env_set_enetaddr("ethaddr", enetaddr);
 	}
 #endif
 

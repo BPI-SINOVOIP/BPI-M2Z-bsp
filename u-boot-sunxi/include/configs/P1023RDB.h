@@ -125,7 +125,6 @@ extern unsigned long get_clock_freq(void);
 
 #define CONFIG_SYS_NAND_BASE_LIST	{ CONFIG_SYS_NAND_BASE }
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_CMD_NAND
 #define CONFIG_NAND_FSL_ELBC
 #define CONFIG_SYS_NAND_BLOCK_SIZE	(128 * 1024)
 
@@ -230,22 +229,12 @@ extern unsigned long get_clock_freq(void);
  */
 #define CONFIG_ENV_OVERWRITE
 
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_ADDR		(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SECT_SIZE)
 #define CONFIG_ENV_SIZE		0x2000
 #define CONFIG_ENV_SECT_SIZE	0x20000 /* 128K (one sector) */
 
 #define CONFIG_LOADS_ECHO		/* echo on for serial download */
 #define CONFIG_SYS_LOADS_BAUD_CHANGE	/* allow baudrate change */
-
-/*
- * Command line configuration.
- */
-#define CONFIG_CMD_REGINFO
-
-#if defined(CONFIG_PCI)
-#define CONFIG_CMD_PCI
-#endif
 
 /*
  * USB
@@ -264,16 +253,6 @@ extern unsigned long get_clock_freq(void);
 #define CONFIG_SYS_LONGHELP			/* undef to save memory	*/
 #define CONFIG_CMDLINE_EDITING		/* Command-line editing */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
-#if defined(CONFIG_CMD_KGDB)
-#define CONFIG_SYS_CBSIZE	1024		/* Console I/O Buffer Size */
-#else
-#define CONFIG_SYS_CBSIZE	256		/* Console I/O Buffer Size */
-#endif
-/* Print Buffer Size */
-#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT)+16)
-#define CONFIG_SYS_MAXARGS	16		/* max number of command args */
-/* Boot Argument Buffer Size */
-#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
 
 /*
  * For booting Linux, the board info and command line data
@@ -319,7 +298,6 @@ extern unsigned long get_clock_freq(void);
 
 /* For FM */
 #define CONFIG_SYS_DPAA_FMAN
-#define CONFIG_PHY_GIGE		/* Include GbE speed/duplex detection */
 
 #ifdef CONFIG_SYS_DPAA_FMAN
 #define CONFIG_FMAN_ENET

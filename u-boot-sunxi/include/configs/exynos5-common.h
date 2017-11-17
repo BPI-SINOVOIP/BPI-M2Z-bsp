@@ -17,7 +17,6 @@
 
 #ifdef FTRACE
 #define CONFIG_TRACE
-#define CONFIG_CMD_TRACE
 #define CONFIG_TRACE_BUFFER_SIZE	(16 << 20)
 #define CONFIG_TRACE_EARLY_SIZE		(8 << 20)
 #define CONFIG_TRACE_EARLY
@@ -49,7 +48,6 @@
 #define CONFIG_SUPPORT_EMMC_BOOT
 
 /* specific .lds file */
-#define CONFIG_SPL_LDSCRIPT	"board/samsung/common/exynos-uboot-spl.lds"
 
 /* Boot Argument Buffer Size */
 /* memtest works on */
@@ -125,22 +123,12 @@
 
 /* Ethernet Controllor Driver */
 #ifdef CONFIG_CMD_NET
-#define CONFIG_SMC911X
-#define CONFIG_SMC911X_BASE		0x5000000
-#define CONFIG_SMC911X_16_BIT
 #define CONFIG_ENV_SROM_BANK		1
 #endif /*CONFIG_CMD_NET*/
 
 /* Enable Time Command */
 
 /* USB */
-#define CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS	3
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS	2
-
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_ASIX
-#define CONFIG_USB_ETHER_SMSC95XX
-#define CONFIG_USB_ETHER_RTL8152
 
 /* USB boot mode */
 #define CONFIG_USB_BOOTING

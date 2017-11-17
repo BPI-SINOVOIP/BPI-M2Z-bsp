@@ -113,6 +113,27 @@ static int write_cr(struct spi_flash *flash, u8 wc)
 #endif
 
 #ifdef CONFIG_SPI_FLASH_BAR
+/*
+ * This "clean_bar" is necessary in a situation when one was accessing
+ * spi flash memory > 16 MiB by using Bank Address Register's BA24 bit.
+ *
+ * After it the BA24 bit shall be cleared to allow access to correct
+ * memory region after SW reset (by calling "reset" command).
+ *
+ * Otherwise, the BA24 bit may be left set and then after reset, the
+ * ROM would read/write/erase SPL from 16 MiB * bank_sel address.
+ */
+static int clean_bar(struct spi_flash *flash)
+{
+	u8 cmd, bank_sel = 0;
+
+	if (flash->bank_curr == 0)
+		return 0;
+	cmd = flash->bank_write_cmd;
+
+	return spi_flash_write_common(flash, &cmd, 1, &bank_sel, 1);
+}
+
 static int write_bar(struct spi_flash *flash, u32 offset)
 {
 	u8 cmd, bank_sel;
@@ -339,6 +360,10 @@ int spi_flash_cmd_erase_ops(struct spi_flash *flash, u32 offset, size_t len)
 		len -= erase_size;
 	}
 
+#ifdef CONFIG_SPI_FLASH_BAR
+	ret = clean_bar(flash);
+#endif
+
 	return ret;
 }
 
@@ -396,6 +421,10 @@ int spi_flash_cmd_write_ops(struct spi_flash *flash, u32 offset,
 
 		offset += chunk_len;
 	}
+
+#ifdef CONFIG_SPI_FLASH_BAR
+	ret = clean_bar(flash);
+#endif
 
 	return ret;
 }
@@ -499,6 +528,10 @@ int spi_flash_cmd_read_ops(struct spi_flash *flash, u32 offset,
 		len -= read_len;
 		data += read_len;
 	}
+
+#ifdef CONFIG_SPI_FLASH_BAR
+	ret = clean_bar(flash);
+#endif
 
 	free(cmd);
 	return ret;
@@ -947,11 +980,25 @@ int spi_flash_scan(struct spi_flash *flash)
 	if (IS_ERR_OR_NULL(info))
 		return -ENOENT;
 
-	/* Flash powers up read-only, so clear BP# bits */
+	/*
+	 * Flash powers up read-only, so clear BP# bits.
+	 *
+	 * Note on some flash (like Macronix), QE (quad enable) bit is in the
+	 * same status register as BP# bits, and we need preserve its original
+	 * value during a reboot cycle as this is required by some platforms
+	 * (like Intel ICH SPI controller working under descriptor mode).
+	 */
 	if (JEDEC_MFR(info) == SPI_FLASH_CFI_MFR_ATMEL ||
-	    JEDEC_MFR(info) == SPI_FLASH_CFI_MFR_MACRONIX ||
-	    JEDEC_MFR(info) == SPI_FLASH_CFI_MFR_SST)
-		write_sr(flash, 0);
+	   (JEDEC_MFR(info) == SPI_FLASH_CFI_MFR_SST) ||
+	   (JEDEC_MFR(info) == SPI_FLASH_CFI_MFR_MACRONIX)) {
+		u8 sr = 0;
+
+		if (JEDEC_MFR(info) == SPI_FLASH_CFI_MFR_MACRONIX) {
+			read_sr(flash, &sr);
+			sr &= STATUS_QEB_MXIC;
+		}
+		write_sr(flash, sr);
+	}
 
 	flash->name = info->name;
 	flash->memory_map = spi->memory_map;

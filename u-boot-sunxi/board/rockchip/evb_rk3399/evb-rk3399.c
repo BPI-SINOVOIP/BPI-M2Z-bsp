@@ -3,13 +3,14 @@
  *
  * SPDX-License-Identifier:     GPL-2.0+
  */
+
 #include <common.h>
 #include <dm.h>
-#include <ram.h>
 #include <dm/pinctrl.h>
 #include <dm/uclass-internal.h>
 #include <asm/arch/periph.h>
 #include <power/regulator.h>
+#include <spl.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -68,33 +69,29 @@ out:
 	return 0;
 }
 
-int dram_init(void)
+void spl_board_init(void)
 {
-	struct ram_info ram;
-	struct udevice *dev;
+	struct udevice *pinctrl;
 	int ret;
 
-	ret = uclass_get_device(UCLASS_RAM, 0, &dev);
+	ret = uclass_get_device(UCLASS_PINCTRL, 0, &pinctrl);
 	if (ret) {
-		debug("DRAM init failed: %d\n", ret);
-		return ret;
+		debug("%s: Cannot find pinctrl device\n", __func__);
+		goto err;
 	}
-	ret = ram_get_info(dev, &ram);
+
+	/* Enable debug UART */
+	ret = pinctrl_request_noflags(pinctrl, PERIPH_ID_UART_DBG);
 	if (ret) {
-		debug("Cannot get DRAM size: %d\n", ret);
-		return ret;
+		debug("%s: Failed to set up console UART\n", __func__);
+		goto err;
 	}
-	debug("SDRAM base=%llx, size=%x\n", ram.base, (unsigned int)ram.size);
-	gd->ram_size = ram.size;
 
-	return 0;
-}
+	preloader_console_init();
+	return;
+err:
+	printf("%s: Error %d\n", __func__, ret);
 
-int dram_init_banksize(void)
-{
-	/* Reserve 0x200000 for ATF bl31 */
-	gd->bd->bi_dram[0].start = 0x200000;
-	gd->bd->bi_dram[0].size = 0x7e000000;
-
-	return 0;
+	/* No way to report error here */
+	hang();
 }

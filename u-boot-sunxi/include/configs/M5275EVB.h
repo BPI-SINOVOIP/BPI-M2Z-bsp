@@ -34,16 +34,14 @@
 #ifndef CONFIG_MONITOR_IS_IN_RAM
 #define CONFIG_ENV_OFFSET		0x4000
 #define CONFIG_ENV_SECT_SIZE	0x2000
-#define CONFIG_ENV_IS_IN_FLASH	1
 #else
 #define CONFIG_ENV_ADDR		0xffe04000
 #define CONFIG_ENV_SECT_SIZE	0x2000
-#define CONFIG_ENV_IS_IN_FLASH	1
 #endif
 
 #define LDS_BOARD_TEXT \
-        . = DEFINED(env_offset) ? env_offset : .; \
-        common/env_embedded.o (.text);
+	. = DEFINED(env_offset) ? env_offset : .; \
+	env/embedded.o(.text);
 
 /*
  * BOOTP options
@@ -91,15 +89,6 @@
 #define CONFIG_SYS_I2C_PINMUX_SET	(0x000F)
 
 #define CONFIG_SYS_LONGHELP		/* undef to save memory	*/
-
-#if (CONFIG_CMD_KGDB)
-#	define CONFIG_SYS_CBSIZE	1024
-#else
-#	define CONFIG_SYS_CBSIZE	256
-#endif
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_MAXARGS		16
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 
 #define CONFIG_SYS_LOAD_ADDR		0x800000
 

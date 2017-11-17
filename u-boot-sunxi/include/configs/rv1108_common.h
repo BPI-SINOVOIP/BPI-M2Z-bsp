@@ -9,9 +9,7 @@
 #include <asm/arch/hardware.h>
 #include "rockchip-common.h"
 
-#define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_ENV_SIZE			0x2000
-#define CONFIG_SYS_MAXARGS		16
 #define CONFIG_SYS_MALLOC_LEN		(32 << 20)
 #define CONFIG_SYS_CBSIZE		1024
 #define CONFIG_SKIP_LOWLEVEL_INIT
@@ -30,4 +28,7 @@
 #define CONFIG_SYS_INIT_SP_ADDR		(CONFIG_SYS_TEXT_BASE + 0x100000)
 #define CONFIG_SYS_LOAD_ADDR		(CONFIG_SYS_SDRAM_BASE + 0x2000000)
 
+/* rockchip ohci host driver */
+#define CONFIG_USB_OHCI_NEW
+#define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS	1
 #endif

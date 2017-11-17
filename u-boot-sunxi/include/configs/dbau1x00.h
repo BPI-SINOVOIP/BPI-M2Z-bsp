@@ -38,7 +38,6 @@
 /* valid baudrates */
 
 #define	CONFIG_TIMESTAMP		/* Print image info with timestamp */
-#undef	CONFIG_BOOTARGS
 
 #define	CONFIG_EXTRA_ENV_SETTINGS					\
 	"addmisc=setenv bootargs ${bootargs} "				\
@@ -67,19 +66,10 @@
  * Command line configuration.
  */
 
-#ifdef CONFIG_DBAU1550
-
-#undef CONFIG_CMD_PCMCIA
-#endif
-
 /*
  * Miscellaneous configurable options
  */
 #define	CONFIG_SYS_LONGHELP				/* undef to save memory      */
-
-#define	CONFIG_SYS_CBSIZE		256		/* Console I/O Buffer Size   */
-#define	CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE+sizeof(CONFIG_SYS_PROMPT)+16)  /* Print Buffer Size */
-#define	CONFIG_SYS_MAXARGS		16		/* max number of command args*/
 
 #define CONFIG_SYS_MALLOC_LEN		128*1024
 
@@ -138,8 +128,6 @@
 #define CONFIG_SYS_FLASH_ERASE_TOUT	(2 * CONFIG_SYS_HZ) /* Timeout for Flash Erase */
 #define CONFIG_SYS_FLASH_WRITE_TOUT	(2 * CONFIG_SYS_HZ) /* Timeout for Flash Write */
 
-#define	CONFIG_ENV_IS_NOWHERE	1
-
 /* Address and size of Primary Environment Sector	*/
 #define CONFIG_ENV_ADDR		0xB0030000
 #define CONFIG_ENV_SIZE		0x10000
@@ -171,7 +159,6 @@
 #define CONFIG_SYS_IDE_MAXBUS		1	/* max. 1 IDE bus		*/
 #define CONFIG_SYS_IDE_MAXDEVICE	1	/* max. 1 drive per IDE bus	*/
 
-#undef	CONFIG_IDE_LED			/* LED   for ide not supported	*/
 #undef	CONFIG_IDE_RESET		/* reset for ide not supported	*/
 
 #define CONFIG_SYS_ATA_IDE0_OFFSET	0x0000

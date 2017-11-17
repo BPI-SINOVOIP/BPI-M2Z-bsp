@@ -89,7 +89,6 @@
 /*
  * Flash & Environment
  */
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_FLASH_CFI_DRIVER
 #define CONFIG_SYS_FLASH_CFI
 /* Use buffered writes (~10x faster) */
@@ -126,7 +125,6 @@
 /*
  * NAND
  */
-#define CONFIG_NAND_MXC
 #define CONFIG_MXC_NAND_REGS_BASE	0xd8000000
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		0xd8000000
@@ -139,28 +137,13 @@
 #define CONFIG_MXC_GPIO
 
 /*
- * MTD partitions
- */
-#define CONFIG_CMD_MTDPARTS
-
-/*
  * U-Boot general configuration
  */
 #define CONFIG_SYS_CBSIZE	1024	/* Console I/O Buffer Size  */
-/* Print buffer sz */
-#define CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE + \
-		sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_MAXARGS	16	/* max number of command args */
 /* Boot Argument Buffer Size */
 #define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_SYS_LONGHELP
-
-/*
- * U-Boot commands
- */
-#define CONFIG_CMD_NAND
-
 
 #define CONFIG_LOADADDR		0xa0800000	/* loadaddr env var */
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
@@ -191,8 +174,8 @@
 		" +${filesize};cp.b ${fileaddr} "			\
 		__stringify(CONFIG_SYS_MONITOR_BASE) " ${filesize}\0"	\
 	"upd=run load update\0"						\
-	"mtdids=" MTDIDS_DEFAULT "\0"					\
-	"mtdparts=" MTDPARTS_DEFAULT "\0"				\
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0"					\
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0"				\
 
 /* additions for new relocation code, must be added to all boards */
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1

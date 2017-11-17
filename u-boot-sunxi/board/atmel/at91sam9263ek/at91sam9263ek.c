@@ -160,7 +160,7 @@ void lcd_show_board_info(void)
 		dram_size += gd->bd->bi_dram[i].size;
 	nand_size = 0;
 	for (i = 0; i < CONFIG_SYS_MAX_NAND_DEVICE; i++)
-		nand_size += nand_info[i]->size;
+		nand_size += get_nand_dev_by_index(i)->size;
 #ifdef CONFIG_MTD_NOR_FLASH
 	flash_size = 0;
 	for (i = 0; i < CONFIG_SYS_MAX_FLASH_BANKS; i++)
@@ -204,10 +204,6 @@ int board_init(void)
 
 #ifdef CONFIG_CMD_NAND
 	at91sam9263ek_nand_hw_init();
-#endif
-#ifdef CONFIG_HAS_DATAFLASH
-	at91_set_pio_output(AT91_PIO_PORTE, 20, 1);	/* select spi0 clock */
-	at91_spi0_hw_init(1 << 0);
 #endif
 #ifdef CONFIG_USB_OHCI_NEW
 	at91_uhp_hw_init();

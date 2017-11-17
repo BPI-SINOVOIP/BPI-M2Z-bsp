@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <sys/file.h>
 #include <unistd.h>
+#include <version.h>
 #include "fw_env_private.h"
 #include "fw_env.h"
 
@@ -48,6 +49,7 @@ static struct option long_options[] = {
 	{"script", required_argument, NULL, 's'},
 	{"noheader", required_argument, NULL, 'n'},
 	{"lock", required_argument, NULL, 'l'},
+	{"version", no_argument, NULL, 'v'},
 	{NULL, 0, NULL, 0}
 };
 
@@ -67,6 +69,7 @@ void usage_printenv(void)
 		"Print variables from U-Boot environment\n"
 		"\n"
 		" -h, --help           print this help.\n"
+		" -v, --version        display version\n"
 #ifdef CONFIG_ENV_AES
 		" -a, --aes            aes key to access environment\n"
 #endif
@@ -78,13 +81,14 @@ void usage_printenv(void)
 		"\n");
 }
 
-void usage_setenv(void)
+void usage_env_set(void)
 {
 	fprintf(stderr,
 		"Usage: fw_setenv [OPTIONS]... [VARIABLE]...\n"
 		"Modify variables in U-Boot environment\n"
 		"\n"
 		" -h, --help           print this help.\n"
+		" -v, --version        display version\n"
 #ifdef CONFIG_ENV_AES
 		" -a, --aes            aes key to access environment\n"
 #endif
@@ -123,7 +127,7 @@ static void parse_common_args(int argc, char *argv[])
 	env_opts.config_file = CONFIG_FILE;
 #endif
 
-	while ((c = getopt_long(argc, argv, ":a:c:l:h", long_options, NULL)) !=
+	while ((c = getopt_long(argc, argv, ":a:c:l:h:v", long_options, NULL)) !=
 	       EOF) {
 		switch (c) {
 		case 'a':
@@ -142,7 +146,11 @@ static void parse_common_args(int argc, char *argv[])
 			env_opts.lockname = optarg;
 			break;
 		case 'h':
-			do_printenv ? usage_printenv() : usage_setenv();
+			do_printenv ? usage_printenv() : usage_env_set();
+			exit(EXIT_SUCCESS);
+			break;
+		case 'v':
+			fprintf(stderr, "Compiled with " U_BOOT_VERSION "\n");
 			exit(EXIT_SUCCESS);
 			break;
 		default:
@@ -162,7 +170,7 @@ int parse_printenv_args(int argc, char *argv[])
 
 	parse_common_args(argc, argv);
 
-	while ((c = getopt_long(argc, argv, "a:c:ns:l:h", long_options, NULL))
+	while ((c = getopt_long(argc, argv, "a:c:ns:l:h:v", long_options, NULL))
 		!= EOF) {
 		switch (c) {
 		case 'n':
@@ -189,7 +197,7 @@ int parse_setenv_args(int argc, char *argv[])
 
 	parse_common_args(argc, argv);
 
-	while ((c = getopt_long(argc, argv, "a:c:ns:l:h", long_options, NULL))
+	while ((c = getopt_long(argc, argv, "a:c:ns:l:h:v", long_options, NULL))
 		!= EOF) {
 		switch (c) {
 		case 's':
@@ -202,7 +210,7 @@ int parse_setenv_args(int argc, char *argv[])
 			/* ignore common options */
 			break;
 		default: /* '?' */
-			usage_setenv();
+			usage_env_set();
 			exit(EXIT_FAILURE);
 			break;
 		}
@@ -273,7 +281,7 @@ int main(int argc, char *argv[])
 			retval = EXIT_FAILURE;
 	} else {
 		if (!script_file) {
-			if (fw_setenv(argc, argv, &env_opts) != 0)
+			if (fw_env_set(argc, argv, &env_opts) != 0)
 				retval = EXIT_FAILURE;
 		} else {
 			if (fw_parse_script(script_file, &env_opts) != 0)

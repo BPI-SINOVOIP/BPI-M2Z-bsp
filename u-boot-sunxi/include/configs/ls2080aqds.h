@@ -16,7 +16,6 @@ unsigned long get_board_ddr_clk(void);
 #endif
 
 #ifdef CONFIG_FSL_QSPI
-#undef CONFIG_CMD_IMLS
 #define CONFIG_QIXIS_I2C_ACCESS
 #define CONFIG_SYS_I2C_EARLY_INIT
 #define CONFIG_SYS_I2C_IFDR_DIV		0x7e
@@ -50,7 +49,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_LIBATA
 #define CONFIG_SCSI_AHCI
 #define CONFIG_SCSI_AHCI_PLAT
-#define CONFIG_SCSI
 
 #define CONFIG_SYS_SATA1			AHCI_BASE_ADDR1
 #define CONFIG_SYS_SATA2			AHCI_BASE_ADDR2
@@ -155,7 +153,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_NAND_BASE_LIST	{ CONFIG_SYS_NAND_BASE }
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_MTD_NAND_VERIFY_WRITE
-#define CONFIG_CMD_NAND
 
 #define CONFIG_SYS_NAND_BLOCK_SIZE	(128 * 1024)
 
@@ -230,7 +227,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_CS0_FTIM2		CONFIG_SYS_NAND_FTIM2
 #define CONFIG_SYS_CS0_FTIM3		CONFIG_SYS_NAND_FTIM3
 
-#define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_OFFSET		(896 * 1024)
 #define CONFIG_ENV_SECT_SIZE		0x20000
 #define CONFIG_ENV_SIZE			0x2000
@@ -238,8 +234,7 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_NAND_U_BOOT_OFFS	(256 * 1024)
 #define CONFIG_SYS_NAND_U_BOOT_SIZE	(640 * 1024)
 #elif defined(CONFIG_SD_BOOT)
-#define CONFIG_ENV_OFFSET		0x200000
-#define CONFIG_ENV_IS_IN_MMC
+#define CONFIG_ENV_OFFSET		0x300000
 #define CONFIG_SYS_MMC_ENV_DEV		0
 #define CONFIG_ENV_SIZE			0x20000
 #endif
@@ -273,7 +268,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_CS2_FTIM3		CONFIG_SYS_NAND_FTIM3
 
 #ifndef CONFIG_QSPI_BOOT
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + 0x300000)
 #define CONFIG_ENV_SECT_SIZE		0x20000
 #define CONFIG_ENV_SIZE			0x2000
@@ -347,7 +341,6 @@ unsigned long get_board_ddr_clk(void);
 
 #ifdef CONFIG_PCI
 #define CONFIG_PCI_SCAN_SHOW
-#define CONFIG_CMD_PCI
 #endif
 
 /*  MMC  */
@@ -411,7 +404,6 @@ unsigned long get_board_ddr_clk(void);
 
 #if defined(CONFIG_FSL_MC_ENET) && !defined(CONFIG_SPL_BUILD)
 #define CONFIG_FSL_MEMAC
-#define	CONFIG_PHYLIB
 #define CONFIG_PHYLIB_10G
 #define CONFIG_PHY_VITESSE
 #define CONFIG_PHY_REALTEK
@@ -440,17 +432,8 @@ unsigned long get_board_ddr_clk(void);
 
 #define CONFIG_MII		/* MII PHY management */
 #define CONFIG_ETHPRIME		"DPMAC1@xgmii"
-#define CONFIG_PHY_GIGE		/* Include GbE speed/duplex detection */
 
 #endif
-
-/*
- * USB
- */
-#define CONFIG_HAS_FSL_XHCI_USB
-#define CONFIG_USB_XHCI_FSL
-#define CONFIG_USB_MAX_CONTROLLER_COUNT		2
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS	2
 
 #include <asm/fsl_secure_boot.h>
 

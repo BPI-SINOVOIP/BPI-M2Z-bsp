@@ -54,14 +54,10 @@
 #define CONFIG_PL01X_SERIAL
 
 #ifdef CONFIG_CMD_USB
-#define CONFIG_USB_DWC2
 #define CONFIG_USB_DWC2_REG_ADDR 0xF72C0000
 /*#define CONFIG_DWC2_DFLT_SPEED_FULL*/
 #define CONFIG_DWC2_ENABLE_DYNAMIC_FIFO
 
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_SMSC95XX
-#define CONFIG_USB_ETHER_ASIX
 #define CONFIG_MISC_INIT_R
 #endif
 
@@ -87,9 +83,6 @@
  * Defines where the kernel and FDT will be put in RAM
  */
 
-/* Assume we boot with root on the seventh partition of eMMC */
-#define CONFIG_BOOTARGS	"console=ttyAMA0,115200n8 root=/dev/mmcblk0p9 rw"
-
 #define BOOT_TARGET_DEVICES(func) \
 	func(USB, usb, 0) \
 	func(MMC, mmc, 1) \
@@ -107,17 +100,10 @@
 
 /* Preserve environment on sd card */
 #define CONFIG_ENV_SIZE			0x1000
-#define CONFIG_ENV_IS_IN_FAT
-#define FAT_ENV_INTERFACE               "mmc"
-#define FAT_ENV_DEVICE_AND_PART         "1:1"
-#define FAT_ENV_FILE                    "uboot.env"
 #define CONFIG_ENV_VARS_UBOOT_CONFIG
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		512	/* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_SYS_MAXARGS		64	/* max command args */

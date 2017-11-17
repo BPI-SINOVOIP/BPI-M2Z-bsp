@@ -626,7 +626,7 @@ int board_late_init(void)
 	 * on HS devices.
 	 */
 	if (get_device_type() == HS_DEVICE)
-		setenv("boot_fit", "1");
+		env_set("boot_fit", "1");
 #endif
 	return 0;
 }
@@ -791,10 +791,10 @@ int board_eth_init(bd_t *bis)
 	mac_addr[4] = mac_lo & 0xFF;
 	mac_addr[5] = (mac_lo & 0xFF00) >> 8;
 
-	if (!getenv("ethaddr")) {
+	if (!env_get("ethaddr")) {
 		puts("<ethaddr> not set. Validating first E-fuse MAC\n");
 		if (is_valid_ethaddr(mac_addr))
-			eth_setenv_enetaddr("ethaddr", mac_addr);
+			eth_env_set_enetaddr("ethaddr", mac_addr);
 	}
 
 	mac_lo = readl(&cdev->macid1l);
@@ -806,9 +806,9 @@ int board_eth_init(bd_t *bis)
 	mac_addr[4] = mac_lo & 0xFF;
 	mac_addr[5] = (mac_lo & 0xFF00) >> 8;
 
-	if (!getenv("eth1addr")) {
+	if (!env_get("eth1addr")) {
 		if (is_valid_ethaddr(mac_addr))
-			eth_setenv_enetaddr("eth1addr", mac_addr);
+			eth_env_set_enetaddr("eth1addr", mac_addr);
 	}
 
 	if (board_is_eposevm()) {
@@ -838,6 +838,15 @@ int board_eth_init(bd_t *bis)
 }
 #endif
 
+#if defined(CONFIG_OF_LIBFDT) && defined(CONFIG_OF_BOARD_SETUP)
+int ft_board_setup(void *blob, bd_t *bd)
+{
+	ft_cpu_setup(blob, bd);
+
+	return 0;
+}
+#endif
+
 #ifdef CONFIG_SPL_LOAD_FIT
 int board_fit_config_name_match(const char *name)
 {
@@ -859,4 +868,11 @@ void board_fit_image_post_process(void **p_image, size_t *p_size)
 {
 	secure_boot_verify_image(p_image, p_size);
 }
+
+void board_tee_image_process(ulong tee_image, size_t tee_size)
+{
+	secure_tee_install((u32)tee_image);
+}
+
+U_BOOT_FIT_LOADABLE_HANDLER(IH_TYPE_TEE, board_tee_image_process);
 #endif

@@ -14,7 +14,6 @@
 #ifndef __CONFIG_IGEP003X_H
 #define __CONFIG_IGEP003X_H
 
-#define CONFIG_NAND
 #include <configs/ti_am335x_common.h>
 
 /* Clock defines */
@@ -64,8 +63,8 @@
 				"bootz ${loadaddr} - ${fdtaddr};" \
 			"fi;" \
 		"fi;\0" \
-	"mtdids=" MTDIDS_DEFAULT "\0" \
-	"mtdparts=" MTDPARTS_DEFAULT "\0" \
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
 	"nandroot=ubi0:rootfs rw ubi.mtd=1\0" \
 	"nandrootfstype=ubifs rootwait\0" \
 	"nandload=ubi part UBI; " \
@@ -111,23 +110,15 @@
 #define CONFIG_CONS_INDEX		1
 
 /* Ethernet support */
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_SMSC
 
 /* NAND support */
-#define CONFIG_NAND_OMAP_ELM
 #define CONFIG_SYS_NAND_ONFI_DETECTION	1
 
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_MTD_DEVICE
-#define CONFIG_RBTREE
-#define CONFIG_LZO
-
-#define MTDIDS_DEFAULT			"nand0=omap2-nand.0"
-#define MTDPARTS_DEFAULT		"mtdparts=omap2-nand.0:512k(SPL),-(UBI)"
 
 /* SPL */
-#define CONFIG_SPL_LDSCRIPT		"arch/arm/mach-omap2/u-boot-spl.lds"
 
 /* UBI configuration */
 #define CONFIG_SPL_UBI			1
@@ -144,7 +135,6 @@
 #define CONFIG_SPL_UBI_INFO_ADDR	0x88080000
 
 /* environment organization */
-#define CONFIG_ENV_IS_IN_UBI		1
 #define CONFIG_ENV_UBI_PART		"UBI"
 #define CONFIG_ENV_UBI_VOLUME		"config"
 #define CONFIG_ENV_UBI_VOLUME_REDUND	"config_r"

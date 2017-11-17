@@ -144,7 +144,7 @@ static const struct {
 	const u16	pn;
 	const char	*name;
 	const char	*var;
-} const socfpga_fpga_model[] = {
+} socfpga_fpga_model[] = {
 	/* Cyclone V E */
 	{ 0x2b15, "Cyclone V, E/A2", "cv_e_a2" },
 	{ 0x2b05, "Cyclone V, E/A4", "cv_e_a4" },
@@ -219,9 +219,9 @@ int arch_misc_init(void)
 {
 	const u32 bsel = readl(&sysmgr_regs->bootinfo) & 0x7;
 	const int fpga_id = socfpga_fpga_id(0);
-	setenv("bootmode", bsel_str[bsel].mode);
+	env_set("bootmode", bsel_str[bsel].mode);
 	if (fpga_id >= 0)
-		setenv("fpgatype", socfpga_fpga_model[fpga_id].var);
+		env_set("fpgatype", socfpga_fpga_model[fpga_id].var);
 	return socfpga_eth_reset();
 }
 #endif

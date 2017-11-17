@@ -6,9 +6,9 @@
 #
 
 obj-y += mmc.o
-obj-$(CONFIG_DM_MMC) += mmc-uclass.o
+obj-$(CONFIG_$(SPL_)DM_MMC) += mmc-uclass.o
 
-ifndef CONFIG_BLK
+ifndef CONFIG_$(SPL_)BLK
 obj-y += mmc_legacy.o
 endif
 
@@ -43,6 +43,7 @@ obj-$(CONFIG_SUPPORT_EMMC_RPMB) += rpmb.o
 obj-$(CONFIG_MMC_SANDBOX)		+= sandbox_mmc.o
 obj-$(CONFIG_SH_MMCIF) += sh_mmcif.o
 obj-$(CONFIG_SH_SDHI) += sh_sdhi.o
+obj-$(CONFIG_STM32_SDMMC2) += stm32_sdmmc2.o
 
 # SDHCI
 obj-$(CONFIG_MMC_SDHCI)			+= sdhci.o

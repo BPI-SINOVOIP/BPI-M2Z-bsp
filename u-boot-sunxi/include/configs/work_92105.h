@@ -57,7 +57,6 @@
 
 #define CONFIG_PHY_SMSC
 #define CONFIG_LPC32XX_ETH
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_ADDR 0
 #define CONFIG_SYS_FAULT_ECHO_LINK_DOWN
 /* FIXME: remove "Waiting for PHY auto negotiation to complete..." message */
@@ -88,9 +87,6 @@
  */
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_CBSIZE		1024
-#define CONFIG_SYS_PBSIZE		\
-	(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_MAXARGS		16
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 
 #define CONFIG_AUTO_COMPLETE
@@ -119,8 +115,6 @@
 #define CONFIG_SYS_NAND_BASE MLC_NAND_BASE
 #define CONFIG_NAND_LPC32XX_MLC
 
-#define CONFIG_CMD_NAND
-
 /*
  * GPIO
  */
@@ -133,12 +127,10 @@
 
 #define CONFIG_LPC32XX_SSP
 #define CONFIG_LPC32XX_SSP_TIMEOUT 100000
-#define CONFIG_CMD_MAX6957
 /*
  * Environment
  */
 
-#define CONFIG_ENV_IS_IN_NAND		1
 #define CONFIG_ENV_SIZE			0x00020000
 #define CONFIG_ENV_OFFSET		0x00100000
 #define CONFIG_ENV_OFFSET_REDUND	0x00120000
@@ -152,7 +144,6 @@
 #define CONFIG_INITRD_TAG
 
 #define CONFIG_BOOTFILE			"uImage"
-#define CONFIG_BOOTARGS			"console=ttyS2,115200n8"
 #define CONFIG_LOADADDR			0x80008000
 
 /*

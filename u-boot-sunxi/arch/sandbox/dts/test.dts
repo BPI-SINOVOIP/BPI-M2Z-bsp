@@ -127,10 +127,12 @@
 		compatible = "denx,u-boot-fdt-test";
 	};
 
-	clk_fixed: clk-fixed {
-		compatible = "fixed-clock";
-		#clock-cells = <0>;
-		clock-frequency = <1234>;
+	clocks {
+		clk_fixed: clk-fixed {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <1234>;
+		};
 	};
 
 	clk_sandbox: clk-sbox {
@@ -286,6 +288,25 @@
 			emul@1f,0 {
 				compatible = "sandbox,swap-case";
 			};
+		};
+	};
+
+	probing {
+		compatible = "simple-bus";
+		test1 {
+			compatible = "denx,u-boot-probe-test";
+		};
+
+		test2 {
+			compatible = "denx,u-boot-probe-test";
+		};
+
+		test3 {
+			compatible = "denx,u-boot-probe-test";
+		};
+
+		test4 {
+			compatible = "denx,u-boot-probe-test";
 		};
 	};
 

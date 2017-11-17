@@ -181,7 +181,6 @@ extern unsigned long get_clock_freq(void);
 #define CONFIG_SYS_NAND_BASE_PHYS	CONFIG_SYS_NAND_BASE
 #define CONFIG_SYS_NAND_BASE_LIST	{ CONFIG_SYS_NAND_BASE, }
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_CMD_NAND			1
 #define CONFIG_NAND_FSL_ELBC		1
 #define CONFIG_SYS_NAND_BLOCK_SIZE	(128 * 1024)
 #define CONFIG_SYS_NAND_BR_PRELIM	(CONFIG_SYS_NAND_BASE_PHYS \
@@ -424,7 +423,6 @@ extern unsigned long get_clock_freq(void);
  */
 #if defined(CONFIG_SYS_RAMBOOT)
 #else
-#define CONFIG_ENV_IS_IN_FLASH	1
 #define CONFIG_ENV_ADDR		(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SECT_SIZE)
 #define CONFIG_ENV_SECT_SIZE	0x20000	/* 128K(one sector) for env */
 #define CONFIG_ENV_SIZE		0x2000
@@ -444,15 +442,6 @@ extern unsigned long get_clock_freq(void);
 #define CONFIG_BOOTP_BOOTPATH
 #define CONFIG_BOOTP_GATEWAY
 #define CONFIG_BOOTP_HOSTNAME
-
-/*
- * Command line configuration.
- */
-#define CONFIG_CMD_REGINFO
-
-#if defined(CONFIG_PCI)
-    #define CONFIG_CMD_PCI
-#endif
 
 #undef CONFIG_WATCHDOG			/* watchdog disabled */
 
@@ -474,8 +463,6 @@ extern unsigned long get_clock_freq(void);
 #else
 #define CONFIG_SYS_CBSIZE	512		/* Console I/O Buffer Size */
 #endif
-#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE+sizeof(CONFIG_SYS_PROMPT)+16)
-						/* Print Buffer Size */
 #define CONFIG_SYS_MAXARGS	32		/* max number of command args */
 #define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
 						/* Boot Argument Buffer Size */
@@ -504,8 +491,6 @@ extern unsigned long get_clock_freq(void);
 #define CONFIG_NETMASK   255.255.255.0
 
 #define CONFIG_LOADADDR  200000   /*default location for tftp and bootm*/
-
-#undef  CONFIG_BOOTARGS           /* the boot command will set bootargs*/
 
 #define	CONFIG_EXTRA_ENV_SETTINGS					\
 	"netdev=eth0\0"							\

@@ -18,8 +18,8 @@
 #include <asm/arch/iomux.h>
 #include <asm/arch/mx6-pins.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/imx-common/iomux-v3.h>
-#include <asm/imx-common/video.h>
+#include <asm/mach-imx/iomux-v3.h>
+#include <asm/mach-imx/video.h>
 
 #include "../common/board.h"
 
@@ -195,9 +195,9 @@ void setup_display(void)
 void setenv_fdt_file(void)
 {
 	if (is_mx6dq())
-		setenv("fdt_file", "imx6q-icore.dtb");
+		env_set("fdt_file", "imx6q-icore.dtb");
 	else if(is_mx6dl() || is_mx6solo())
-		setenv("fdt_file", "imx6dl-icore.dtb");
+		env_set("fdt_file", "imx6dl-icore.dtb");
 }
 
 #ifdef CONFIG_SPL_BUILD

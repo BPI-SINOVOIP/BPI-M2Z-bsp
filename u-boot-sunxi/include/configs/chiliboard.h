@@ -7,15 +7,12 @@
 #ifndef __CONFIG_CHILIBOARD_H
 #define __CONFIG_CHILIBOARD_H
 
-#define CONFIG_NAND
-
 #include <configs/ti_am335x_common.h>
 
 #define CONFIG_CONS_INDEX		1
 
 #ifndef CONFIG_SPL_BUILD
 # define CONFIG_TIMESTAMP
-# define CONFIG_LZO
 #endif
 
 /* Clock Defines */
@@ -23,8 +20,8 @@
 #define V_SCLK				(V_OSCK)
 
 #define NANDARGS \
-	"mtdids=" MTDIDS_DEFAULT "\0" \
-	"mtdparts=" MTDPARTS_DEFAULT "\0" \
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
 	"nandargs=setenv bootargs console=${console} ${optargs} " \
 		"${mtdparts} " \
 		"root=${nandroot} " \
@@ -48,7 +45,7 @@
 	"boot_fdt=try\0" \
 	"console=ttyO0,115200n8\0" \
 	"image=zImage\0" \
-	"fdt_file=am335x-chiliboard.dtb\0" \
+	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"ip_dyn=yes\0" \
 	"optargs=\0" \
 	"loadbootscript=" \
@@ -130,8 +127,6 @@
 #define CONFIG_BOOTCOUNT_AM33XX
 #define CONFIG_SYS_BOOTCOUNT_BE
 
-#define CONFIG_SPL_LDSCRIPT	"arch/arm/mach-omap2/u-boot-spl.lds"
-
 /* NAND: device related configs */
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
 #define CONFIG_SYS_NAND_PAGE_COUNT	(CONFIG_SYS_NAND_BLOCK_SIZE / \
@@ -140,9 +135,6 @@
 #define CONFIG_SYS_NAND_OOBSIZE		64
 #define CONFIG_SYS_NAND_BLOCK_SIZE	(128*1024)
 /* NAND: driver related configs */
-#define CONFIG_NAND_OMAP_GPMC
-#define CONFIG_NAND_OMAP_GPMC_PREFETCH
-#define CONFIG_NAND_OMAP_ELM
 #define CONFIG_SYS_NAND_BAD_BLOCK_POS	NAND_LARGE_BADBLOCK_POS
 #define CONFIG_SYS_NAND_ECCPOS		{ 2, 3, 4, 5, 6, 7, 8, 9, \
 					 10, 11, 12, 13, 14, 15, 16, 17, \
@@ -156,23 +148,8 @@
 #define CONFIG_SYS_NAND_ECCBYTES	14
 #define CONFIG_SYS_NAND_ONFI_DETECTION
 #define CONFIG_NAND_OMAP_ECCSCHEME	OMAP_ECC_BCH8_CODE_HW
-#define MTDIDS_DEFAULT			"nand0=8000000.nand"
-#define MTDPARTS_DEFAULT		"mtdparts=8000000.nand:" \
-					"128k(NAND.SPL)," \
-					"128k(NAND.SPL.backup1)," \
-					"128k(NAND.SPL.backup2)," \
-					"128k(NAND.SPL.backup3)," \
-					"256k(NAND.u-boot-spl-os)," \
-					"1m(NAND.u-boot)," \
-					"128k(NAND.u-boot-env)," \
-					"128k(NAND.u-boot-env.backup1)," \
-					"8m(NAND.kernel)," \
-					"-(NAND.file-system)"
 #define CONFIG_SYS_NAND_U_BOOT_OFFS	0x000c0000
 /* NAND: SPL related configs */
-#ifdef CONFIG_SPL_NAND_SUPPORT
-#define CONFIG_SPL_NAND_AM33XX_BCH
-#endif
 
 /* USB configuration */
 #define CONFIG_USB_MUSB_DSPS
@@ -188,9 +165,7 @@
  */
 #ifdef CONFIG_SPL_BUILD
 #undef CONFIG_DM_MMC
-#undef CONFIG_DM_MMC_OPS
 #undef CONFIG_TIMER
-#undef CONFIG_DM_USB
 #endif
 
 #if defined(CONFIG_ENV_IS_IN_NAND)
@@ -199,7 +174,6 @@
 #define CONFIG_ENV_SIZE			SZ_128K
 #define CONFIG_SYS_ENV_SECT_SIZE	CONFIG_SYS_NAND_BLOCK_SIZE
 #else
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV		0
 #define CONFIG_ENV_OFFSET		SZ_128K
 #define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
@@ -208,7 +182,6 @@
 #endif
 
 /* Network. */
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_SMSC
 
 #endif	/* ! __CONFIG_CHILIBOARD_H */

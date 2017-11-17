@@ -33,8 +33,6 @@
  */
 #define CONFIG_SYS_TEXT_BASE	0x80008000
 
-#define CONFIG_SDRC			/* The chip has SDRC controller */
-
 #include <asm/arch/cpu.h>		/* get chip and board defs */
 #include <asm/arch/omap.h>
 #include <asm/arch/mem.h>
@@ -102,22 +100,9 @@
 #define CONFIG_CMDLINE_EDITING		/* add command line history */
 #define CONFIG_AUTO_COMPLETE		/* add autocompletion support */
 
-#ifdef ONENAND_SUPPORT
-
-#define CONFIG_CMD_ONENAND		/* ONENAND support */
-#define CONFIG_CMD_MTDPARTS		/* mtd parts support */
-
-#ifdef UBIFS_SUPPORT
-#define CONFIG_CMD_UBIFS		/* UBIFS Support */
-#endif
-
-#endif
-
-#define CONFIG_OMAP3_SPI
 #define CONFIG_SYS_I2C
 #define CONFIG_SYS_OMAP24_I2C_SPEED	100000
 #define CONFIG_SYS_OMAP24_I2C_SLAVE	1
-#define CONFIG_SYS_I2C_OMAP34XX
 
 /*
  * TWL4030
@@ -179,20 +164,6 @@
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
 
-#ifdef UBIFS_SUPPORT
-#define CONFIG_RBTREE
-#define CONFIG_LZO
-#endif
-
-#define MTDIDS_DEFAULT			"onenand0=onenand"
-#define MTDPARTS_DEFAULT		"mtdparts=onenand:" \
-		__stringify(PART1_SIZE) PART1_SUFF "(" PART1_NAME ")ro," \
-		__stringify(PART2_SIZE) PART2_SUFF "(" PART2_NAME ")," \
-		__stringify(PART3_SIZE) PART3_SUFF "(" PART3_NAME ")," \
-		__stringify(PART4_SIZE) PART4_SUFF "(" PART4_NAME ")," \
-		__stringify(PART5_SIZE) PART5_SUFF "(" PART5_NAME ")," \
-		"-(" PART6_NAME ")"
-
 #endif
 
 /* Watchdog support */
@@ -218,13 +189,14 @@ int rx51_kp_tstc(struct stdio_dev *sdev);
 int rx51_kp_getc(struct stdio_dev *sdev);
 #endif
 
-#ifndef MTDPARTS_DEFAULT
-#define MTDPARTS_DEFAULT
-#endif
-
 /* Environment information */
+#ifdef CONFIG_MTDPARTS_DEFAULT
+#define MTDPARTS "mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0"
+#else
+#define MTDPARTS
+#endif
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"mtdparts=" MTDPARTS_DEFAULT "\0" \
+	MTDPARTS \
 	"usbtty=cdc_acm\0" \
 	"stdin=vga\0" \
 	"stdout=vga\0" \
@@ -349,13 +321,6 @@ int rx51_kp_getc(struct stdio_dev *sdev);
  * Miscellaneous configurable options
  */
 #define CONFIG_SYS_LONGHELP			/* undef to save memory */
-#define CONFIG_SYS_CBSIZE		256	/* Console I/O Buffer Size */
-/* Print Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-						sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_MAXARGS		16	/* max number of command args */
-/* Boot Argument Buffer Size */
-#define CONFIG_SYS_BARGSIZE		(CONFIG_SYS_CBSIZE)
 
 #define CONFIG_SYS_MEMTEST_START	(OMAP34XX_SDRC_CS0)
 #define CONFIG_SYS_MEMTEST_END		(OMAP34XX_SDRC_CS0 + 0x01F00000)/*31MB*/
@@ -380,8 +345,6 @@ int rx51_kp_getc(struct stdio_dev *sdev);
 /*
  * FLASH and environment organization
  */
-
-#define CONFIG_ENV_IS_NOWHERE
 
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1
 #define CONFIG_SYS_INIT_RAM_ADDR	0x4020f800

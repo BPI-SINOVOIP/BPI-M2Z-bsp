@@ -173,6 +173,30 @@ static int __maybe_unused ti_i2c_eeprom_get(int bus_addr, int dev_addr,
 	return 0;
 }
 
+int __maybe_unused ti_i2c_eeprom_am_set(const char *name, const char *rev)
+{
+	struct ti_common_eeprom *ep;
+
+	if (!name || !rev)
+		return -1;
+
+	ep = TI_EEPROM_DATA;
+	if (ep->header == TI_EEPROM_HEADER_MAGIC)
+		goto already_set;
+
+	/* Set to 0 all fields */
+	memset(ep, 0, sizeof(*ep));
+	strncpy(ep->name, name, TI_EEPROM_HDR_NAME_LEN);
+	strncpy(ep->version, rev, TI_EEPROM_HDR_REV_LEN);
+	/* Some dummy serial number to identify the platform */
+	strncpy(ep->serial, "0000", TI_EEPROM_HDR_SERIAL_LEN);
+	/* Mark it with a valid header */
+	ep->header = TI_EEPROM_HEADER_MAGIC;
+
+already_set:
+	return 0;
+}
+
 int __maybe_unused ti_i2c_eeprom_am_get(int bus_addr, int dev_addr)
 {
 	int rc;
@@ -355,21 +379,21 @@ void __maybe_unused set_board_info_env(char *name)
 	struct ti_common_eeprom *ep = TI_EEPROM_DATA;
 
 	if (name)
-		setenv("board_name", name);
+		env_set("board_name", name);
 	else if (ep->name)
-		setenv("board_name", ep->name);
+		env_set("board_name", ep->name);
 	else
-		setenv("board_name", unknown);
+		env_set("board_name", unknown);
 
 	if (ep->version)
-		setenv("board_rev", ep->version);
+		env_set("board_rev", ep->version);
 	else
-		setenv("board_rev", unknown);
+		env_set("board_rev", unknown);
 
 	if (ep->serial)
-		setenv("board_serial", ep->serial);
+		env_set("board_serial", ep->serial);
 	else
-		setenv("board_serial", unknown);
+		env_set("board_serial", unknown);
 }
 
 static u64 mac_to_u64(u8 mac[6])
@@ -427,9 +451,19 @@ void board_ti_set_ethaddr(int index)
 		for (i = 0; i < num_macs; i++) {
 			u64_to_mac(mac1 + i, mac_addr);
 			if (is_valid_ethaddr(mac_addr)) {
-				eth_setenv_enetaddr_by_index("eth", i + index,
-							     mac_addr);
+				eth_env_set_enetaddr_by_index("eth", i + index,
+							      mac_addr);
 			}
 		}
 	}
+}
+
+bool __maybe_unused board_ti_was_eeprom_read(void)
+{
+	struct ti_common_eeprom *ep = TI_EEPROM_DATA;
+
+	if (ep->header == TI_EEPROM_HEADER_MAGIC)
+		return true;
+	else
+		return false;
 }

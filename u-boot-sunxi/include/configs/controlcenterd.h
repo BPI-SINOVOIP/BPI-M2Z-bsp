@@ -220,7 +220,6 @@
 #define CONFIG_PCI_INDIRECT_BRIDGE
 #define CONFIG_PCI_SCAN_SHOW		/* show pci devices on startup */
 #define CONFIG_SYS_PCI_64BIT		/* enable 64-bit PCI resources */
-#define CONFIG_CMD_PCI
 
 #define CONFIG_FSL_PCI_INIT		/* Use common FSL init code */
 #define CONFIG_FSL_PCIE_RESET		/* need PCIe reset errata */
@@ -248,7 +247,6 @@
  */
 #define CONFIG_LIBATA
 #define CONFIG_LBA48
-#define CONFIG_CMD_SATA
 
 #define CONFIG_FSL_SATA
 #define CONFIG_SYS_SATA_MAX_DEVICE	2
@@ -283,8 +281,6 @@
 
 #define CONFIG_ETHPRIME		"eTSEC1"
 
-#define CONFIG_PHY_GIGE		/* Include GbE speed/duplex detection */
-
 /*
  * USB
  */
@@ -299,10 +295,8 @@
  * Environment
  */
 #if defined(CONFIG_TRAILBLAZER)
-#define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_ENV_SIZE		0x2000		/* 8KB */
 #elif defined(CONFIG_RAMBOOT_SPIFLASH)
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SPI_BUS	0
 #define CONFIG_ENV_SPI_CS	0
 #define CONFIG_ENV_SPI_MAX_HZ	10000000
@@ -311,7 +305,6 @@
 #define CONFIG_ENV_OFFSET	0x100000	/* 1MB */
 #define CONFIG_ENV_SECT_SIZE	0x10000
 #elif defined(CONFIG_RAMBOOT_SDCARD)
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_FSL_FIXED_MMC_LOCATION
 #define CONFIG_ENV_SIZE		0x2000
 #define CONFIG_SYS_MMC_ENV_DEV	0
@@ -329,20 +322,8 @@
 #endif /* CONFIG_TRAILBLAZER */
 
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
-#ifdef CONFIG_CMD_KGDB
-#define CONFIG_SYS_CBSIZE	1024		/* Console I/O Buffer Size */
-#else
-#define CONFIG_SYS_CBSIZE	256		/* Console I/O Buffer Size */
-#endif
-/* Print Buffer Size */
-#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_MAXARGS	16
-#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
 
 #ifndef CONFIG_TRAILBLAZER
-
-#define CONFIG_CMD_REGINFO
-
 /*
  * Board initialisation callbacks
  */

@@ -25,22 +25,10 @@
 #define PHYS_SDRAM_1_SIZE		0x40000000
 
 /* Ethernet on SoC (EMAC) */
-#if defined(CONFIG_CMD_NET)
-#define CONFIG_PHY_MICREL
-#define CONFIG_PHY_MICREL_KSZ9031
-#endif
 
 /*
  * U-Boot environment configurations
  */
-#define CONFIG_ENV_IS_IN_MMC
-
-/*
- * arguments passed to the bootz command. The value of
- * CONFIG_BOOTARGS goes into the environment value "bootargs".
- * Do note the value will overide also the chosen node in FDT blob.
- */
-#define CONFIG_BOOTARGS "console=ttyS0," __stringify(CONFIG_BAUDRATE)
 
 /*
  * Serial / UART configurations

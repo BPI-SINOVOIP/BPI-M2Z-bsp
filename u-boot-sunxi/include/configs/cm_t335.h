@@ -12,12 +12,10 @@
 #define __CONFIG_CM_T335_H
 
 #define CONFIG_CM_T335
-#define CONFIG_NAND
 
 #include <configs/ti_am335x_common.h>
 
 #undef CONFIG_SPI
-#undef CONFIG_OMAP3_SPI
 #undef CONFIG_BOOTCOUNT_LIMIT
 #undef CONFIG_SPL_AM33XX_ENABLE_RTC32K_OSC
 
@@ -45,8 +43,8 @@
 		"bootm ${loadaddr}\0"
 
 #define NANDARGS \
-	"mtdids=" MTDIDS_DEFAULT "\0" \
-	"mtdparts=" MTDPARTS_DEFAULT "\0" \
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
 	"nandroot=ubi0:rootfs rw\0" \
 	"nandrootfstype=ubifs\0" \
 	"nandargs=setenv bootargs console=${console} " \
@@ -99,11 +97,8 @@
 #define CONFIG_SYS_I2C_EEPROM_BUS	0
 
 /* SPL */
-#define CONFIG_SPL_LDSCRIPT		"arch/arm/mach-omap2/u-boot-spl.lds"
 
 /* Network. */
-#define CONFIG_PHY_GIGE
-#define CONFIG_PHYLIB
 #define CONFIG_PHY_ATHEROS
 
 /* NAND support */
@@ -130,20 +125,11 @@
 #undef CONFIG_SYS_NAND_U_BOOT_OFFS
 #define CONFIG_SYS_NAND_U_BOOT_OFFS	0x200000
 
-#define CONFIG_CMD_NAND
-#define MTDIDS_DEFAULT			"nand0=nand"
-#define MTDPARTS_DEFAULT		"mtdparts=nand:2m(spl)," \
-					"1m(u-boot),1m(u-boot-env)," \
-					"1m(dtb),4m(splash)," \
-					"6m(kernel),-(rootfs)"
-#define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_OFFSET		0x300000 /* environment starts here */
 #define CONFIG_SYS_ENV_SECT_SIZE	(128 << 10)	/* 128 KiB */
 #define CONFIG_SYS_NAND_ONFI_DETECTION
 #ifdef CONFIG_SPL_OS_BOOT
-#define CONFIG_CMD_SPL_NAND_OFS		0x400000 /* un-assigned: (using dtb) */
 #define CONFIG_SYS_NAND_SPL_KERNEL_OFFS	0x500000
-#define CONFIG_CMD_SPL_WRITE_SIZE	0x2000
 #endif
 
 /* GPIO pin + bank to pin ID mapping */
@@ -165,8 +151,6 @@
  * First select the I2C0 bus with "i2c dev 0", then use "pca953x" command.
  */
 #define CONFIG_PCA953X
-#define CONFIG_CMD_PCA953X
-#define CONFIG_CMD_PCA953X_INFO
 #define CONFIG_SYS_I2C_PCA953X_ADDR	0x26
 #define CONFIG_SYS_I2C_PCA953X_WIDTH	{ {0x26, 16} }
 #endif /* CONFIG_SPL_BUILD */

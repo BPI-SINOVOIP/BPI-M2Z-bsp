@@ -57,17 +57,6 @@
  * Miscellaneous configurable options
  */
 #define CONFIG_SYS_LONGHELP
-#define CONFIG_SYS_CBSIZE		256
-
-/* Print Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE \
-					 + sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_MAXARGS		16
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
-
-#define CONFIG_BOOTARGS \
-		"console=ttyS4,115200n8" \
-		" root=/dev/ram rw"
 
 #define CONFIG_BOOTCOMMAND		"bootm 20080000 20300000"
 #define CONFIG_ENV_OVERWRITE

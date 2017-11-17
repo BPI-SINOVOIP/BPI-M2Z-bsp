@@ -29,7 +29,6 @@
  * Commands configuration
  */
 #define CONFIG_SYS_MVFS
-#define CONFIG_CMD_NAND
 
 /*
  * mv-common.h should be defined after CMD configs since it used them
@@ -41,10 +40,7 @@
  *  Environment variables configurations
  */
 #ifdef CONFIG_CMD_NAND
-#define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_SECT_SIZE		0x20000	/* 128K */
-#else
-#define CONFIG_ENV_IS_NOWHERE
 #endif
 
 #define CONFIG_ENV_SIZE			0x20000	/* 128k */
@@ -77,11 +73,7 @@
 /*
  * File system
  */
-#define CONFIG_CMD_UBIFS
-#define CONFIG_RBTREE
 #define CONFIG_MTD_DEVICE               /* needed for mtdparts commands */
 #define CONFIG_MTD_PARTITIONS
-#define CONFIG_CMD_MTDPARTS
-#define CONFIG_LZO
 
 #endif /* _CONFIG_POGO_E02_H */

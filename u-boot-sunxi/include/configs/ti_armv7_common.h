@@ -53,7 +53,7 @@
 
 #define DEFAULT_FIT_TI_ARGS \
 	"boot_fit=0\0" \
-	"fit_loadaddr=0x88000000\0" \
+	"fit_loadaddr=0x87000000\0" \
 	"fit_bootfile=fitImage\0" \
 	"update_to_fit=setenv loadaddr ${fit_loadaddr}; setenv bootfile ${fit_bootfile}\0" \
 	"loadfit=run args_mmc; bootm ${loadaddr}#${fdtfile};\0" \
@@ -126,9 +126,6 @@
 
 /* Console I/O Buffer Size */
 #define CONFIG_SYS_CBSIZE		1024
-/* Print Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE \
-					+ sizeof(CONFIG_SYS_PROMPT) + 16)
 /* Boot Argument Buffer Size */
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 
@@ -139,7 +136,6 @@
  */
 #if defined(CONFIG_SPI_BOOT) || defined(CONFIG_NOR) || defined(CONFIG_NAND) || defined(CONFIG_NAND_DAVINCI)
 #define CONFIG_MTD_DEVICE		/* Required for mtdparts */
-#define CONFIG_CMD_MTDPARTS
 #endif
 
 #define CONFIG_SUPPORT_RAW_INITRD
@@ -202,10 +198,6 @@
 #define CONFIG_SYS_MMCSD_RAW_MODE_KERNEL_SECTOR	0x1700  /* address 0x2E0000 */
 #define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTOR	0x1500  /* address 0x2A0000 */
 #define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTORS	0x200   /* 256KiB */
-
-
-/* spl export command */
-#define CONFIG_CMD_SPL
 #endif
 
 /* General parts of the framework, required. */

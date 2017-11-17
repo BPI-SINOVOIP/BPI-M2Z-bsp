@@ -46,7 +46,6 @@
 /*
  * Command line configuration.
  */
-#define CONFIG_SCSI
 
 #define CONFIG_BOOT_RETRY_TIME		-1
 #define CONFIG_RESET_TO_RETRY
@@ -55,11 +54,7 @@
  * Miscellaneous configurable options
  */
 #define CONFIG_SYS_CBSIZE		1024	/* Console I/O Buffer Size */
-#define CONFIG_SYS_MAXARGS		16	/* max number of cmd args */
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
-/* Print Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					 sizeof(CONFIG_SYS_PROMPT)+16)
 
 #define CONFIG_SYS_LOAD_ADDR		0x800000
 #define CONFIG_SYS_64BIT_LBA
@@ -75,7 +70,6 @@
 
 /* Environment data setup
 */
-#define CONFIG_ENV_IS_IN_NVRAM
 #define CONFIG_SYS_NVRAM_BASE_ADDR	0xfff88000	/* NVRAM base address */
 #define CONFIG_SYS_NVRAM_SIZE		0x8000		/* NVRAM size */
 #define CONFIG_ENV_SIZE			0x2000		/* Size of Environ */

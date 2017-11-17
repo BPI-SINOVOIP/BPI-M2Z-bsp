@@ -60,17 +60,11 @@
  * Environment settings
  */
 #define CONFIG_ENV_SIZE			SZ_16K
-#define CONFIG_ENV_IS_IN_FAT
-#define FAT_ENV_INTERFACE		"mmc"
-#define FAT_ENV_DEVICE_AND_PART		"0:1"
-#define FAT_ENV_FILE			"uboot.env"
-#define CONFIG_FAT_WRITE
 
 /*
  * Environment configuration
  */
 #define CONFIG_BOOTFILE			"uImage"
-#define CONFIG_BOOTARGS			"console=ttyS0,115200n8"
 #define CONFIG_LOADADDR			CONFIG_SYS_LOAD_ADDR
 
 /*
@@ -79,11 +73,6 @@
 #define CONFIG_AUTO_COMPLETE
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_SYS_LONGHELP
-#define CONFIG_SYS_MAXARGS		16
-#define CONFIG_SYS_CBSIZE		SZ_256
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-						sizeof(CONFIG_SYS_PROMPT) + 16)
 
 /*
  * Misc utility configuration

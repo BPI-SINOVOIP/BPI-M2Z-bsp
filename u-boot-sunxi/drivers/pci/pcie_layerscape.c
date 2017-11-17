@@ -241,14 +241,19 @@ static int ls_pcie_addr_valid(struct ls_pcie *pcie, pci_dev_t bdf)
 	return 0;
 }
 
-void *ls_pcie_conf_address(struct ls_pcie *pcie, pci_dev_t bdf,
-				   int offset)
+int ls_pcie_conf_address(struct udevice *bus, pci_dev_t bdf,
+			 uint offset, void **paddress)
 {
-	struct udevice *bus = pcie->bus;
+	struct ls_pcie *pcie = dev_get_priv(bus);
 	u32 busdev;
 
-	if (PCI_BUS(bdf) == bus->seq)
-		return pcie->dbi + offset;
+	if (ls_pcie_addr_valid(pcie, bdf))
+		return -EINVAL;
+
+	if (PCI_BUS(bdf) == bus->seq) {
+		*paddress = pcie->dbi + offset;
+		return 0;
+	}
 
 	busdev = PCIE_ATU_BUS(PCI_BUS(bdf)) |
 		 PCIE_ATU_DEV(PCI_DEV(bdf)) |
@@ -256,67 +261,28 @@ void *ls_pcie_conf_address(struct ls_pcie *pcie, pci_dev_t bdf,
 
 	if (PCI_BUS(bdf) == bus->seq + 1) {
 		ls_pcie_cfg0_set_busdev(pcie, busdev);
-		return pcie->cfg0 + offset;
+		*paddress = pcie->cfg0 + offset;
 	} else {
 		ls_pcie_cfg1_set_busdev(pcie, busdev);
-		return pcie->cfg1 + offset;
+		*paddress = pcie->cfg1 + offset;
 	}
+	return 0;
 }
 
 static int ls_pcie_read_config(struct udevice *bus, pci_dev_t bdf,
 			       uint offset, ulong *valuep,
 			       enum pci_size_t size)
 {
-	struct ls_pcie *pcie = dev_get_priv(bus);
-	void *address;
-
-	if (ls_pcie_addr_valid(pcie, bdf)) {
-		*valuep = pci_get_ff(size);
-		return 0;
-	}
-
-	address = ls_pcie_conf_address(pcie, bdf, offset);
-
-	switch (size) {
-	case PCI_SIZE_8:
-		*valuep = readb(address);
-		return 0;
-	case PCI_SIZE_16:
-		*valuep = readw(address);
-		return 0;
-	case PCI_SIZE_32:
-		*valuep = readl(address);
-		return 0;
-	default:
-		return -EINVAL;
-	}
+	return pci_generic_mmap_read_config(bus, ls_pcie_conf_address,
+					    bdf, offset, valuep, size);
 }
 
 static int ls_pcie_write_config(struct udevice *bus, pci_dev_t bdf,
 				uint offset, ulong value,
 				enum pci_size_t size)
 {
-	struct ls_pcie *pcie = dev_get_priv(bus);
-	void *address;
-
-	if (ls_pcie_addr_valid(pcie, bdf))
-		return 0;
-
-	address = ls_pcie_conf_address(pcie, bdf, offset);
-
-	switch (size) {
-	case PCI_SIZE_8:
-		writeb(value, address);
-		return 0;
-	case PCI_SIZE_16:
-		writew(value, address);
-		return 0;
-	case PCI_SIZE_32:
-		writel(value, address);
-		return 0;
-	default:
-		return -EINVAL;
-	}
+	return pci_generic_mmap_write_config(bus, ls_pcie_conf_address,
+					     bdf, offset, value, size);
 }
 
 /* Clear multi-function bit */
@@ -478,6 +444,7 @@ static int ls_pcie_probe(struct udevice *dev)
 	bool ep_mode;
 	uint svr;
 	int ret;
+	fdt_size_t cfg_size;
 
 	pcie->bus = dev;
 
@@ -539,8 +506,10 @@ static int ls_pcie_probe(struct udevice *dev)
 	if (svr == SVR_LS2088A || svr == SVR_LS2084A ||
 	    svr == SVR_LS2048A || svr == SVR_LS2044A ||
 	    svr == SVR_LS2081A || svr == SVR_LS2041A) {
+		cfg_size = fdt_resource_size(&pcie->cfg_res);
 		pcie->cfg_res.start = LS2088A_PCIE1_PHYS_ADDR +
 					LS2088A_PCIE_PHYS_SIZE * pcie->idx;
+		pcie->cfg_res.end = pcie->cfg_res.start + cfg_size;
 		pcie->ctrl = pcie->lut + 0x40000;
 	}
 

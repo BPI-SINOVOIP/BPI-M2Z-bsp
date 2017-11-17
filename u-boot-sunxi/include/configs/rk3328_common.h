@@ -9,9 +9,6 @@
 
 #include "rockchip-common.h"
 
-#define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_ENV_SIZE			0x2000
-#define CONFIG_SYS_MAXARGS		16
 #define CONFIG_SYS_MALLOC_LEN		(32 << 20)
 #define CONFIG_SYS_CBSIZE		1024
 #define CONFIG_SKIP_LOWLEVEL_INIT
@@ -37,6 +34,7 @@
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
 #define CONFIG_SYS_SDRAM_BASE		0
 #define CONFIG_NR_DRAM_BANKS		1
+#define SDRAM_MAX_SIZE			0xff000000
 
 #define CONFIG_SPI_FLASH
 #define CONFIG_SPI
@@ -63,6 +61,4 @@
 #define CONFIG_USB_OHCI_NEW
 #define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS	1
 
-/* xhci host */
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS	2
 #endif

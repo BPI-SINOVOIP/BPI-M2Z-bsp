@@ -54,8 +54,6 @@
  */
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_CBSIZE	1024		/* Console I/O buffer size */
-#define CONFIG_SYS_PBSIZE	\
-	(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
 						/* Print buffer size */
 #define CONFIG_SYS_MAXARGS	32		/* Max number of command args */
 #define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
@@ -96,21 +94,15 @@
 #if defined(CONFIG_CMD_NET) && !defined(CONFIG_SOCFPGA_VIRTUAL_TARGET)
 #define CONFIG_DW_ALTDESCRIPTOR
 #define CONFIG_MII
-#define CONFIG_AUTONEG_TIMEOUT		(15 * CONFIG_SYS_HZ)
-#define CONFIG_PHY_GIGE
 #endif
 
 /*
  * FPGA Driver
  */
-#ifdef CONFIG_TARGET_SOCFPGA_GEN5
 #ifdef CONFIG_CMD_FPGA
-#define CONFIG_FPGA
-#define CONFIG_FPGA_ALTERA
-#define CONFIG_FPGA_SOCFPGA
 #define CONFIG_FPGA_COUNT		1
 #endif
-#endif
+
 /*
  * L4 OSC1 Timer 0
  */
@@ -149,19 +141,16 @@
  */
 #ifdef CONFIG_NAND_DENALI
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_SYS_NAND_MAX_CHIPS	1
 #define CONFIG_SYS_NAND_ONFI_DETECTION
 #define CONFIG_NAND_DENALI_ECC_SIZE	512
 #define CONFIG_SYS_NAND_REGS_BASE	SOCFPGA_NANDREGS_ADDRESS
 #define CONFIG_SYS_NAND_DATA_BASE	SOCFPGA_NANDDATA_ADDRESS
-#define CONFIG_SYS_NAND_BASE		(CONFIG_SYS_NAND_DATA_BASE + 0x10)
 #endif
 
 /*
  * I2C support
  */
 #define CONFIG_SYS_I2C
-#define CONFIG_SYS_I2C_BUS_MAX		4
 #define CONFIG_SYS_I2C_BASE		SOCFPGA_I2C0_ADDRESS
 #define CONFIG_SYS_I2C_BASE1		SOCFPGA_I2C1_ADDRESS
 #define CONFIG_SYS_I2C_BASE2		SOCFPGA_I2C2_ADDRESS
@@ -188,10 +177,8 @@ unsigned int cm_get_l4_sp_clk_hz(void);
 /* Enable multiple SPI NOR flash manufacturers */
 #ifndef CONFIG_SPL_BUILD
 #define CONFIG_SPI_FLASH_MTD
-#define CONFIG_CMD_MTDPARTS
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#define MTDIDS_DEFAULT			"nor0=ff705000.spi.0"
 #endif
 /* QSPI reference clock */
 #ifndef __ASSEMBLY__
@@ -224,9 +211,6 @@ unsigned int cm_get_qspi_controller_clk_hz(void);
 /*
  * USB
  */
-#ifdef CONFIG_CMD_USB
-#define CONFIG_USB_DWC2
-#endif
 
 /*
  * USB Gadget (DFU, UMS)
@@ -274,22 +258,6 @@ unsigned int cm_get_qspi_controller_clk_hz(void);
  * 5: rootfs              0x01000000      0x01000000      0
  *
  */
-#if defined(CONFIG_CMD_SF) && !defined(MTDPARTS_DEFAULT)
-#define MTDPARTS_DEFAULT	"mtdparts=ff705000.spi.0:"\
-				"1m(u-boot),"		\
-				"256k(env1),"		\
-				"256k(env2),"		\
-				"14848k(boot),"		\
-				"16m(rootfs),"		\
-				"-@1536k(UBI)\0"
-#endif
-
-/* UBI and UBIFS support */
-#if defined(CONFIG_CMD_SF) || defined(CONFIG_CMD_NAND)
-#define CONFIG_CMD_UBIFS
-#define CONFIG_RBTREE
-#define CONFIG_LZO
-#endif
 
 /*
  * SPL

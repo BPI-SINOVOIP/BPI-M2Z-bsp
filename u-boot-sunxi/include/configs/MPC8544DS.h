@@ -318,14 +318,11 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 #define TSEC3_PHYIDX		0
 
 #define CONFIG_ETHPRIME		"eTSEC1"
-
-#define CONFIG_PHY_GIGE		1	/* Include GbE speed/duplex detection */
 #endif	/* CONFIG_TSEC_ENET */
 
 /*
  * Environment
  */
-#define CONFIG_ENV_IS_IN_FLASH	1
 #define CONFIG_ENV_SECT_SIZE	0x10000 /* 64K (one sector) */
 #if CONFIG_SYS_MONITOR_BASE > 0xfff80000
 #define CONFIG_ENV_ADDR		0xfff80000
@@ -346,21 +343,10 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 #define CONFIG_BOOTP_HOSTNAME
 
 /*
- * Command line configuration.
- */
-#define CONFIG_CMD_REGINFO
-
-#if defined(CONFIG_PCI)
-    #define CONFIG_CMD_PCI
-    #define CONFIG_SCSI
-#endif
-
-/*
  * USB
  */
 
 #ifdef CONFIG_USB_EHCI_HCD
-#define CONFIG_USB_EHCI_PCI
 #define CONFIG_EHCI_HCD_INIT_AFTER_RESET
 #define CONFIG_PCI_EHCI_DEVICE			0
 #endif
@@ -374,14 +360,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 #define CONFIG_CMDLINE_EDITING			/* Command-line editing */
 #define CONFIG_AUTO_COMPLETE			/* add autocompletion support */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
-#if defined(CONFIG_CMD_KGDB)
-#define CONFIG_SYS_CBSIZE	1024		/* Console I/O Buffer Size */
-#else
-#define CONFIG_SYS_CBSIZE	256		/* Console I/O Buffer Size */
-#endif
-#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE+sizeof(CONFIG_SYS_PROMPT)+16) /* Print Buffer Size */
-#define CONFIG_SYS_MAXARGS	16		/* max number of command args */
-#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE	/* Boot Argument Buffer Size */
 
 /*
  * For booting Linux, the board info and command line data
@@ -417,8 +395,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 #define CONFIG_NETMASK	255.255.0.0
 
 #define CONFIG_LOADADDR	1000000	/*default location for tftp and bootm*/
-
-#undef	CONFIG_BOOTARGS		/* the boot command will set bootargs*/
 
 #define	CONFIG_EXTRA_ENV_SETTINGS				\
 "netdev=eth0\0"						\

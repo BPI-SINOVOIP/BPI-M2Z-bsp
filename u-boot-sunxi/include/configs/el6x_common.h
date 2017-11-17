@@ -56,9 +56,6 @@
 #define CONFIG_ENV_OVERWRITE
 #define CONFIG_MXC_UART_BASE	UART2_BASE
 
-/* Command definition */
-#undef CONFIG_CMD_IMLS
-
 #define CONFIG_BOARD_NAME	EL6Q
 
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
@@ -113,8 +110,6 @@
 /* environment organization */
 
 #define CONFIG_ENV_SIZE			(8 * 1024)
-
-#define CONFIG_ENV_IS_IN_MMC
 
 #if defined(CONFIG_ENV_IS_IN_MMC)
 #define CONFIG_SYS_MMC_ENV_DEV		1

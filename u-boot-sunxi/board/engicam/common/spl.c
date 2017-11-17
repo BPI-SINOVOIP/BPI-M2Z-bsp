@@ -20,8 +20,8 @@
 #include <asm/arch/mx6-pins.h>
 #include <asm/arch/sys_proto.h>
 
-#include <asm/imx-common/iomux-v3.h>
-#include <asm/imx-common/video.h>
+#include <asm/mach-imx/iomux-v3.h>
+#include <asm/mach-imx/video.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -38,6 +38,17 @@ static iomux_v3_cfg_t const uart_pads[] = {
 	IOMUX_PADS(PAD_UART1_RX_DATA__UART1_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL)),
 #endif
 };
+
+#ifdef CONFIG_SPL_OS_BOOT
+int spl_start_uboot(void)
+{
+	/* break into full u-boot on 'c' */
+	if (serial_tstc() && serial_getc() == 'c')
+		return 1;
+
+	return 0;
+}
+#endif
 
 #ifdef CONFIG_MX6QDL
 /*
@@ -332,17 +343,6 @@ static void ccgr_init(void)
 #endif
 }
 
-static void gpr_init(void)
-{
-	struct iomuxc *iomux = (struct iomuxc *)IOMUXC_BASE_ADDR;
-
-	/* enable AXI cache for VDOA/VPU/IPU */
-	writel(0xF00000CF, &iomux->gpr[4]);
-	/* set IPU AXI-id0 Qos=0xf(bypass) AXI-id1 Qos=0x7 */
-	writel(0x007F007F, &iomux->gpr[6]);
-	writel(0x007F007F, &iomux->gpr[7]);
-}
-
 static void spl_dram_init(void)
 {
 #ifdef CONFIG_MX6QDL
@@ -384,10 +384,4 @@ void board_init_f(ulong dummy)
 
 	/* DDR initialization */
 	spl_dram_init();
-
-	/* Clear the BSS. */
-	memset(__bss_start, 0, __bss_end - __bss_start);
-
-	/* load/boot image from boot device */
-	board_init_r(NULL, 0);
 }

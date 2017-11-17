@@ -22,13 +22,6 @@
 #define	CONFIG_SYS_TEXT_BASE	0x00800000
 #define CONFIG_SYS_TCLK		250000000	/* 250MHz */
 
-/*
- * Commands configuration
- */
-#define CONFIG_CMD_NAND
-#define CONFIG_CMD_PCI
-#define CONFIG_CMD_SATA
-
 /* I2C */
 #define CONFIG_SYS_I2C
 #define CONFIG_SYS_I2C_MVTWSI
@@ -45,7 +38,6 @@
 #define CONFIG_SF_DEFAULT_MODE		SPI_MODE_3
 
 /* Environment in SPI NOR flash */
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_OFFSET		(1 << 20) /* 1MiB in */
 #define CONFIG_ENV_SIZE			(64 << 10) /* 64KiB */
 #define CONFIG_ENV_SECT_SIZE		(64 << 10) /* 64KiB sectors */

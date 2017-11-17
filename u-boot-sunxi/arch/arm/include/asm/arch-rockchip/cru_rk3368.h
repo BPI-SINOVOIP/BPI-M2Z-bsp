@@ -51,8 +51,6 @@ check_member(rk3368_cru, emmc_con[1], 0x41c);
 
 struct rk3368_clk_priv {
 	struct rk3368_cru *cru;
-	ulong rate;
-	bool has_bwadj;
 };
 
 enum {
@@ -91,19 +89,31 @@ enum {
 	MCU_CLK_DIV_SHIFT		= 0,
 	MCU_CLK_DIV_MASK		= GENMASK(4, 0),
 
+	/* CLKSEL_CON25 */
+	CLK_SARADC_DIV_CON_SHIFT	= 8,
+	CLK_SARADC_DIV_CON_MASK		= GENMASK(15, 8),
+	CLK_SARADC_DIV_CON_WIDTH	= 8,
+
+	/* CLKSEL43_CON */
+	GMAC_MUX_SEL_EXTCLK             = BIT(8),
+
 	/* CLKSEL51_CON */
 	MMC_PLL_SEL_SHIFT		= 8,
 	MMC_PLL_SEL_MASK		= GENMASK(9, 8),
-	MMC_PLL_SEL_CPLL		= 0,
-	MMC_PLL_SEL_GPLL,
-	MMC_PLL_SEL_USBPHY_480M,
-	MMC_PLL_SEL_24M,
+	MMC_PLL_SEL_CPLL		= (0 << MMC_PLL_SEL_SHIFT),
+	MMC_PLL_SEL_GPLL                = (1 << MMC_PLL_SEL_SHIFT),
+	MMC_PLL_SEL_USBPHY_480M         = (2 << MMC_PLL_SEL_SHIFT),
+	MMC_PLL_SEL_24M                 = (3 << MMC_PLL_SEL_SHIFT),
 	MMC_CLK_DIV_SHIFT		= 0,
 	MMC_CLK_DIV_MASK		= GENMASK(6, 0),
 
 	/* SOFTRST1_CON */
 	MCU_PO_SRST_MASK		= BIT(13),
 	MCU_SYS_SRST_MASK		= BIT(12),
+	DMA1_SRST_REQ                   = BIT(2),
+
+	/* SOFTRST4_CON */
+	DMA2_SRST_REQ                   = BIT(0),
 
 	/* GLB_RST_CON */
 	PMU_GLB_SRST_CTRL_SHIFT		= 2,

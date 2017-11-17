@@ -33,10 +33,6 @@
 #define CONFIG_BOOTP_GATEWAY
 #define CONFIG_BOOTP_HOSTNAME
 
-/* Command line configuration */
-#define CONFIG_CMD_PCI
-#define CONFIG_CMD_REGINFO
-
 #define CONFIG_MCFFEC
 #ifdef CONFIG_MCFFEC
 #	define CONFIG_MII		1
@@ -99,15 +95,6 @@
 #define CONFIG_PRAM		512	/* 512 KB */
 #define CONFIG_SYS_LONGHELP		/* undef to save memory */
 
-#if defined(CONFIG_KGDB)
-#	define CONFIG_SYS_CBSIZE		1024	/* Console I/O Buffer Size */
-#else
-#	define CONFIG_SYS_CBSIZE		256	/* Console I/O Buffer Size */
-#endif
-
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE+sizeof(CONFIG_SYS_PROMPT)+16)	/* Print Buffer Size */
-#define CONFIG_SYS_MAXARGS		16	/* max number of command args */
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE	/* Boot Argument Buffer Size    */
 #define CONFIG_SYS_LOAD_ADDR		(CONFIG_SYS_SDRAM_BASE+0x20000)
 
 #define CONFIG_SYS_CLK			75000000
@@ -177,11 +164,10 @@
 /* Configuration for environment
  * Environment is embedded in u-boot in the second sector of the flash
  */
-#define CONFIG_ENV_IS_IN_FLASH	1
 
 #define LDS_BOARD_TEXT \
 	. = DEFINED(env_offset) ? env_offset : .; \
-	common/env_embedded.o (.text);
+	env/embedded.o(.text);
 
 #ifdef NORFLASH_PS32BIT
 #	define CONFIG_ENV_OFFSET		(0x8000)

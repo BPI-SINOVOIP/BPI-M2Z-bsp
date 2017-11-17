@@ -110,7 +110,6 @@
 #define CONFIG_SYS_NAND_BASE_LIST	{ CONFIG_SYS_NAND_BASE }
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_MTD_NAND_VERIFY_WRITE
-#define CONFIG_CMD_NAND
 
 #define CONFIG_SYS_NAND_BLOCK_SIZE	(128 * 1024)
 
@@ -152,7 +151,6 @@
 #define CONFIG_SYS_LS_MC_BOOT_TIMEOUT_MS 200000
 
 /* Store environment at top of flash */
-#define CONFIG_ENV_IS_NOWHERE		1
 #define CONFIG_ENV_SIZE			0x1000
 
 #endif /* __LS2_SIMU_H */

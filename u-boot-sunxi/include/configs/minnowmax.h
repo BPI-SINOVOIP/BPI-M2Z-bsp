@@ -15,16 +15,12 @@
 
 #define CONFIG_SYS_MONITOR_LEN		(1 << 20)
 
-#define CONFIG_SMSC_LPC47M
 #define CONFIG_MISC_INIT_R
 
 #define CONFIG_STD_DEVICES_SETTINGS	"stdin=usbkbd,serial\0" \
 					"stdout=vidconsole,serial\0" \
-					"stderr=vidconsole,serial\0"
-
-#define CONFIG_SCSI_DEV_LIST		\
-	{PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_VALLEYVIEW_SATA}, \
-	{PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_VALLEYVIEW_SATA_ALT}
+					"stderr=vidconsole,serial\0" \
+					"usb_pgood_delay=40\0"
 
 #define VIDEO_IO_OFFSET				0
 #define CONFIG_X86EMU_RAW_IO

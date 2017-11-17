@@ -14,6 +14,12 @@ source "arch/Kconfig"
 
 menu "General setup"
 
+config BROKEN
+	bool
+	help
+	  This option cannot be enabled. It is used as dependency
+	  for broken and incomplete features.
+
 config LOCALVERSION
 	string "Local version - append to U-Boot release"
 	help
@@ -95,6 +101,26 @@ config SYS_MALLOC_F_LEN
 	  particular needs this to operate, so that it can allocate the
 	  initial serial device and any others that are needed.
 
+config SPL_SYS_MALLOC_F_LEN
+        hex "Size of malloc() pool in SPL before relocation"
+        depends on SYS_MALLOC_F
+        default SYS_MALLOC_F_LEN
+        help
+          Before relocation, memory is very limited on many platforms. Still,
+          we can provide a small malloc() pool if needed. Driver model in
+          particular needs this to operate, so that it can allocate the
+          initial serial device and any others that are needed.
+
+config TPL_SYS_MALLOC_F_LEN
+        hex "Size of malloc() pool in TPL before relocation"
+        depends on SYS_MALLOC_F
+        default SYS_MALLOC_F_LEN
+        help
+          Before relocation, memory is very limited on many platforms. Still,
+          we can provide a small malloc() pool if needed. Driver model in
+          particular needs this to operate, so that it can allocate the
+          initial serial device and any others that are needed.
+
 menuconfig EXPERT
 	bool "Configure standard U-Boot features (expert users)"
 	default y
@@ -138,9 +164,25 @@ config PHYS_64BIT
 	  This can be used not only for 64bit SoCs, but also for
 	  large physical address extention on 32bit SoCs.
 
+config BUILD_ROM
+	bool "Build U-Boot as BIOS replacement"
+	depends on X86
+	help
+	  This option allows to build a ROM version of U-Boot.
+	  The build process generally requires several binary blobs
+	  which are not shipped in the U-Boot source tree.
+	  Please, see doc/README.x86 for details.
+
 endmenu		# General setup
 
 menu "Boot images"
+
+config ANDROID_BOOT_IMAGE
+	bool "Enable support for Android Boot Images"
+	default y if FASTBOOT
+	help
+	  This enables support for booting images which use the Android
+	  image format header.
 
 config FIT
 	bool "Support Flattened Image Tree"
@@ -246,7 +288,7 @@ config SPL_LOAD_FIT
 
 config SPL_FIT_IMAGE_POST_PROCESS
 	bool "Enable post-processing of FIT artifacts after loading by the SPL"
-	depends on SPL_LOAD_FIT && TI_SECURE_DEVICE
+	depends on SPL_LOAD_FIT
 	help
 	  Allows doing any sort of manipulation to blobs after they got extracted
 	  from the U-Boot FIT image like stripping off headers or modifying the
@@ -325,11 +367,13 @@ config SYS_EXTRA_OPTIONS
 config SYS_TEXT_BASE
 	depends on ARC || X86 || ARCH_UNIPHIER || ARCH_ZYNQMP || \
 		(M68K && !TARGET_ASTRO_MCF5373L) || MICROBLAZE || MIPS || \
-		ARCH_ZYNQ || ARCH_KEYSTONE
+		ARCH_ZYNQ || ARCH_KEYSTONE || ARCH_OMAP2PLUS
 	depends on !EFI_APP
 	hex "Text Base"
 	help
 	  TODO: Move CONFIG_SYS_TEXT_BASE for all the architecture
+
+	default 0x80800000 if ARCH_OMAP2PLUS
 
 
 config SYS_CLK_FREQ
@@ -358,6 +402,8 @@ source "disk/Kconfig"
 
 source "dts/Kconfig"
 
+source "env/Kconfig"
+
 source "net/Kconfig"
 
 source "drivers/Kconfig"
@@ -367,5 +413,3 @@ source "fs/Kconfig"
 source "lib/Kconfig"
 
 source "test/Kconfig"
-
-source "scripts/Kconfig"

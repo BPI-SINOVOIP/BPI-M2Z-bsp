@@ -24,7 +24,6 @@
 /*
  * Commands configuration
  */
-#define CONFIG_CMD_PCI
 
 /* I2C */
 #define CONFIG_SYS_I2C
@@ -54,7 +53,6 @@
 #define CONFIG_ENV_MIN_ENTRIES		128
 
 /* Environment in MMC */
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV		0
 #define CONFIG_ENV_SECT_SIZE		0x200
 #define CONFIG_ENV_SIZE			0x10000

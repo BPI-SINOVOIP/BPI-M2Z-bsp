@@ -166,7 +166,7 @@ static int fit_image_setup_sig(struct image_sign_info *info,
 	info->keyname = fdt_getprop(fit, noffset, "key-name-hint", NULL);
 	info->fit = fit;
 	info->node_offset = noffset;
-	info->name = algo_name;
+	info->name = strdup(algo_name);
 	info->checksum = image_get_checksum_algo(algo_name);
 	info->crypto = image_get_crypto_algo(algo_name);
 	info->require_keys = require_keys;
@@ -242,18 +242,19 @@ static int fit_image_process_sig(const char *keydir, void *keydest,
 	/* Get keyname again, as FDT has changed and invalidated our pointer */
 	info.keyname = fdt_getprop(fit, noffset, "key-name-hint", NULL);
 
-	if (keydest)
-		ret = info.crypto->add_verify_data(&info, keydest);
-	else
-		return -1;
-
 	/*
 	 * Write the public key into the supplied FDT file; this might fail
 	 * several times, since we try signing with successively increasing
 	 * size values
 	 */
-	if (keydest && ret)
-		return ret;
+	if (keydest) {
+		ret = info.crypto->add_verify_data(&info, keydest);
+		if (ret) {
+			printf("Failed to add verification data for '%s' signature node in '%s' image node\n",
+			       node_name, image_name);
+			return ret;
+		}
+	}
 
 	return 0;
 }
@@ -513,7 +514,7 @@ static int fit_config_get_data(void *fit, int conf_noffset, int noffset,
 	int ret, len;
 
 	conf_name = fit_get_name(fit, conf_noffset, NULL);
-	sig_name = fit_get_name(fit, conf_noffset, NULL);
+	sig_name = fit_get_name(fit, noffset, NULL);
 	debug("%s: conf='%s', sig='%s'\n", __func__, conf_name, sig_name);
 
 	/* Get a list of nodes we want to hash */
@@ -625,10 +626,8 @@ static int fit_config_process_sig(const char *keydir, void *keydest,
 	/* Write the public key into the supplied FDT file */
 	if (keydest) {
 		ret = info.crypto->add_verify_data(&info, keydest);
-		if (ret == -ENOSPC)
-			return -ENOSPC;
 		if (ret) {
-			printf("Failed to add verification data for '%s' signature node in '%s' image node\n",
+			printf("Failed to add verification data for '%s' signature node in '%s' configuration node\n",
 			       node_name, conf_name);
 		}
 		return ret;

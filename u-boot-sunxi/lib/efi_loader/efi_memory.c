@@ -43,7 +43,7 @@ void *efi_bounce_buffer;
  */
 struct efi_pool_allocation {
 	u64 num_pages;
-	char data[];
+	char data[] __aligned(ARCH_DMA_MINALIGN);
 };
 
 /*
@@ -356,7 +356,8 @@ efi_status_t efi_allocate_pool(int pool_type, unsigned long size,
 {
 	efi_status_t r;
 	efi_physical_addr_t t;
-	u64 num_pages = (size + sizeof(u64) + EFI_PAGE_MASK) >> EFI_PAGE_SHIFT;
+	u64 num_pages = (size + sizeof(struct efi_pool_allocation) +
+			 EFI_PAGE_MASK) >> EFI_PAGE_SHIFT;
 
 	if (size == 0) {
 		*buffer = NULL;
@@ -378,6 +379,9 @@ efi_status_t efi_free_pool(void *buffer)
 {
 	efi_status_t r;
 	struct efi_pool_allocation *alloc;
+
+	if (buffer == NULL)
+		return EFI_INVALID_PARAMETER;
 
 	alloc = container_of(buffer, struct efi_pool_allocation, data);
 	/* Sanity check, was the supplied address returned by allocate_pool */
@@ -406,14 +410,14 @@ efi_status_t efi_get_memory_map(unsigned long *memory_map_size,
 
 	*memory_map_size = map_size;
 
+	if (provided_map_size < map_size)
+		return EFI_BUFFER_TOO_SMALL;
+
 	if (descriptor_size)
 		*descriptor_size = sizeof(struct efi_mem_desc);
 
 	if (descriptor_version)
 		*descriptor_version = EFI_MEMORY_DESCRIPTOR_VERSION;
-
-	if (provided_map_size < map_size)
-		return EFI_BUFFER_TOO_SMALL;
 
 	/* Copy list into array */
 	if (memory_map) {
@@ -427,6 +431,8 @@ efi_status_t efi_get_memory_map(unsigned long *memory_map_size,
 			memory_map--;
 		}
 	}
+
+	*map_key = 0;
 
 	return EFI_SUCCESS;
 }

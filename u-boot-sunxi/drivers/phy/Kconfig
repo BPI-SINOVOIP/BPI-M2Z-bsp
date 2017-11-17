@@ -41,9 +41,27 @@ config PHY_SANDBOX
 	  This select a dummy sandbox PHY driver. It used only to implement
 	  the unit tests for the phy framework
 
+config NOP_PHY
+	bool "NOP PHY driver"
+	depends on PHY
+	help
+	  Support for a no-op PHY driver (stubbed PHY driver).
+
+	  This is useful when a driver uses the PHY framework but no real PHY
+	  hardware exists.
+
+config SPL_NOP_PHY
+	bool "NOP PHY driver in SPL"
+	depends on SPL_PHY
+	help
+	  Support for a no-op PHY driver (stubbed PHY driver) in the SPL.
+
+	  This is useful when a driver uses the PHY framework but no real PHY
+	  hardware exists.
+
 config PIPE3_PHY
 	bool "Support omap's PIPE3 PHY"
-	depends on PHY && ARCH_OMAP2
+	depends on PHY && ARCH_OMAP2PLUS
 	help
 	  Support for the omap PIPE3 phy for sata
 
@@ -52,11 +70,19 @@ config PIPE3_PHY
 
 config SPL_PIPE3_PHY
 	bool "Support omap's PIPE3 PHY in SPL"
-	depends on SPL_PHY && ARCH_OMAP2
+	depends on SPL_PHY && ARCH_OMAP2PLUS
 	help
 	  Support for the omap PIPE3 phy for sata in SPL
 
 	  This PHY is found on omap devices supporting SATA such as dra7, am57x
 	  and omap5
+
+config STI_USB_PHY
+	bool "STMicroelectronics USB2 picoPHY driver for STiH407 family"
+	depends on PHY && ARCH_STI
+	help
+	  This is the generic phy driver for the picoPHY ports
+	  used by USB2 and USB3 Host controllers available on
+	  STiH407 SoC families.
 
 endmenu

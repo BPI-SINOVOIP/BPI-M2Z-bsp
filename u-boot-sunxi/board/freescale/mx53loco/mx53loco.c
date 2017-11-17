@@ -14,9 +14,10 @@
 #include <asm/arch/iomux-mx53.h>
 #include <asm/arch/clock.h>
 #include <linux/errno.h>
-#include <asm/imx-common/mx5_video.h>
+#include <asm/mach-imx/mx5_video.h>
 #include <netdev.h>
 #include <i2c.h>
+#include <input.h>
 #include <mmc.h>
 #include <fsl_esdhc.h>
 #include <asm/gpio.h>
@@ -246,7 +247,7 @@ static int power_init(void)
 		if (!p)
 			return -ENODEV;
 
-		setenv("fdt_file", "imx53-qsb.dtb");
+		env_set("fdt_file", "imx53-qsb.dtb");
 
 		/* Set VDDA to 1.25V */
 		val = DA9052_BUCKCORE_BCOREEN | DA_BUCKCORE_VBCORE_1_250V;
@@ -289,7 +290,7 @@ static int power_init(void)
 		if (!p)
 			return -ENODEV;
 
-		setenv("fdt_file", "imx53-qsrb.dtb");
+		env_set("fdt_file", "imx53-qsrb.dtb");
 
 		/* Set VDDGP to 1.25V for 1GHz on SW1 */
 		pmic_reg_read(p, REG_SW_0, &val);

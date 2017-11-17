@@ -77,8 +77,6 @@
 #define CONFIG_FSL_PCIE_RESET		/* need PCIe reset errata */
 #define CONFIG_SYS_PCI_64BIT		/* enable 64-bit PCI resources */
 
-#define CONFIG_CMD_PCI
-
 /*
  * PCI Windows
  * Memory space is mapped 1-1, but I/O space must start from 0.
@@ -111,7 +109,6 @@
 #define CONFIG_L2_CACHE			/* toggle L2 cache */
 #define CONFIG_BTB			/* toggle branch predition */
 
-#define CONFIG_ADDR_STREAMING		/* toggle addr streaming */
 
 #define CONFIG_ENABLE_36BIT_PHYS
 
@@ -200,7 +197,6 @@
 #define CONFIG_SYS_NAND_BASE_LIST	{ CONFIG_SYS_NAND_BASE }
 
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_CMD_NAND
 #define CONFIG_SYS_NAND_BLOCK_SIZE	(1024 * 1024)
 
 /* 8Bit NAND Flash - K9F1G08U0B */
@@ -395,8 +391,6 @@
 #define TSEC2_FLAGS		(TSEC_GIGABIT | TSEC_REDUCED)
 
 #define CONFIG_ETHPRIME		"eTSEC1"
-
-#define CONFIG_PHY_GIGE
 #endif	/* CONFIG_TSEC_ENET */
 
 /*
@@ -404,7 +398,6 @@
  */
 #if defined(CONFIG_SYS_RAMBOOT)
 #if defined(CONFIG_RAMBOOT_SPIFLASH)
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SPI_BUS	0
 #define CONFIG_ENV_SPI_CS	0
 #define CONFIG_ENV_SPI_MAX_HZ	10000000
@@ -414,7 +407,6 @@
 #define CONFIG_ENV_SIZE		0x2000
 #endif
 #elif defined(CONFIG_NAND)
-#define CONFIG_ENV_IS_IN_NAND
 #ifdef CONFIG_TPL_BUILD
 #define CONFIG_ENV_SIZE		0x2000
 #define CONFIG_ENV_ADDR		(CONFIG_SYS_INIT_L2_ADDR + (160 << 10))
@@ -424,7 +416,6 @@
 #endif
 #define CONFIG_ENV_OFFSET	CONFIG_SYS_NAND_BLOCK_SIZE
 #else
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_ADDR	(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SECT_SIZE)
 #define CONFIG_ENV_SIZE		0x2000
 #define CONFIG_ENV_SECT_SIZE	0x20000
@@ -434,23 +425,12 @@
 #define CONFIG_SYS_LOADS_BAUD_CHANGE
 
 /*
- * Command line configuration.
- */
-#define CONFIG_CMD_REGINFO
-
-/*
  * Miscellaneous configurable options
  */
 #define CONFIG_SYS_LONGHELP			/* undef to save memory	*/
 #define CONFIG_CMDLINE_EDITING			/* Command-line editing */
 #define CONFIG_AUTO_COMPLETE			/* add autocompletion support */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
-
-#define CONFIG_SYS_CBSIZE	256		/* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-						/* Print Buffer Size */
-#define CONFIG_SYS_MAXARGS	16		/* max number of command args */
-#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE/* Boot Argument Buffer Size */
 
 /*
  * For booting Linux, the board info and command line data
