@@ -365,7 +365,7 @@ pwm_used = 0
 pwm_positive = port:PA06<3><0><default><default>
 
 [gmac0]
-gmac_used = 0
+gmac_used = 2
 gmac_rxd3 = port:PD00<2><default><3><default>
 gmac_rxd2 = port:PD01<2><default><3><default>
 gmac_rxd1 = port:PD02<2><default><3><default>
@@ -506,7 +506,7 @@ sdc_2xmode = 1
 sdc_ddrmode = 1
 
 [mmc2_para]
-sdc_used = 0
+sdc_used = 1
 sdc_detmode = 3
 sdc_buswidth = 8
 sdc_clk = port:PC05<3><1><2><default>

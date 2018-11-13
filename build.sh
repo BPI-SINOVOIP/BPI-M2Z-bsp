@@ -89,7 +89,7 @@ case $BOARD in
   BPI-M2P*)
     board="bpi-m2p"
     kernel="3.4.113-BPI-M2P-Kernel"
-    BOOT_PACK_P=$T/sunxi-pack/chips/${MACH}/configs/default/linux
+    BOOT_PACK_P=$T/sunxi-pack/chips/${MACH}/configs/${BOARD}/linux
     ;;
   BPI-M2Z*)
     board="bpi-m2z"
@@ -131,7 +131,6 @@ echo -e "\033[31m Now building...\033[0m"
 echo
 case $mode in
 	1) make && 
-	   make pack && 
 	   cp_download_files;;
 	2) make u-boot;;
 	3) make kernel;;
